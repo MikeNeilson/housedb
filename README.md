@@ -32,3 +32,11 @@ Valid types are:
  - Min
  - Max
  - Total
+
+The three primary function are 
+
+| Function | Descrption |
+| create_timeseries | creates a time series, without data, in the database|
+| store_timeseries_data| stores data into the database, creating a time series as needed |
+| retrieve_timeseries_data| retrieve data from the database|
+| catalog | lists the available time series in the database|
