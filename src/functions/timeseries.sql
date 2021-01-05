@@ -21,19 +21,22 @@ DECLARE
 	duration_id integer;
 	version text;
 BEGIN
+    RAISE NOTICE 'Creating or returning ID for %s', $1;
+
 	SELECT id INTO ts_id FROM catalog WHERE UPPER($1)=UPPER(quote_literal(timeseries_name));
-	IF FOUND THEN
+	
+    IF FOUND THEN
 		RETURN ts_id;
 	ELSE
-		ts_parts = regexp_split_to_array($1,',');
-		zone = ts_parts[0];
-		location = ts_parts[1];
-		param = ts_parts[2];
-		data_type = ts_parts[3];
-		_interval = ts_parts[4];
-		duration = ts_parts[5];
-		version = ts_parts[6];
-
+        select regexp_split_to_array($1,'\.') into ts_parts;		
+		zone := ts_parts[1];        
+		location := ts_parts[2];
+		param := ts_parts[3];
+		data_type := ts_parts[4];
+		_interval := ts_parts[5];
+		duration := ts_parts[6];
+		version := ts_parts[7];
+        
 		SELECT id into zone_id FROM zones WHERE UPPER(name)=UPPER(quote_literal(zone));
 		IF NOT FOUND THEN
 			INSERT INTO zones(name) values ( quote_literal(zone) ) RETURNING ID into zone_id;
