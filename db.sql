@@ -15,19 +15,6 @@ SET client_min_messages = warning;
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
-
---
--- Name: plpythonu; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: -
---
-
-CREATE OR REPLACE PROCEDURAL LANGUAGE plpythonu;
-
 
 SET search_path = public, pg_catalog;
 
@@ -36,10 +23,8 @@ SET search_path = public, pg_catalog;
 --
 CREATE role housedb_owner;
 CREATE DATABASE housedb OWNER housedb_owner;
-\c housedb
-GRANT CREATE TABLE,TYPE,PROCEDURE to housedb_owner;
 SET SESSION AUTHORIZATION housedb_owner;
-
+\c housedb
 
 CREATE TYPE data_triple AS (
 	date_time timestamp with time zone,
@@ -47,128 +32,82 @@ CREATE TYPE data_triple AS (
 	quality integer
 );
 
-
 --
 -- Name: create_timeseries(character varying); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION create_timeseries(ts_name character varying) RETURNS bigint
-    LANGUAGE plpythonu
-    AS $_$
-if 'check_catalog' in SD:
-	check_catalog = SD["check_catalog"]
-	add_ts = SD["add_ts"]
-else:
-	check_catalog = plpy.prepare( "select id from catalog where upper($1)=upper(timeseries_name)", ["varchar",] )
-	add_ts = plpy.prepare( "insert into timeseries(zone,location,parameter,type,interval,duration,version) values($1,$2,$3,$4,$5,$6,$7)", ["int", "int", "int", "int", "int", "int", "varchar"])
-	SD["check_catalog"] = check_catalog
-	SD["add_ts"] = add_ts
+AS  $$
+DECLARE    
+	ts_id integer;
+	ts_parts text[];
+	zone text;
+	zone_id integer;
+	location text;
+	location_id integer;
+	param text;
+	param_id integer;
+	data_type text;
+	data_type_id integer;
+	_interval text;
+	interval_id integer;	
+	duration text;
+	duration_id integer;
+	version text;
+BEGIN
+	SELECT id INTO ts_id FROM catalog WHERE UPPER($1)=UPPER(quote_literal(timeseries_name));
+	IF FOUND THEN
+		RETURN ts_id;
+	ELSE
+		ts_parts = regexp_split_to_array(ts_name,',');
+		zone = ts_parts[0];
+		location = ts_parts[1];
+		param = ts_parts[2];
+		data_type = ts_parts[3];
+		_interval = ts_parts[4];
+		duration = ts_parts[5];
+		version = ts_parts[6];
 
+		SELECT id into zone_id FROM zones WHERE UPPER(name)=UPPER(quote_literal(zone));
+		IF NOT FOUND THEN
+			INSERT INTO zones(name) values ( quote_literal(zone) ) RETURNING ID into zone_id;
+		END IF;
 
-result = plpy.execute(check_catalog, [ts_name,] )
-if result.nrows() > 0:
-	return result[0]["id"]
-else:
-	plpy.log("creating new time series: " + ts_name );
-	# now we build a new one
-	zone,location,parameter,type,interval,duration,version = ts_name.split('.')
-	
-	# check for the zone
-	plpy.log("Checking for zone '%s'" % zone )
-	result = plpy.execute( "select id from zones where upper(name)=upper(%s)" % plpy.quote_literal(zone) )
-	plpy.log("Number of Rows: " + str(result.nrows() ) )	
-	if result.nrows() == 1:
-		plpy.debug( "Using existing zone" )
-		zone_id = result[0]["id"]
-	else:
-		plpy.log( "Creating new zone: " + zone )
-		result = plpy.execute("insert into zones(name) values( %s )" % plpy.quote_literal( zone ) )
-		# now get the id we just created
-		result = plpy.execute( "select id from zones where upper(name)=upper(%s)" % plpy.quote_literal(zone) )
-		zone_id = result[0]["id"]
-		plpy.log("new zone id: " + str(zone_id) )
+		SELECT id into location_id FROM locations WHERE UPPER(name)=UPPER(quote_literal(location));
+		IF NOT FOUND THEN
+			INSERT INTO locations(name) values (quote_literal(location)) RETURNING ID into location_id;
+		END IF;
 
-	plpy.log("Checking for Location '%s'" % location )
-	result = plpy.execute( "select id from locations where upper(name)=upper(%s)" % plpy.quote_literal(location) )
-	if result.nrows() == 1:
-		plpy.debug( "Using existing zone" )
-		location_id = result[0]["id"]
-	else:
-		plpy.log( "Creating new location: " + location )
-		result = plpy.execute("insert into locations(name) values( %s )" % plpy.quote_literal( location ) )
-		result = plpy.execute("select id from locations where upper(name)=upper(%s)" % plpy.quote_literal(location) )
-		location_id = result[0]["id"]
-		plpy.log("new location id: " + str(location_id ) )
+		SELECT id INTO param_id FROM parameters WHERE UPPER(name)=UPPER(quote_literal(param));
+		IF NOT FOUND THEN
+			INSERT INTO parameters(name,units) values (quote_literal(param),'raw') RETURNING ID into param_id;
+		END IF;
+		
+		SELECT id INTO data_type_id FROM types where UPPER(name)=UPPER(data_type);
+		IF NOT FOUND THEN
+			RAISE EXCEPTION 'Type % not defined in this system', data_type;
+		END IF;
 
+		SELECT id INTO interval_id FROM intervals where UPPER(name)=UPPER(_interval);
+		IF NOT FOUND THEN
+			RAISE EXCEPTION 'Interval % not defined in this system', _interval;
+		END IF;
 
-	plpy.log("Checking for Parameter '%s'" % parameter )
-	result = plpy.execute( "select id from parameters where upper(name)=upper(%s)" % plpy.quote_literal(parameter) )
-	if result.nrows() == 1:
-		plpy.log("Parameter exists, using")
-		parameter_id = result[0]["id"]
-	else:
-		plpy.log("creating new parameter with 'raw' units")
-		result = plpy.execute( "insert into parameters(name,units) values( %s, 'raw')"% plpy.quote_literal(parameter) )
-		result = plpy.execute( "select id from parameters where upper(name)=upper(%s)" % plpy.quote_literal(parameter) )
-		parameter_id = result[0]["id"]
+		SELECT id INTO duration_id FROM durations where UPPER(name)=UPPER(duration);
+		IF NOT FOUND THEN
+			RAISE EXCEPTION 'Duration % not defined in this system', duration;
+		END IF;
 
-	plpy.log("Checking for type '%s'" % type )
-	result = plpy.execute( "select id from types where upper(name)=upper(%s)" % plpy.quote_literal(type) )
-	if result.nrows() == 1:
-		plpy.log("Type available, using")
-		type_id = result[0]["id"]
-	else:
-		plpy.fatal( 'Type not defined in this system' )
+		INSERT INTO timeseries(zone_id,location_id,parameter_id,type_id,interval_id,duration_id,version)
+		VALUES (zone_id,lcoation_Id,parameter_id,type_id,interval_id,duration_id,version) RETURNING id INTO ts_id;
 
+		RETURN ts_id;
 
-	plpy.log("Checking interval '%s'" % interval )
-	result = plpy.execute( "select id from intervals where upper(name)=upper(%s)" % plpy.quote_literal(interval) )
-	if result.nrows() == 1:
-		plpy.log("Interval Allowed" )
-		interval_id = result[0]["id"]
-	else:
-		plpy.fatal('Interval not defined')
-	
-	plpy.log("Checking duration '%s'" % duration )
-	result = plpy.execute( "select id from intervals where upper(name)=upper(%s)" % plpy.quote_literal(duration) )
-	if result.nrows() == 1:
-		plpy.log("Duration Allowed" )
-		duration_id = result[0]["id"]
-	else:
-		plpy.fatal('Duration not defined' )
-
-	plpy.log( "Creating new time series with the following values \n %s => %d.%d.%d.%d.%d.%d.%s" % (ts_name,zone_id,location_id,parameter_id,type_id,interval_id,duration_id,version) )
-	result = plpy.execute(add_ts, [zone_id,location_id,parameter_id,type_id,interval_id,duration_id,version] )
-	#result = plpy.execute("select id from timeseries where zone=%d and location=%d and parameter=%d and type=%d and interval=%d and duration=%d and version=%s" % (zone_id,location_id,parameter_id,type_id,interval_id,duration_id,plpy.quote_literal(version) ) )
-	result = plpy.execute(check_catalog, [ts_name,] )
-	return result[0]["id"]
-	#return -1
-
-
-$_$;
-
-
---
--- Name: get_interval(character varying); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION get_interval(ts_name character varying) RETURNS integer
-    LANGUAGE plpythonu
-    AS $_$
-if SD.has_key('get_interval'):
-	get_interval = SD['get_interval']
-else:
-	get_interval = plpy.prepare("select id from intervals where upper(name) = upper($1)", ["varchar",] )
-	SD['get_interval'] = get_interval
-plpy.log( ts_name )
-zone,location,parameter,_type,interval,duration,version = ts_name.split(".")
-	
-plpy.log('getting id/time for interval named' + interval )
-results = plpy.execute( get_interval, [interval] )
-return results[0]["id"]
-
-
-$_$;
+	END IF;
+END;
+$$
+LANGUAGE 'plpgsql';
+\q
 
 
 --
@@ -178,6 +117,14 @@ $_$;
 CREATE FUNCTION retreive_timeseries_data(ts_name character varying, start_time timestamp with time zone, end_time timestamp with time zone, excludenulls boolean DEFAULT false) RETURNS SETOF data_triple
     LANGUAGE plpythonu
     AS $_$
+DECLARE
+	ts_id integer;
+	data_triple thedata;
+BEGIN
+	select id into ts_id from catalog where UPPER(timeseries_name)=UPPER($1);
+	IF NOT FOUND THEN
+		RAISE EXCEPTIOn 'TimeSeries, %s, not found', $1;
+	END IF;
 	import time
 	import datetime
 	from dateutil.rrule import *
