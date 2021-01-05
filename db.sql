@@ -34,6 +34,12 @@ SET search_path = public, pg_catalog;
 --
 -- Name: data_triple; Type: TYPE; Schema: public; Owner: -
 --
+CREATE role housedb_owner;
+CREATE DATABASE housedb OWNER housedb_owner;
+\c housedb
+GRANT CREATE TABLE,TYPE,PROCEDURE to housedb_owner;
+SET SESSION AUTHORIZATION housedb_owner;
+
 
 CREATE TYPE data_triple AS (
 	date_time timestamp with time zone,
