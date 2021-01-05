@@ -23,7 +23,7 @@ DECLARE
 BEGIN
     RAISE NOTICE 'Creating or returning ID for %s', $1;
 
-	SELECT id INTO ts_id FROM catalog WHERE UPPER($1)=UPPER(quote_literal(timeseries_name));
+	SELECT id INTO ts_id FROM catalog WHERE UPPER($1)=UPPER(timeseries_name);
 	
     IF FOUND THEN
 		RETURN ts_id;
@@ -37,19 +37,20 @@ BEGIN
 		duration := ts_parts[6];
 		version := ts_parts[7];
         
-		SELECT id into zone_id FROM zones WHERE UPPER(name)=UPPER(quote_literal(zone));
+		SELECT id into zone_id FROM zones WHERE UPPER(name)=UPPER(zone);
 		IF NOT FOUND THEN
-			INSERT INTO zones(name) values ( quote_literal(zone) ) RETURNING ID into zone_id;
+			INSERT INTO zones(name) values ( zone ) RETURNING ID into zone_id;
+            RAISE NOTICE 'Added zone % with id %', zone,zone_id;
 		END IF;
 
-		SELECT id into location_id FROM locations WHERE UPPER(name)=UPPER(quote_literal(location));
+		SELECT id into location_id FROM locations WHERE UPPER(name)=UPPER(location);
 		IF NOT FOUND THEN
-			INSERT INTO locations(name) values (quote_literal(location)) RETURNING ID into location_id;
+			INSERT INTO locations(name) values (location) RETURNING ID into location_id;
 		END IF;
 
-		SELECT id INTO param_id FROM parameters WHERE UPPER(name)=UPPER(quote_literal(param));
+		SELECT id INTO param_id FROM parameters WHERE UPPER(name)=UPPER(param);
 		IF NOT FOUND THEN
-			INSERT INTO parameters(name,units) values (quote_literal(param),'raw') RETURNING ID into param_id;
+			INSERT INTO parameters(name,units) values (param,'raw') RETURNING ID into param_id;
 		END IF;
 		
 		SELECT id INTO data_type_id FROM types where UPPER(name)=UPPER(data_type);
@@ -62,13 +63,13 @@ BEGIN
 			RAISE EXCEPTION 'Interval % not defined in this system', _interval;
 		END IF;
 
-		SELECT id INTO duration_id FROM durations where UPPER(name)=UPPER(duration);
+		SELECT id INTO duration_id FROM intervals where UPPER(name)=UPPER(duration);
 		IF NOT FOUND THEN
 			RAISE EXCEPTION 'Duration % not defined in this system', duration;
 		END IF;
 
 		INSERT INTO timeseries(zone_id,location_id,parameter_id,type_id,interval_id,duration_id,version)
-		VALUES (zone_id,lcoation_Id,parameter_id,type_id,interval_id,duration_id,version) RETURNING id INTO ts_id;
+		VALUES (zone_id,location_id,param_id,data_type_id,interval_id,duration_id,version) RETURNING id INTO ts_id;
 
 		RETURN ts_id;
 
