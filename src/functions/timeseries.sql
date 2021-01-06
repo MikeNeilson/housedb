@@ -77,6 +77,61 @@ BEGIN
 END;
 $$
 LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION store_timeseries_data(ts_name character varying, data data_triple[] ) RETURNS bigint AS $$
+BEGIN  
+    RETURN store_timeseries_data($1,$2,false);
+END;
+$$
+LANGUAGE 'plpgsql';
+
+CREATE FUNCTION store_timeseries_data(ts_name character varying, data data_triple[], overwrite boolean DEFAULT false) RETURNS bigint    
+    AS $$
+DECLARE
+    ts_id bigint;
+    tuple data_triple;
+BEGIN
+    SELECT create_timeseries($1) INTO ts_id;
+    
+    FOREACH tuple IN array $2 LOOP
+        INSERT INTO timeseries_values(ts_id,date_time,value,quality) VALUES (ts_id,tuple.date_time,tuple.value,tuple.quality);
+    END LOOP;
+
+    RETURN ts_id;
+    /*
+	insert_value = plpy.prepare( "insert into timeseries_values(timeseries_id,date_time,value,quality) values($1,$2,$3,$4)", ["bigint", "timestamp with time zone","double precision","int"] )
+	delete_value = plpy.prepare( "delete from timeseries_values where timeseries_id=$1 and date_time=$2", ["bigint","timestamp with time zone"] )
+	SD['add_ts'] = add_ts
+	SD['insert_value'] = insert_value
+	SD['delete_value'] = delete_value
+
+# just run create_timeseries, if it exits it will just return the name
+result = plpy.execute( add_ts, [ts_name] )
+plpy.log(repr(result[0].keys() ) )
+ts_id = result[0]["create_timeseries"]
+plpy.log("Storing data as time series id %d" % ts_id )
+		
+with plpy.subtransaction():
+	for i in range(0, len(data) ):
+		try:
+			plpy.log( repr(data[i] ) )
+			_data = data[i].replace("(","").replace(")","").split(",")
+			result = plpy.execute( insert_value, [ts_id, _data[0], float(_data[1]), int(_data[2]) ] )
+		except Exception,err:
+			plpy.log( repr(err) + " : " + str(err) )
+			if overwrite == True:
+				plpy.log( "deleting previous value" );
+				# delete the value first
+				result = plpy.execute( delete_value, [ts_id, _data[0] ] )
+				result = plpy.execute( insert_value, [ts_id, _data[0], float(_data[1]), int(_data[2]) ] )
+return ts_id
+*/
+END;
+$$
+LANGUAGE 'plpgsql';
+
+
+
 \q
 
 
@@ -167,43 +222,7 @@ $_$;
 -- Name: store_timeseries_data(character varying, data_triple[], boolean); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION store_timeseries_data(ts_name character varying, data data_triple[], overwrite boolean DEFAULT false) RETURNS bigint
-    LANGUAGE plpythonu
-    AS $_$
-if SD.has_key('add_ts'):
-	add_ts = SD['add_ts']
-	insert_value = SD['insert_value']
-	delete_value = SD['delete_value']
-else:
-	add_ts = plpy.prepare( "select create_timeseries($1)", ["varchar"] )
-	insert_value = plpy.prepare( "insert into timeseries_values(timeseries_id,date_time,value,quality) values($1,$2,$3,$4)", ["bigint", "timestamp with time zone","double precision","int"] )
-	delete_value = plpy.prepare( "delete from timeseries_values where timeseries_id=$1 and date_time=$2", ["bigint","timestamp with time zone"] )
-	SD['add_ts'] = add_ts
-	SD['insert_value'] = insert_value
-	SD['delete_value'] = delete_value
 
-# just run create_timeseries, if it exits it will just return the name
-result = plpy.execute( add_ts, [ts_name] )
-plpy.log(repr(result[0].keys() ) )
-ts_id = result[0]["create_timeseries"]
-plpy.log("Storing data as time series id %d" % ts_id )
-		
-with plpy.subtransaction():
-	for i in range(0, len(data) ):
-		try:
-			plpy.log( repr(data[i] ) )
-			_data = data[i].replace("(","").replace(")","").split(",")
-			result = plpy.execute( insert_value, [ts_id, _data[0], float(_data[1]), int(_data[2]) ] )
-		except Exception,err:
-			plpy.log( repr(err) + " : " + str(err) )
-			if overwrite == True:
-				plpy.log( "deleting previous value" );
-				# delete the value first
-				result = plpy.execute( delete_value, [ts_id, _data[0] ] )
-				result = plpy.execute( insert_value, [ts_id, _data[0], float(_data[1]), int(_data[2]) ] )
-return ts_id
-
-$_$;
 
 
 --
