@@ -1,4 +1,4 @@
-name: PostgreSQL service example
+name: HouseDB tests
 on: push
 
 jobs:
