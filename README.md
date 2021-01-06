@@ -4,7 +4,7 @@
 # Description
 -----------
 
-This is a database create to store time series database for a smart home project.
+This is a database create to store time series database for monitoring my home and garden.
 
 
 # How to Use
