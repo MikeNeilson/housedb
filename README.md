@@ -1,14 +1,14 @@
-House TSDB
-===========
+# House TSDB
 
-Description
+
+# Description
 -----------
 
 This is a database create to store time series database for a smart home project.
 
 
-How to Use
-===========
+# How to Use
+
 
 There are a few support function and some views, these should be used to interact with the database.
 A time series is identified with the following format:
@@ -41,3 +41,9 @@ The three primary function are
 | store_timeseries_data| stores data into the database, creating a time series as needed |
 | retrieve_timeseries_data| retrieve data from the database|
 | catalog | lists the available time series in the database|
+
+
+# Why another Timseries database in SQL
+
+Wanted simple database for home/garden automation. I'm familiar with SQL and wanted to work with it more. 
+And I wanted a place to expirement with how timeseries data interacts with an RDBMS.
