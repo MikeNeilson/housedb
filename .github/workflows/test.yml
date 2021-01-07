@@ -1,5 +1,7 @@
 name: HouseDB tests
 on: push
+# includes code from https://github.com/francois2metz/pgtap-github-actions/blob/master/.github/workflows/pgtest.yml
+# francois2metz
 
 jobs:
   # Label of the container job
@@ -29,6 +31,23 @@ jobs:
       # Downloads a copy of the code in your repository before running CI tests
       - name: Check out repository code
         uses: actions/checkout@v2
+      - name: Install pg_prove
+        run: sudo cpan TAP::Praser::SourceHandler::pgTAP
+        env:
+          SHELL: /bin/bash
+      - name: Install postgres dev
+        run: sudo apt-get install -y --no-install-recommends postgresql-server-dev-all
+      - name: Checkout pgTAP
+        uses: actions/checkout@v2
+        with:
+          repository: theory/pgtap
+          path: pgtap
+          ref: v1.1.0
+      - name: install pgtap
+        working-directory: pgtap
+        run: make && psql --host posgres --username postgres --dbname postgres --file sql/pgtap.sql
+        env:
+          PGPASSWORD: postgres
       - name: Install database schema
         # Runs a script that creates a PostgreSQL client, populates
         # the client with data, and retrieves data
@@ -39,3 +58,7 @@ jobs:
           POSTGRES_HOST: postgres
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
+      - name: Run tests
+        run: pg_prove --host postgres -dbname postgres --suername postgres src/test/*_test.sql
+        env:
+          PGPASSWORD: postgres
