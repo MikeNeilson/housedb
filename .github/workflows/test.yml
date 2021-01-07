@@ -32,7 +32,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
       - name: Install pg_prove
-        run: sudo cpan TAP::Praser::SourceHandler::pgTAP
+        run: sudo cpan TAP::Parser::SourceHandler::pgTAP
         env:
           SHELL: /bin/bash
       - name: Install postgres dev
