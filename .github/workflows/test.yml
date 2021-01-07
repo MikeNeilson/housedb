@@ -43,7 +43,7 @@ jobs:
           ref: v1.1.0
       - name: install pgtap
         working-directory: pgtap
-        run: make && psql --host posgres --username postgres --dbname postgres --file sql/pgtap.sql
+        run: make && psql --host postgres --username postgres --dbname postgres --file sql/pgtap.sql
         env:
           PGPASSWORD: postgres
       - name: Install database schema
