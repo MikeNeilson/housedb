@@ -1,5 +1,5 @@
 insert into parameters(name) values 
-('Moisture'),
-('Precip'),
-('temp-Air'),
-('Temp-Soil');
+('Moisture','%'),
+('Precip','in'),
+('temp-Air','degC'),
+('Temp-Soil','degC');

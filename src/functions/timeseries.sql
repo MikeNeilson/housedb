@@ -42,17 +42,17 @@ BEGIN
 			INSERT INTO zones(name) values ( zone ) RETURNING ID into zone_id;
             RAISE NOTICE 'Added zone % with id %', zone,zone_id;
 		END IF;
-		RAISE NOTICE 'checking location';
+		
 		SELECT id into location_id FROM locations WHERE UPPER(name)=UPPER(location);
 		IF NOT FOUND THEN
 			INSERT INTO locations(name) values (location) RETURNING ID into location_id;
-			RAISE NOTICE 'Added location %s with id %, location,location_id;
+			RAISE NOTICE 'Added location %s with id %', location,location_id;
 		END IF;
 
 		SELECT id INTO param_id FROM parameters WHERE UPPER(name)=UPPER(param);
 		IF NOT FOUND THEN
 			INSERT INTO parameters(name,units) values (param,'raw') RETURNING ID into param_id;
-			RAISE NOTICE 'Added parameter %s with id %, param, param_id;
+			RAISE NOTICE 'Added parameter %s with id %', param, param_id;
 		END IF;
 		
 		SELECT id INTO data_type_id FROM types where UPPER(name)=UPPER(data_type);
