@@ -45,7 +45,7 @@ jobs:
           ref: v1.1.0
       - name: install pgtap
         working-directory: pgtap
-        run: make && psql --host localhost --username postgres --dbname postgres --file sql/pgtap.sql
+        run: make && psql --host localhost --username postgres --dbname template1 --file sql/pgtap.sql
         env:
           PGPASSWORD: postgres
       - name: Install database schema
@@ -58,7 +58,12 @@ jobs:
           POSTGRES_HOST: postgres
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
-      - name: Run tests
-        run: pg_prove --host localhost -dbname housedb --username postgres src/test/*_test.sql
+      - name: Install tests
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -w -f install_tests.sql
         env:
-          PGPASSWORD: postgres
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+      - name: Run tests
+        run: pg_prove --host localhost -dbname housedb --username housedb_user --runtests --schema housedb_tests
+        env:
+          PGPASSWORD: testpassword
