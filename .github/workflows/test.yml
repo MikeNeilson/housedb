@@ -64,6 +64,6 @@ jobs:
           POSTGRES_HOST: postgres
           POSTGRES_PORT: 5432
       - name: Run tests
-        run: pg_prove --host localhost -dbname housedb --username housedb_user --runtests --schema housedb_tests
+        run: pg_prove --host localhost --dbname housedb --username housedb_user --runtests --schema housedb_tests
         env:
           PGPASSWORD: testpassword
