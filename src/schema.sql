@@ -22,7 +22,7 @@ SET search_path = public, pg_catalog;
 -- Name: data_triple; Type: TYPE; Schema: public; Owner: -
 --
 CREATE role housedb_owner;
-CREATE role housedb_user;
+CREATE ROLE housedb_user WITH PASSWORD 'testpassword' LOGIN;
 CREATE DATABASE housedb OWNER housedb_owner;
 SET SESSION AUTHORIZATION housedb_owner;
 \c housedb
