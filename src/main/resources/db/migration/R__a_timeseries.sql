@@ -21,6 +21,7 @@ DECLARE
 	duration_id integer;
 	version text;
 BEGIN
+	SET search_path TO housedb,public;
     RAISE NOTICE 'Creating or returning ID for %s', $1;
 
 	SELECT id INTO ts_id FROM catalog WHERE UPPER($1)=UPPER(timeseries_name);
@@ -87,7 +88,7 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE FUNCTION store_timeseries_data(ts_name character varying, data data_triple[], overwrite boolean DEFAULT false) RETURNS bigint    
+CREATE OR REPLACE FUNCTION store_timeseries_data(ts_name character varying, data data_triple[], overwrite boolean DEFAULT false) RETURNS bigint    
     AS $$
 DECLARE
     ts_id bigint;

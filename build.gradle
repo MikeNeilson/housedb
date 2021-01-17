@@ -5,14 +5,34 @@ buildscript{
 }
 
 plugins {
-    id 'java'
+    //id 'java'
     id "org.flywaydb.flyway" version "7.5.0"
 }
 
 flyway {
-    url = DBURL
+    url = "jdbc:postgresql://$PGHOST:$PGPORT/$PGDATABASE"
     user = DBUSER
     password = DBPASSWORD
     mixed = true
     schemas = ['housedb']
+}
+
+
+task setup_tests( type: Exec ){
+    environment 'PGPASSWORD', DBPASSWORD    
+    commandLine "psql", "-h", "$PGHOST", "-p", "$PGPORT", "-d", "$PGDATABASE", "-U", "$DBUSER", "-f", "src/test/sql/install_tests.sql"
+}
+
+task teardown_tests(type: Exec ){
+    environment 'PGPASSWORD', DBPASSWORD
+    commandLine "psql", "-h", "$PGHOST", "-p", "$PGPORT", "-d", "$PGDATABASE", "-U", "$DBUSER", "-f", "src/test/sql/remove_tests.sql"
+}
+
+task test( type: Exec ){
+    dependsOn setup_tests
+
+    environment 'PGPASSWORD', "testpassword"
+    commandLine "pg_prove", "--host", PGHOST, "--port", PGPORT, "--dbname", PGDATABASE, "--username", "housedb_user", "--runtests", "--schema", "housedb_tests"
+
+    finalizedBy teardown_tests
 }
