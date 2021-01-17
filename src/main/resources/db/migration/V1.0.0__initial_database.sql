@@ -20,7 +20,6 @@ SET search_path = public, pg_catalog;
 
 --
 --CREATE role housedb_owner;
-CREATE ROLE housedb_user WITH PASSWORD 'testpassword' LOGIN;
 --CREATE DATABASE housedb OWNER housedb_owner;
 --SET SESSION AUTHORIZATION housedb_owner;
 
