@@ -1,0 +1,1 @@
+drop schema housedb_tests cascade;
