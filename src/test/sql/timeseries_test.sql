@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE FUNCTION housedb_tests.test_timeseries()
+CREATE OR REPLACE FUNCTION housedb_tests.test_create_timeseries()
 RETURNS SETOF TEXT AS $$
 DECLARE
     tsid1 bigint;
@@ -14,3 +14,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION housedb_tests.test_store_timeseries()
+RETURNS SETOF TEXT AS $$
+DECLARE
+    inputdata housedb.data_triple[];
+    tsid varchar(255) = 'Test1.Test1.Precip.Total.0.0.raw';
+    thecount int;
+BEGIN
+    inputdata = array[ ('2020-01-17T17:00:00Z-08:00',0,0), ('2020-01-17T08:00:00Z-08:00',0,0) ];
+    housedb.store_timeseries_data(tsid, inputdata);
+    SELECT count(*) into thecount from hosuedb.timeseries_values;
+    RETURN NEXT is( thecount, 2 );
+END;
+$$ LANGUAGE plpgsql;

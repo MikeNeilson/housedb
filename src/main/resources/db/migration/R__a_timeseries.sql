@@ -81,13 +81,6 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION store_timeseries_data(ts_name character varying, data data_triple[] ) RETURNS bigint AS $$
-BEGIN  
-    RETURN store_timeseries_data($1,$2,false);
-END;
-$$
-LANGUAGE 'plpgsql';
-
 CREATE OR REPLACE FUNCTION store_timeseries_data(ts_name character varying, data data_triple[], overwrite boolean DEFAULT false) RETURNS bigint    
     AS $$
 DECLARE
