@@ -13,7 +13,7 @@ This is a database create to store time series database for monitoring my home a
 There are a few support function and some views, these should be used to interact with the database.
 A time series is identified with the following format:
 
-	Zone.Specifc Station/Sensor.Measurement Name.Type.Interval.Duration.Version
+	Location[-Sublocation[.. up to 10 deep]].Measurement Name.Type.Interval.Duration.Version
 
 For example:
 
@@ -37,10 +37,12 @@ The three primary function are
 
 | Function | Descrption |
 | -------- | ---------- |
-| create_timeseries | creates a time series, without data, in the database|
-| store_timeseries_data| stores data into the database, creating a time series as needed |
-| retrieve_timeseries_data| retrieve data from the database|
+| create_timeseries(ts_name text) | creates a time series, without data, in the database|
+| store_timeseries_data(ts_name, array of (time timestamp,value double,quality integer)| stores data into the database, creating a time series as needed |
+| retrieve_timeseries_data(ts_name, start, end)| retrieve data from the database|
 | catalog | lists the available time series in the database|
+|create_location(location_name) | Inserts a new location in the locations table, creating all the intermediate locations as required.|
+|expend_location_name(location_id) | Takes the lowested level location and expands out it's parents|
 
 
 # Why another Timseries database in SQL

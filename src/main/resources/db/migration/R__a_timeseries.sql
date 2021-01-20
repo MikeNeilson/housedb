@@ -21,39 +21,26 @@ DECLARE
 	duration_id integer;
 	version text;
 BEGIN
-	SET search_path TO housedb,public;
-    RAISE NOTICE 'Creating or returning ID for %s', $1;
+	SET search_path TO housedb,public;    
 
-	SELECT id INTO ts_id FROM catalog WHERE UPPER($1)=UPPER(timeseries_name);
+	SELECT id INTO ts_id FROM catalog WHERE UPPER(ts_name)=UPPER(timeseries_name);
 	
     IF FOUND THEN
 		RETURN ts_id;
 	ELSE
-        select regexp_split_to_array($1,'\.') into ts_parts;		
-		zone := ts_parts[1];        
-		location := ts_parts[2];
-		param := ts_parts[3];
-		data_type := ts_parts[4];
-		_interval := ts_parts[5];
-		duration := ts_parts[6];
-		version := ts_parts[7];
-        
-		SELECT id into zone_id FROM zones WHERE UPPER(name)=UPPER(zone);
-		IF NOT FOUND THEN
-			INSERT INTO zones(name) values ( zone ) RETURNING ID into zone_id;
-            RAISE NOTICE 'Added zone % with id %', zone,zone_id;
-		END IF;
+        select regexp_split_to_array(ts_name,'\.') into ts_parts;				    
+		location := ts_parts[1];
+		param := ts_parts[2];
+		data_type := ts_parts[3];
+		_interval := ts_parts[4];
+		duration := ts_parts[5];
+		version := ts_parts[6];		
 		
-		SELECT id into location_id FROM locations WHERE UPPER(name)=UPPER(location);
-		IF NOT FOUND THEN
-			INSERT INTO locations(name) values (location) RETURNING ID into location_id;
-			RAISE NOTICE 'Added location %s with id %', location,location_id;
-		END IF;
+		location_id = create_location(location);
 
 		SELECT id INTO param_id FROM parameters WHERE UPPER(name)=UPPER(param);
 		IF NOT FOUND THEN
 			INSERT INTO parameters(name,units) values (param,'raw') RETURNING ID into param_id;
-			RAISE NOTICE 'Added parameter %s with id %', param, param_id;
 		END IF;
 		
 		SELECT id INTO data_type_id FROM types where UPPER(name)=UPPER(data_type);
@@ -72,18 +59,10 @@ BEGIN
 		END IF;
 
 		INSERT INTO timeseries(zone_id,location_id,parameter_id,type_id,interval_id,duration_id,version)
-		VALUES (zone_id,location_id,param_id,data_type_id,interval_id,duration_id,version) RETURNING id INTO ts_id;
-		RAISE NOTICE 'returning ID %s', ts_id;
+		VALUES (zone_id,location_id,param_id,data_type_id,interval_id,duration_id,version) RETURNING id INTO ts_id;		
 		RETURN ts_id;
 
 	END IF;
-END;
-$$
-LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION store_timeseries_data(ts_name character varying, data data_triple[] ) RETURNS bigint AS $$
-BEGIN  
-    RETURN store_timeseries_data($1,$2,false);
 END;
 $$
 LANGUAGE 'plpgsql';
@@ -92,12 +71,13 @@ CREATE OR REPLACE FUNCTION store_timeseries_data(ts_name character varying, data
     AS $$
 DECLARE
     ts_id bigint;
-    tuple data_triple;
+    tuple housedb.data_triple;
 BEGIN
+	set search_path to housedb,public;
     SELECT create_timeseries($1) INTO ts_id;
     
     FOREACH tuple IN array $2 LOOP
-        INSERT INTO timeseries_values(ts_id,date_time,value,quality) VALUES (ts_id,tuple.date_time,tuple.value,tuple.quality);
+        INSERT INTO housedb.timeseries_values(timeseries_id,date_time,value,quality) VALUES (ts_id,tuple.date_time,tuple.value,tuple.quality);
     END LOOP;
 
     RETURN ts_id;
