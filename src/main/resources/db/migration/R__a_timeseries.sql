@@ -115,6 +115,24 @@ LANGUAGE 'plpgsql';
 
 
 
+CREATE OR REPLACE FUNCTION housedb.retrieve_timeseries_data(ts_name text, start_time timestamp with time zone, end_time timestamp with time zone, timezone text DEFAULT 'UTC', exclude_missing boolean DEFAULT false )
+RETURNS SETOF data_triple
+AS $$
+DECLARE
+	ts_id bigint;
+	thedata data_triple;
+BEGIN
+	select id into ts_id from catalog where UPPER(timeseries_name)=UPPER(ts_name);
+	if not found then
+		raise exception 'TimeSeries, %, not found', ts_name;
+	end if;
+	for thedata in select date_time,value,quality from housedb.timeseries_values where timeseries_id = ts_id and date_time between start_time and end_time
+	loop
+		return next thedata;
+	end loop;
+END;
+$$ LANGUAGE plpgsql;
+
 /*
 
 
