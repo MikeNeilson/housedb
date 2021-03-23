@@ -1,0 +1,44 @@
+apply plugin: java
+
+repositories {
+    mavelLocal()
+    mavenCentral()
+}   
+
+
+dependencies {
+    compile 'org.jooq:jooq:3.14.8'
+
+    runtime project(":database")
+    testCompile 'junit:junit:4.11'
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.jooq:jooq-codegen:3.14.8'
+        classpath 'org.postgresql:postgresql:42.2.18.jre7'
+    }
+}
+
+import org.jooq.codegen.GenerationTool
+import org.jooq.meta.jaxb.*
+
+GenerationTool.generate(new Configuration()
+    .withJdbc(new Jdbc()
+        .withDriver('org.postgres.Driver')
+        .withUrl('jdbc:postgres:$PGHOST:$PGPORT/$PGDATABASE')
+        .withUser(DBUSER)
+        .withPassword(DBPASSWORD)
+    .withGenerator(new Generator()
+        .withDatabase(new Database())
+        .withGenerate(new Generate()
+            .withPojos(true)
+            .withDaos(true))
+        .withTarget(new Target()
+            .withPackageName(project.group)
+            .withDirectory('src/main/java'))))
