@@ -1,44 +1,32 @@
-apply plugin: java
+plugins {
+    id 'java'
+    id "org.jetbrains.kotlin.jvm" version "1.4.31"    
+}
 
 repositories {
-    mavelLocal()
+    mavenLocal()
     mavenCentral()
+    jcenter()
 }   
 
 
 dependencies {
     compile 'org.jooq:jooq:3.14.8'
-
-    runtime project(":database")
+    compile 'org.slf4j:slf4j-simple:1.8.0-beta4'
+    compile 'io.javalin:javalin:3.13.4'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:1.4.31"
+    compile project(":database")
     testCompile 'junit:junit:4.11'
 }
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
+jar {
+    manifest {
+        attributes (
+            'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+            'Main-Class': 'EntryKt'
+        )                
     }
-
-    dependencies {
-        classpath 'org.jooq:jooq-codegen:3.14.8'
-        classpath 'org.postgresql:postgresql:42.2.18.jre7'
+    from {
+            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
-
-import org.jooq.codegen.GenerationTool
-import org.jooq.meta.jaxb.*
-
-GenerationTool.generate(new Configuration()
-    .withJdbc(new Jdbc()
-        .withDriver('org.postgres.Driver')
-        .withUrl('jdbc:postgres:$PGHOST:$PGPORT/$PGDATABASE')
-        .withUser(DBUSER)
-        .withPassword(DBPASSWORD)
-    .withGenerator(new Generator()
-        .withDatabase(new Database())
-        .withGenerate(new Generate()
-            .withPojos(true)
-            .withDaos(true))
-        .withTarget(new Target()
-            .withPackageName(project.group)
-            .withDirectory('src/main/java'))))
