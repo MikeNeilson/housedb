@@ -22,8 +22,8 @@ configurations {
 }
 
 dependencies {
-    flywayMigration 'org.postgresql:postgresql:42.2.18.jre7'
-    jooqGenerator 'org.postgresql:postgresql:42.2.18.jre7'
+    flywayMigration "org.postgresql:postgresql:$PG_VERSION"
+    jooqGenerator "org.postgresql:postgresql:$PG_VERSION"
 }
 
 flyway {

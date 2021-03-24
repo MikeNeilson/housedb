@@ -1,2 +1,4 @@
 version = '0.0.1'
 group = 'net.hobbyscience.housedb'
+
+ext.PG_VERSION="42.2.18.jre7"
