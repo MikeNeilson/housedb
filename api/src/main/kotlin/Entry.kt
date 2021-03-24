@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
     println(args[1])
 
     val ds = DataSource()
-    ds.setDriverClassName("org.postgres.Driver")
+    ds.setDriverClassName("org.postgresql.Driver")
     ds.setUrl(args[0])
     ds.setUsername(args[1])
     ds.setPassword(args[2])

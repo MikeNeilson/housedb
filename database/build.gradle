@@ -7,7 +7,7 @@ buildscript{
 plugins {    
     id "org.flywaydb.flyway" version "7.5.0"
     id "nu.studer.jooq" version "5.2"
-    id 'java'
+    id 'java-library'
 }
 
 
@@ -21,9 +21,17 @@ configurations {
     flywayMigration 
 }
 
+sourceSets {
+    main {
+        java.srcDirs += "${buildDir}/generated-src/jooq/main"
+    }
+}
+
 dependencies {
     flywayMigration "org.postgresql:postgresql:$PG_VERSION"
     jooqGenerator "org.postgresql:postgresql:$PG_VERSION"
+    compile "org.jooq:jooq:3.14.8"
+    compile "org.jooq:jooq-meta:3.14.8"
 }
 
 flyway {
@@ -100,4 +108,14 @@ tasks.named('generateJooq').configure {
     // make jOOQ task participate in incremental builds and build caching
     allInputsDeclared = true
     outputs.cacheIf { true }
+}
+/*
+compileGeneratedJava {
+    dependsOn(generateJooq)
+    classpath = configurations.compile
+}
+*/
+compileJava {
+    dependsOn(generateJooq)
+    //source += sourceSets.generated.java
 }
