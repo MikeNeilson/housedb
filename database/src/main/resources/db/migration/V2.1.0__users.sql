@@ -28,7 +28,7 @@ create table housedb.user_permissions (
     regex text not null,
     primary key (user_id,permission_id,data_table_id)
 );
-comment on column user_permissions.regex is 'regular expression that will be matched against what the user is requesting.';
+comment on column housedb.user_permissions.regex is 'regular expression that will be matched against what the user is requesting.';
 
 
 /* default permissions */
@@ -44,9 +44,21 @@ insert into housedb.data_tables (name)
            ('timeseries'),
            ('intervals'),
            ('types'),
-           ('parameters')
+           ('parameters'),
+           ('users'),
+           ('permissions'),
+           ('user_permissions')
 ;
 
 /* guest user */
 insert into housedb.users(id,username,active)
     values (0,'guest',true);
+
+/* guest permissions */
+insert into housedb.user_permissions(user_id,permission_id,data_table_id,regex)
+    values (0,1,1,'.*'),
+           (0,1,2,'.*'),
+           (0,1,3,'.*'),
+           (0,1,4,'.*'),
+           (0,1,5,'.*')
+;
