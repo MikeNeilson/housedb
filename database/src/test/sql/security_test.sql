@@ -10,5 +10,9 @@ BEGIN
     RETURN NEXT ok(housedb.can_perform('guest','WRITE','locations',a_location) = false );
     RETURN NEXT ok(housedb.can_perform('guest','READ','timeseries',a_timeseries) = true );
     RETURN NEXT ok(housedb.can_perform('guest','READ','timeseries',complex_location) = true);
+
+    PERFORM housedb.add_permission('guest','WRITE','locations','^public\..*');
+    RETURN NEXT ok(housedb.can_perform('guest','WRITE','locations','public.sidewalk') = true);
+    RETURN NEXT ok(housedb.can_perform('guest','WRITE','locations','notpublic.driveway') = false);
 END;
 $$ LANGUAGE plpgsql;
