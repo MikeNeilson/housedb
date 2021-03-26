@@ -6,8 +6,8 @@ import java.util.logging.*;
 import java.util.List;
 import java.util.ArrayList;
 
-import housedb.tables.*;
-import housedb.*;
+import net.hobbyscience.housedb.tables.*;
+import net.hobbyscience.housedb.*;
 import static org.jooq.impl.DSL.*;
 
 import org.jooq.*;

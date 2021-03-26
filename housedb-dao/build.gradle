@@ -1,6 +1,12 @@
+import nu.studer.gradle.jooq.JooqEdition
+
 plugins {
     id "nu.studer.jooq" version "5.2"
-    id 'java-library'
+    id 'java-library'    
+}
+
+configurations {
+
 }
 
 sourceSets {
@@ -11,19 +17,16 @@ sourceSets {
 
 dependencies {
     jooqGenerator "org.postgresql:postgresql:$PG_VERSION"
-    compile "org.jooq:jooq:3.14.8"
-    compile "org.jooq:jooq-meta:3.14.8"
 }
-    
-
-jooq {
+   
+jooq {    
     configurations {
         main {
-            generationTool{
+            generationTool {
                 logging = org.jooq.meta.jaxb.Logging.WARN
                 jdbc {
                     driver = 'org.postgresql.Driver'
-                    url = project(":database").flyway.url
+                    url = project(":database").flyway.url //"jdbc:postgresql://$PGHOST:$PGPORT/$PGDATABASE"
                     user = project(":database").flyway.user
                     password = project(":database").flyway.password
                 }
@@ -36,7 +39,7 @@ jooq {
                         excludes = ''
                     }
                     target {
-                        packageName = project.group
+                        packageName = rootProject.group
                     }
                 }
             }
@@ -44,6 +47,7 @@ jooq {
         }
     }
 }
+
 /* from plugin example */
 // configure jOOQ task such that it only executes when something has changed that potentially affects the generated JOOQ sources
 // - the jOOQ configuration has changed (Jdbc, Generator, Strategy, etc.)
@@ -51,10 +55,10 @@ jooq {
 // - the schema files from which the schema is generated and which is used by jOOQ to generate the sources have changed (scripts added, modified, etc.)
 tasks.named('generateJooq').configure {
     // ensure database schema has been prepared by Flyway before generating the jOOQ sources
-    dependsOn tasks.named('flywayMigrate')
+    dependsOn project(":database").flywayMigrate
 
     // declare Flyway migration scripts as inputs on the jOOQ task
-    inputs.files(fileTree('src/main/resources/db/migration'))
+    inputs.files(fileTree(project(":database").projectDir.toString()+'src/main/resources/db/migration'))
         .withPropertyName('migrations')
         .withPathSensitivity(PathSensitivity.RELATIVE)
 
@@ -62,13 +66,8 @@ tasks.named('generateJooq').configure {
     allInputsDeclared = true
     outputs.cacheIf { true }
 }
-/*
-compileGeneratedJava {
-    dependsOn(generateJooq)
-    classpath = configurations.compile
-}
-*/
+
 compileJava {
-    dependsOn(generateJooq)
-    //source += sourceSets.generated.java
+    dependsOn(generateJooq)    
+    
 }

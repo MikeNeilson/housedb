@@ -3,10 +3,16 @@ group = 'net.hobbyscience.housedb'
 
 ext.PG_VERSION="42.2.18.jre7"
 
-allprojects {
-    repositories {
-        mavenLocal()
+subprojects {
+    apply plugin: 'base'
+    apply plugin: 'java'
+
+    repositories {        
         mavenCentral()
         jcenter()
+    }   
+
+    dependencies {
+        compile "org.postgresql:postgresql:$PG_VERSION"
     }
 }
