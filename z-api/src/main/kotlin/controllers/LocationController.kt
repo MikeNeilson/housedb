@@ -12,7 +12,7 @@ class LocationController : CrudHandler {
         val db = HouseDb(ds,ctx.attribute("username"))
         val locations = db.getAllLocations()
         val om = ObjectMapper()        
-        ctx.json(om.writerWithDefaultPrettyPrinter().writeValueAsString(locations))
+        ctx.json(locations)
     }
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")

@@ -28,11 +28,18 @@ public class HouseDb {
         try( Connection conn = ds.getConnection(); ){        
             DSLContext dsl = DSL.using(conn,SQLDialect.POSTGRES);
 
-            Result<Record> result = dsl.select().from(Locations.LOCATIONS).fetch();
+            Result<Record> result = dsl.selectDistinct().from(Locations.LOCATIONS).fetch();
             for( Record r: result ){
+                long id = r.getValue(Locations.LOCATIONS.ID);
                 String loc = r.getValue(Locations.LOCATIONS.NAME);
+                Long parent_id = r.getValue(Locations.LOCATIONS.PARENT_ID);                
                 if ( Routines.canPerform(dsl.configuration(),username,"READ","locations",loc)){
-                    locations.add(loc);
+                    if ( parent_id != null ){
+                        logger.info("expanding name");
+                        locations.add( Routines.expandLocationName(dsl.configuration(),id));
+                    } else {
+                        locations.add(loc);
+                    }
                 }
             }
             return locations;
