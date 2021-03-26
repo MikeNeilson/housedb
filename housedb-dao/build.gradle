@@ -1,0 +1,74 @@
+plugins {
+    id "nu.studer.jooq" version "5.2"
+    id 'java-library'
+}
+
+sourceSets {
+    main {
+        java.srcDirs += "${buildDir}/generated-src/jooq/main"
+    }
+}
+
+dependencies {
+    jooqGenerator "org.postgresql:postgresql:$PG_VERSION"
+    compile "org.jooq:jooq:3.14.8"
+    compile "org.jooq:jooq-meta:3.14.8"
+}
+    
+
+jooq {
+    configurations {
+        main {
+            generationTool{
+                logging = org.jooq.meta.jaxb.Logging.WARN
+                jdbc {
+                    driver = 'org.postgresql.Driver'
+                    url = project(":database").flyway.url
+                    user = project(":database").flyway.user
+                    password = project(":database").flyway.password
+                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'                        
+                        inputSchema = project(":database").flyway.schemas[0]
+                        includes = '.*'
+                        excludes = ''
+                    }
+                    target {
+                        packageName = project.group
+                    }
+                }
+            }
+            
+        }
+    }
+}
+/* from plugin example */
+// configure jOOQ task such that it only executes when something has changed that potentially affects the generated JOOQ sources
+// - the jOOQ configuration has changed (Jdbc, Generator, Strategy, etc.)
+// - the classpath used to execute the jOOQ generation tool has changed (jOOQ library, database driver, strategy classes, etc.)
+// - the schema files from which the schema is generated and which is used by jOOQ to generate the sources have changed (scripts added, modified, etc.)
+tasks.named('generateJooq').configure {
+    // ensure database schema has been prepared by Flyway before generating the jOOQ sources
+    dependsOn tasks.named('flywayMigrate')
+
+    // declare Flyway migration scripts as inputs on the jOOQ task
+    inputs.files(fileTree('src/main/resources/db/migration'))
+        .withPropertyName('migrations')
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // make jOOQ task participate in incremental builds and build caching
+    allInputsDeclared = true
+    outputs.cacheIf { true }
+}
+/*
+compileGeneratedJava {
+    dependsOn(generateJooq)
+    classpath = configurations.compile
+}
+*/
+compileJava {
+    dependsOn(generateJooq)
+    //source += sourceSets.generated.java
+}

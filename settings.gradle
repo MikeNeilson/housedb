@@ -17,4 +17,5 @@ include 'services:webservice'
 
 rootProject.name = 'housedb'
 include 'database'
+include 'housedb-dao'
 include 'api'

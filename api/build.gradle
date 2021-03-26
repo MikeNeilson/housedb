@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id "org.jetbrains.kotlin.jvm" version "1.4.31"    
 }
 
@@ -19,7 +19,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:1.4.31"
     compile "org.jetbrains.kotlin:kotlin-reflect:1.4.31"
     compile "org.postgresql:postgresql:$PG_VERSION"
-    compile project(":database")
+    compile project(":housedb-dao")
     testCompile 'junit:junit:4.11'
 }
 

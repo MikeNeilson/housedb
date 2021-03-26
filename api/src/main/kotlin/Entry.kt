@@ -26,7 +26,11 @@ fun main(args: Array<String>) {
         .apply {
             exception(Exception::class.java){ e, _ -> e.printStackTrace() }
             error(404){ ctx -> ctx.json("not found") }
+           
         }.attribute(javax.sql.DataSource::class.java,ds)
+        .before { ctx -> 
+            ctx.attribute("username","guest")
+        }
         .start(7000)        
     app.routes {
         get("/") { ctx -> ctx.result("Hello World") }
@@ -34,3 +38,4 @@ fun main(args: Array<String>) {
     }
      
 }
+
