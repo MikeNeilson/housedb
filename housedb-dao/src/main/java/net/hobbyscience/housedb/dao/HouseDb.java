@@ -1,4 +1,4 @@
-package net.hobbyscience.housedb;
+package net.hobbyscience.housedb.dao;
 
 import java.sql.Connection;
 import javax.sql.DataSource;
@@ -18,9 +18,24 @@ public class HouseDb {
     private DataSource ds = null;
     private String username = null;
 
+
+    public HouseDb(){
+
+    }
+
     public HouseDb(DataSource ds, String username ){
         this.ds = ds;
         this.username = username;
+    }
+
+    public HouseDb setDataSource(DataSource ds ){
+        this.ds = ds;
+        return this;
+    }
+
+    public HouseDb setUsername(String username){
+        this.username = username;
+        return this;
     }
 
     public List<String> getAllLocations() throws Exception{

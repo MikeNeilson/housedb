@@ -1,31 +1,24 @@
 plugins {    
+    id 'application'
     id "org.jetbrains.kotlin.jvm" version "1.4.31"    
 }
 
 dependencies {
-    compile 'org.jooq:jooq:3.14.8'
-    compile 'org.slf4j:slf4j-simple:1.8.0-beta4'
-    compile 'org.apache.tomcat:tomcat-jdbc:9.0.41'
-    compile 'io.javalin:javalin:3.13.4'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.10.3'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:1.4.31"
-    compile "org.jetbrains.kotlin:kotlin-reflect:1.4.31"
-    compile "org.postgresql:postgresql:$PG_VERSION"
-    compile project(":housedb-dao")
-    compile project(":database")
-    testCompile 'junit:junit:4.11'
+    implementation 'org.jooq:jooq:3.14.8'
+    implementation 'org.slf4j:slf4j-simple:1.8.0-beta4'
+    implementation 'org.apache.tomcat:tomcat-jdbc:9.0.41'
+    implementation 'io.javalin:javalin:3.13.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.4.31"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.4.31"
+    implementation "org.postgresql:postgresql:$PG_VERSION"
+    implementation project(":housedb-dao")
+    implementation project(":database")
+    testImplementation 'junit:junit:4.11'
 }
 
-jar {
-    manifest {
-        attributes (
-            'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-            'Main-Class': 'EntryKt'
-        )                
-    }
-    from {
-            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+application {
+    mainClass = "EntryKt"
 }
 
 compileKotlin {
@@ -35,7 +28,9 @@ compileKotlin {
     }
 }
 
-task run(type: JavaExec, dependsOn: jar ){
-    classpath = files(tasks.jar)    
+//task run(type: JavaExec, dependsOn: jar ){
+    //classpath = files(tasks.jar)
+    //classpath += configurations.compile.collect    
+run {
     args project(":database").flyway.url, project(":database").flyway.user, project(":database").flyway.password
 }    
