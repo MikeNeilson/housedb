@@ -64,5 +64,7 @@ jobs:
         run: ./gradlew testdb -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword        
       - name: Build JOOQ Library
         run: ./gradlew :database:jar -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword        
+      - name: Build DAO Library
+        run: ./gradlew :housedb-dao:jar -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword        
       - name: Build API Library
-        run: ./gradlew :api:jar -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword        
+        run: ./gradlew :z-api:jar -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword        
