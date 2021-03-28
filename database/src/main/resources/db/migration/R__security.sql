@@ -4,13 +4,14 @@ AS $$
 DECLARE
     l_regex text;
 BEGIN
+    set search_path to housedb,public;
     select 
         up.regex into l_regex 
         from 
-            housedb.user_permissions up
-        join housedb.users u on u.id = up.user_id
-        join housedb.permissions p on p.id = up.permission_id
-        join housedb.data_tables dt on dt.id = up.data_table_id
+           user_permissions up
+        join users u on u.id = up.user_id
+        join permissions p on p.id = up.permission_id
+        join data_tables dt on dt.id = up.data_table_id
         where 
             u.username = p_username
             and
@@ -34,6 +35,7 @@ DECLARE
     l_perm_id int;
     l_dt_id int;
 BEGIN
+    set search_path to housedb,public;
     select id into l_userid from users where username = p_username;
     select id into l_perm_id from permissions where name = p_permission;
     select id into l_dt_id from data_tables where name = p_data_table;
@@ -44,7 +46,7 @@ BEGIN
     elsif l_dt_id is null THEN
         raise exception 'Unrecognized data table %', p_data_table;
     end if;
-    insert into housedb,user_permissions(user_id,permission_id,data_table_id,regex) values (l_userid,l_perm_id,l_dt_id,p_regex);
+    insert into user_permissions(user_id,permission_id,data_table_id,regex) values (l_userid,l_perm_id,l_dt_id,p_regex);
     return true;
 END;
 $$ language plpgsql
