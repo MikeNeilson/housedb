@@ -16,3 +16,20 @@ BEGIN
     RETURN NEXT ok(housedb.can_perform('guest','WRITE','locations','notpublic.driveway') = false);
 END;
 $$ LANGUAGE plpgsql;
+
+create or replace function housedb_tests.test_session_management()
+returns setof text as $$
+declare
+begin
+    RETURN NEXT ok(housedb.get_session_user() = 'guest', 'Default Session user not set');
+    RETURN NEXT ok(housedb.set_session_user('guest') = true, 'unable to set session to guest');
+    RETURN NEXT throws_like('select housedb.set_session_user(''invalid'')', '%does not exist%', 'Invalid user got through.');
+
+    RETURN NEXT ok(housedb.add_user('newuser') > 0, 'unabled to create new user');
+    perform housedb.set_session_user('newuser');
+    RETURN NEXT ok(housedb.get_session_user() = 'newuser','session user wasn''t changed');
+
+end;
+$$ LANGUAGE plpgsql
+
+
