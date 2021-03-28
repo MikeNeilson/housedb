@@ -7,10 +7,10 @@ BEGIN
     select 
         up.regex into l_regex 
         from 
-            user_permissions up
-        join users u on u.id = up.user_id
-        join permissions p on p.id = up.permission_id
-        join data_tables dt on dt.id = up.data_table_id
+            housedb.user_permissions up
+        join housedb.users u on u.id = up.user_id
+        join housedb.permissions p on p.id = up.permission_id
+        join housedb.data_tables dt on dt.id = up.data_table_id
         where 
             u.username = p_username
             and
@@ -44,7 +44,7 @@ BEGIN
     elsif l_dt_id is null THEN
         raise exception 'Unrecognized data table %', p_data_table;
     end if;
-    insert into user_permissions(user_id,permission_id,data_table_id,regex) values (l_userid,l_perm_id,l_dt_id,p_regex);
+    insert into housedb,user_permissions(user_id,permission_id,data_table_id,regex) values (l_userid,l_perm_id,l_dt_id,p_regex);
     return true;
 END;
 $$ language plpgsql
