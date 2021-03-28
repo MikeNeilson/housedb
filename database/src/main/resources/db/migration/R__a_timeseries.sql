@@ -7,8 +7,7 @@ AS  $$
 DECLARE    
 	ts_id integer;
 	ts_parts text[];
-	zone text;
-	zone_id integer;
+	zone text;	
 	location text;
 	location_id integer;
 	param text;
@@ -58,8 +57,8 @@ BEGIN
 			RAISE EXCEPTION 'Duration % not defined in this system', duration;
 		END IF;
 
-		INSERT INTO timeseries(zone_id,location_id,parameter_id,type_id,interval_id,duration_id,version)
-		VALUES (zone_id,location_id,param_id,data_type_id,interval_id,duration_id,version) RETURNING id INTO ts_id;		
+		INSERT INTO timeseries(location_id,parameter_id,type_id,interval_id,duration_id,version)
+		VALUES (location_id,param_id,data_type_id,interval_id,duration_id,version) RETURNING id INTO ts_id;		
 		RETURN ts_id;
 
 	END IF;

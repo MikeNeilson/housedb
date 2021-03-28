@@ -1,0 +1,48 @@
+buildscript{
+    dependencies {
+       classpath 'org.postgresql:postgresql:42.2.18.jre7'
+    }
+}
+
+plugins {    
+    id 'java'
+    id "org.flywaydb.flyway" version "7.5.0"
+
+}
+
+configurations {
+    flywayMigration 
+}
+
+dependencies {
+    flywayMigration "org.postgresql:postgresql:$PG_VERSION"
+}
+
+flyway {
+    configurations = ['flywayMigration']
+    url = "jdbc:postgresql://$PGHOST:$PGPORT/$PGDATABASE"
+    user = DBUSER
+    password = DBPASSWORD
+    mixed = true
+    schemas = ['housedb']
+}
+
+
+task setup_tests( type: Exec ){
+    environment 'PGPASSWORD', DBPASSWORD    
+    commandLine "psql", "-h", "$PGHOST", "-p", "$PGPORT", "-d", "$PGDATABASE", "-U", "$DBUSER", "-f", "src/test/sql/install_tests.sql"
+}
+
+task teardown_tests(type: Exec ){
+    environment 'PGPASSWORD', DBPASSWORD
+    commandLine "psql", "-h", "$PGHOST", "-p", "$PGPORT", "-d", "$PGDATABASE", "-U", "$DBUSER", "-f", "src/test/sql/remove_tests.sql"
+}
+
+task testdb( type: Exec ){
+    dependsOn setup_tests
+
+    environment 'PGPASSWORD', "testpassword"
+    commandLine "pg_prove", "--host", PGHOST, "--port", PGPORT, "--dbname", PGDATABASE, "--username", "housedb_user", "--runtests", "--schema", "housedb_tests"
+
+    finalizedBy teardown_tests
+}

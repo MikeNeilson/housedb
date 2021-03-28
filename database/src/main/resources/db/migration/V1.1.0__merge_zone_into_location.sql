@@ -1,7 +1,7 @@
-DROP VIEW catalog;
-DROP VIEW catalog_view;
+DROP VIEW housedb.catalog;
+DROP VIEW housedb.catalog_view;
 
-ALTER TABLE locations ADD COLUMN parent_id bigint references locations(id) default null;
+ALTER TABLE housedb.locations ADD COLUMN parent_id bigint references housedb.locations(id) default null;
 
 CREATE OR REPLACE FUNCTION housedb.expand_location_name( location_id bigint ) RETURNS TEXT AS $$ 
 BEGIN

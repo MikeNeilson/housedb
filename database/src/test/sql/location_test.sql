@@ -2,8 +2,10 @@ CREATE OR REPLACE FUNCTION housedb_tests.test_create_location()
 RETURNS SETOF TEXT AS $$
 DECLARE
     simple_location text = 'Simple1';
-    complex_location text = 'This-Is-Complex';    
+    complex_location text = 'This-Is-Complex'; 
+    sub_location text = 'Simple1-Sub';   
     query_res record;
+    sub_id bigint;
 BEGIN
     RETURN NEXT ok(housedb.create_location(simple_location) > 0 );
     RETURN NEXT ok(housedb.create_location(complex_location) > 0 );
@@ -15,6 +17,11 @@ BEGIN
     end loop;
 
     RETURN NEXT isnt_empty( 'select * from housedb.locations where parent_id is not null' );
+
+    sub_id = housedb.create_location(sub_location);
+    RETURN NEXT ok(sub_id > 0 );
+    RETURN NEXT ok(housedb.expand_location_name(sub_id) = sub_location);
+
 END;
 $$ LANGUAGE plpgsql;
 
@@ -23,9 +30,11 @@ CREATE OR REPLACE FUNCTION housedb_tests.test_expand_location()
 RETURNS SETOF TEXT AS $$
 DECLARE
     simple_location text = 'Simple';
+    
     complex_location text = 'This-Is-Complex';
     result text;
     a_parent_id bigint;
+    sub_id bigint;
     the_simple_id bigint;
     the_complex_id bigint;
 BEGIN
@@ -40,5 +49,7 @@ BEGIN
     RETURN NEXT is( housedb.expand_location_name(the_complex_id), complex_location );
 END;
 $$ LANGUAGE plpgsql;
+
+
 
 
