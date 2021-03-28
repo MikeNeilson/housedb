@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION housedb_tests.test_create_location()
 RETURNS SETOF TEXT AS $$
 DECLARE
     simple_location text = 'Simple1';
+    simple_location_diffcase text = 'SiMPLe1';
     complex_location text = 'This-Is-Complex'; 
     sub_location text = 'Simple1-Sub';   
     query_res record;
@@ -21,6 +22,9 @@ BEGIN
     sub_id = housedb.create_location(sub_location);
     RETURN NEXT ok(sub_id > 0 );
     RETURN NEXT ok(housedb.expand_location_name(sub_id) = sub_location);
+
+
+    RETURN NEXT throws_ok('select housedb.create_location(''SiMPle1'')', 23505 );
 
 END;
 $$ LANGUAGE plpgsql;
