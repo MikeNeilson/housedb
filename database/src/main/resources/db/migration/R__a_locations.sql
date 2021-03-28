@@ -19,16 +19,25 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION housedb.create_location( location text ) RETURNS BIGINT AS $$
-DECLARE
+CREATE OR REPLACE FUNCTION housedb.create_location( location text, expect_new boolean default false ) RETURNS BIGINT AS $$
+DECLARE    
     parts text[];
     the_parent_id bigint = NULL;
     found_parent_id bigint = NULL;
     the_id bigint = NULL;
     length integer = NULL;
     cur_level text;
-BEGIN
+BEGIN    
     set search_path to housedb,public;
+    
+    select id into the_id from view_locations where lower(name) = lower(location);
+    if expect_new = true and the_id is not null then
+        raise exception 'Location %s already exists and you indicated a new location id is expected', location USING ERRCODE = 'unique_violation';
+    elsif expect_new = false and the_id is not null then
+        raise notice 'found existing location';
+        return the_id;
+    end if;
+
     select regexp_split_to_array($1,'-') into parts;				
     select array_length(parts,1) into length;
     if length > 10 THEN

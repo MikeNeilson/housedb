@@ -8,8 +8,8 @@ DECLARE
     query_res record;
     sub_id bigint;
 BEGIN
-    RETURN NEXT ok(housedb.create_location(simple_location) > 0 );
-    RETURN NEXT ok(housedb.create_location(complex_location) > 0 );
+    RETURN NEXT ok(housedb.create_location(simple_location) > 0, 'unable to create a simple location');
+    RETURN NEXT ok(housedb.create_location(complex_location) > 0, 'unable to create a complex location' );
 
     RAISE NOTICE 'showing locations that exist';    
     for query_res in execute 'select * from housedb.locations'
@@ -17,14 +17,15 @@ BEGIN
         raise notice 'row: %', query_res;
     end loop;
 
-    RETURN NEXT isnt_empty( 'select * from housedb.locations where parent_id is not null' );
+    RETURN NEXT isnt_empty( 'select * from housedb.locations where parent_id is not null', 'no locations have been created' );
 
     sub_id = housedb.create_location(sub_location);
-    RETURN NEXT ok(sub_id > 0 );
+    RETURN NEXT ok(sub_id > 0,'sub location not made' );
     RETURN NEXT ok(housedb.expand_location_name(sub_id) = sub_location);
 
-
-    RETURN NEXT throws_ok('select housedb.create_location(''SiMPle1'')', 23505 );
+    RAISE NOTICE 'checking case issues';
+    RETURN NEXT throws_ok('select housedb.create_location(''SiMPle1'',true)', 23505 );
+    RETURN NEXT ok(housedb.create_location('SiMPle1',false) > 0);
 
 END;
 $$ LANGUAGE plpgsql;
@@ -33,8 +34,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION housedb_tests.test_expand_location()
 RETURNS SETOF TEXT AS $$
 DECLARE
-    simple_location text = 'Simple';
-    
+    simple_location text = 'Simple';    
     complex_location text = 'This-Is-Complex';
     result text;
     a_parent_id bigint;
@@ -42,6 +42,7 @@ DECLARE
     the_simple_id bigint;
     the_complex_id bigint;
 BEGIN
+    RAISE NOTICE 'EXPANDING LOCATIONS';
     insert into housedb.locations(name) values ('Simple') returning id into the_simple_id;
     insert into housedb.locations(name) values ('This') returning id into a_parent_id;
     insert into housedb.locations(name,parent_id) values ('Is',a_parent_id) returning id into a_parent_id;
