@@ -1,6 +1,7 @@
 drop view housedb.view_locations;
 
-drop function housedb.expand_location_name cascade;
+drop function if exists housedb.expand_location_name cascade;
+create function housedb_locations.expand_location_name( bigint ) returns text as $$ BEGIN return "forward declaration"; END; $$ language plpgsql;
 
 create or replace view housedb.view_locations as 
     select id,housedb_locations.expand_location_name(id) as name,parent_id from housedb.locations;
