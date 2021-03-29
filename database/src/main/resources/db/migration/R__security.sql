@@ -1,4 +1,4 @@
-create or replace function housedb.can_perform( p_username varchar(255), p_permission varchar(255), p_data_table varchar(255), p_object text ) 
+create or replace function housedb_security.can_perform( p_username varchar(255), p_permission varchar(255), p_data_table varchar(255), p_object text ) 
 returns boolean 
 AS $$
 DECLARE
@@ -27,7 +27,7 @@ END;
 $$ language plpgsql;
 
 
-create or replace function housedb.add_permission( p_username varchar(255), p_permission varchar(255), p_data_table varchar(255), p_regex text )
+create or replace function housedb_security.add_permission( p_username varchar(255), p_permission varchar(255), p_data_table varchar(255), p_regex text )
 RETURNS boolean
 AS $$
 DECLARE
@@ -51,7 +51,7 @@ BEGIN
 END;
 $$ language plpgsql;
 
-create or replace function housedb.set_session_user( p_username varchar(255) )
+create or replace function housedb_security.set_session_user( p_username varchar(255) )
 returns boolean
 as $$
 declare
@@ -69,13 +69,13 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function housedb.get_session_user()
+create or replace function housedb_security.get_session_user()
 returns text
 as $$
 declare
     l_username varchar(255);
 begin
-    set search_path to housedb,public;
+    set search_path to housedb_security,housedb,public;
 
     select current_setting('housedb.user',true) into l_username;
     if l_username is null then 
@@ -88,7 +88,7 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function housedb.add_user( p_username text, p_active boolean default true)
+create or replace function housedb_security.add_user( p_username text, p_active boolean default true)
 returns bigint
 as $$
 declare

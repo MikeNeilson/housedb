@@ -8,8 +8,8 @@ DECLARE
     query_res record;
     sub_id bigint;
 BEGIN
-    RETURN NEXT ok(housedb.create_location(simple_location) > 0, 'unable to create a simple location');
-    RETURN NEXT ok(housedb.create_location(complex_location) > 0, 'unable to create a complex location' );
+    RETURN NEXT ok(housedb_locations.create_location(simple_location) > 0, 'unable to create a simple location');
+    RETURN NEXT ok(housedb_locations.create_location(complex_location) > 0, 'unable to create a complex location' );
 
     --RAISE NOTICE 'showing locations that exist';    
     --for query_res in execute 'select * from housedb.locations'
@@ -19,13 +19,13 @@ BEGIN
 
     RETURN NEXT isnt_empty( 'select * from housedb.locations where parent_id is not null', 'no locations have been created' );
 
-    sub_id = housedb.create_location(sub_location);
+    sub_id = housedb_locations.create_location(sub_location);
     RETURN NEXT ok(sub_id > 0,'sub location not made' );
-    RETURN NEXT ok(housedb.expand_location_name(sub_id) = sub_location);
+    RETURN NEXT ok(housedb_locations.expand_location_name(sub_id) = sub_location);
 
     --RAISE NOTICE 'checking case issues';
-    RETURN NEXT throws_ok('select housedb.create_location(''SiMPle1'',true)', 23505 );
-    RETURN NEXT ok(housedb.create_location('SiMPle1',false) > 0);
+    RETURN NEXT throws_ok('select housedb_locations.create_location(''SiMPle1'',true)', 23505 );
+    RETURN NEXT ok(housedb_locations.create_location('SiMPle1',false) > 0);
 
 END;
 $$ LANGUAGE plpgsql;
@@ -47,11 +47,11 @@ BEGIN
     insert into housedb.locations(name) values ('This') returning id into a_parent_id;
     insert into housedb.locations(name,parent_id) values ('Is',a_parent_id) returning id into a_parent_id;
     insert into housedb.locations(name,parent_id) values ('Complex',a_parent_id) returning id into the_complex_id;
-    --RAISE NOTICE 'Simple -> %', housedb.expand_location_name(the_simple_id);
+    --RAISE NOTICE 'Simple -> %', housedb_locations.expand_location_name(the_simple_id);
     --RAISE NOTICE 'Complex -> ';
-    --RAISE NOTICE '%', housedb.expand_location_name(the_complex_id);
-    RETURN NEXT is( housedb.expand_location_name(the_simple_id), simple_location );
-    RETURN NEXT is( housedb.expand_location_name(the_complex_id), complex_location );
+    --RAISE NOTICE '%', housedb_locations.expand_location_name(the_complex_id);
+    RETURN NEXT is( housedb_locations.expand_location_name(the_simple_id), simple_location );
+    RETURN NEXT is( housedb_locations.expand_location_name(the_complex_id), complex_location );
 END;
 $$ LANGUAGE plpgsql;
 

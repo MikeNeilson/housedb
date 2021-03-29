@@ -2,7 +2,7 @@
 -- Name: create_timeseries(character varying); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE OR REPLACE FUNCTION create_timeseries(ts_name character varying) RETURNS bigint
+CREATE OR REPLACE FUNCTION housedb_timeseries.create_timeseries(ts_name character varying) RETURNS bigint
 AS  $$
 DECLARE    
 	ts_id integer;
@@ -20,7 +20,7 @@ DECLARE
 	duration_id integer;
 	version text;
 BEGIN
-	SET search_path TO housedb,public;    
+	SET search_path TO housedb_timeseries,housedb,public;    
 
 	SELECT id INTO ts_id FROM catalog WHERE UPPER(ts_name)=UPPER(timeseries_name);
 	
@@ -35,7 +35,7 @@ BEGIN
 		duration := ts_parts[5];
 		version := ts_parts[6];		
 		
-		location_id = create_location(location);
+		location_id = housedb_locations.create_location(location);
 
 		SELECT id INTO param_id FROM parameters WHERE UPPER(name)=UPPER(param);
 		IF NOT FOUND THEN
@@ -66,13 +66,13 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION store_timeseries_data(ts_name character varying, data data_triple[], overwrite boolean DEFAULT false) RETURNS bigint    
+CREATE OR REPLACE FUNCTION housedb_timeseries.store_timeseries_data(ts_name character varying, data data_triple[], overwrite boolean DEFAULT false) RETURNS bigint    
     AS $$
 DECLARE
     ts_id bigint;
     tuple housedb.data_triple;
 BEGIN
-	set search_path to housedb,public;
+	set search_path to housedb_timeseries,housedb,public;
     SELECT create_timeseries($1) INTO ts_id;
     
     FOREACH tuple IN array $2 LOOP
@@ -114,7 +114,7 @@ LANGUAGE 'plpgsql';
 
 
 
-CREATE OR REPLACE FUNCTION housedb.retrieve_timeseries_data(ts_name text, start_time timestamp with time zone, end_time timestamp with time zone, timezone text DEFAULT 'UTC', exclude_missing boolean DEFAULT false )
+CREATE OR REPLACE FUNCTION housedb_timeseries.retrieve_timeseries_data(ts_name text, start_time timestamp with time zone, end_time timestamp with time zone, timezone text DEFAULT 'UTC', exclude_missing boolean DEFAULT false )
 RETURNS SETOF data_triple
 AS $$
 DECLARE

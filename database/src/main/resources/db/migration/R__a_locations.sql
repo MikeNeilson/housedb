@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE FUNCTION housedb.expand_location_name( location_id bigint ) RETURNS TEXT AS $$
+CREATE OR REPLACE FUNCTION housedb_locations.expand_location_name( location_id bigint ) RETURNS TEXT AS $$
 DECLARE    
     location text = '';
     cur_loc text = '';
@@ -19,7 +19,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION housedb.create_location( location text, expect_new boolean default false ) RETURNS BIGINT AS $$
+CREATE OR REPLACE FUNCTION housedb_locations.create_location( location text, expect_new boolean default false ) RETURNS BIGINT AS $$
 DECLARE    
     parts text[];
     the_parent_id bigint = NULL;
