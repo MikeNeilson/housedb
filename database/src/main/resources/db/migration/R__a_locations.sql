@@ -29,7 +29,10 @@ DECLARE
     cur_level text;
 BEGIN    
     set search_path to housedb,public;
-    
+    if not housedb_security.can_perform(housedb_security.get_session_user(),'CREATE','locations',location) then 
+        raise exception 'User % cannot create this location (%s)', housedb_security.get_session_user(), location;
+    end if;
+
     select id into the_id from view_locations where lower(name) = lower(location);
     if expect_new = true and the_id is not null then
         raise exception 'Location %s already exists and you indicated a new location id is expected', location USING ERRCODE = 'unique_violation';

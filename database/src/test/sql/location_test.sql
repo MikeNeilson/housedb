@@ -8,6 +8,8 @@ DECLARE
     query_res record;
     sub_id bigint;
 BEGIN
+    perform housedb_security.add_permission('guest', 'CREATE', 'locations','.*');
+    
     RETURN NEXT ok(housedb_locations.create_location(simple_location) > 0, 'unable to create a simple location');
     RETURN NEXT ok(housedb_locations.create_location(complex_location) > 0, 'unable to create a complex location' );
 
