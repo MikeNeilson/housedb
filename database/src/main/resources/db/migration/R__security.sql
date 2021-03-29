@@ -1,10 +1,11 @@
-create or replace function housedb_security.can_perform( p_username varchar(255), p_permission varchar(255), p_data_table varchar(255), p_object text ) 
-returns boolean 
+create or replace function housedb_security.can_perform__( p_username varchar(255), p_permission varchar(255), p_data_table varchar(255), p_object text ) 
+returns boolean
 AS $$
 DECLARE
     l_regex text;
+    l_cando boolean;
 BEGIN
-    set search_path to housedb,public;
+    set search_path to housedb_security,housedb,public;
     select 
         up.regex into l_regex 
         from 
@@ -21,9 +22,30 @@ BEGIN
 
     if l_regex is null THEN
         return false;
+    else
+        return p_object ~ l_regex;
     end if;
-    return p_object ~ l_regex;
+    
 END;
+$$ language plpgsql;
+
+create or replace function housedb_security.can_perform( p_username varchar(255), p_permission varchar(255), p_data_table varchar(255), p_object text ) 
+returns void
+as $$
+declare
+    l_cando boolean;
+begin
+    raise notice 'checking (%,%,%,%)',p_username,p_permission,p_data_table,p_object;
+    set search_path to housedb_security,housedb,public;
+
+    if can_perform__(p_username,p_permission,p_data_table,p_object) THEN
+        raise notice 'user has permission';--return
+    elsif can_perform__('guest',p_permission,p_data_table,p_object) then 
+        raise notice 'guest has permission'; --return -- all users can always do what a guest can
+    else 
+        raise exception 'User % has no % permission to object %s',p_username,p_permission,p_object;
+    end if;    
+end;
 $$ language plpgsql;
 
 

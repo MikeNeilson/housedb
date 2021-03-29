@@ -4,16 +4,18 @@ DECLARE
     a_location text = 'Simple1';
     a_timeseries text = 'Loc 1.Moisture.Int.1Hour.0.raw';
     complex_location text = 'This-Is-Complex';    
+    query text;
     query_res record;
-BEGIN
-    RETURN NEXT ok(housedb_security.can_perform('guest','READ','locations',a_location) = true );
-    RETURN NEXT ok(housedb_security.can_perform('guest','WRITE','locations',a_location) = false );
-    RETURN NEXT ok(housedb_security.can_perform('guest','READ','timeseries',a_timeseries) = true );
-    RETURN NEXT ok(housedb_security.can_perform('guest','READ','timeseries',complex_location) = true);
+BEGIN    
+    RETURN NEXT lives_ok('select housedb_security.can_perform(''guest'',''READ'',''locations'', ''Simple1'')', 'should have passed' );        
+    RETURN NEXT throws_like('select housedb_security.can_perform(''guest'',''WRITE'',''locations'',''Simple1'')' , '%has no%', 'should have failed' );
+    RETURN NEXT lives_ok('select housedb_security.can_perform(''guest'',''READ'',''timeseries'',''Loc 1.Moisture.Int.1Hour.0.raw'')', 'should have passed' );
+    RETURN NEXT lives_ok('select housedb_security.can_perform(''guest'',''READ'',''timeseries'',''This-Is-Complex'')', 'should have passed');
 
     PERFORM housedb_security.add_permission('guest','WRITE','locations','^public\..*');
-    RETURN NEXT ok(housedb_security.can_perform('guest','WRITE','locations','public.sidewalk') = true);
-    RETURN NEXT ok(housedb_security.can_perform('guest','WRITE','locations','notpublic.driveway') = false);
+    RETURN NEXT lives_ok('select housedb_security.can_perform(''guest'',''WRITE'',''locations'',''public.sidewalk'')', 'should have passed');
+    RETURN NEXT throws_like('select housedb_security.can_perform(''guest'',''WRITE'',''locations'',''notpublic.driveway'')','%has no%', 'should have failed');    
+    raise notice 'done with can_perform';
 END;
 $$ LANGUAGE plpgsql;
 

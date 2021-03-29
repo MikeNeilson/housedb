@@ -20,13 +20,15 @@ DECLARE
 	duration_id integer;
 	version text;
 BEGIN
-	SET search_path TO housedb_timeseries,housedb,public;    
+	SET search_path TO housedb_timeseries,housedb,public;    	
 
 	SELECT id INTO ts_id FROM catalog WHERE UPPER(ts_name)=UPPER(timeseries_name);
 	
     IF FOUND THEN
 		RETURN ts_id;
 	ELSE
+		--perform housedb_security.can_perform(housedb_security.get_session_user(),'CREATE','timeseries',ts_name);
+			
         select regexp_split_to_array(ts_name,'\.') into ts_parts;				    
 		location := ts_parts[1];
 		param := ts_parts[2];
