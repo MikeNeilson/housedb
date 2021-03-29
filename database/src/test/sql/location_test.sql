@@ -9,15 +9,9 @@ DECLARE
     sub_id bigint;
 BEGIN
     perform housedb_security.add_permission('guest', 'CREATE', 'locations','.*');
-    
+
     RETURN NEXT ok(housedb_locations.create_location(simple_location) > 0, 'unable to create a simple location');
     RETURN NEXT ok(housedb_locations.create_location(complex_location) > 0, 'unable to create a complex location' );
-
-    --RAISE NOTICE 'showing locations that exist';    
-    --for query_res in execute 'select * from housedb.locations'
-    --loop
-    --    raise notice 'row: %', query_res;
-    --end loop;
 
     RETURN NEXT isnt_empty( 'select * from housedb.locations where parent_id is not null', 'no locations have been created' );
 

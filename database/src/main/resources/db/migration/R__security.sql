@@ -35,7 +35,7 @@ as $$
 declare
     l_cando boolean;
 begin
-    raise notice 'checking (%,%,%,%)',p_username,p_permission,p_data_table,p_object;
+    --raise notice 'checking (%,%,%,%)',p_username,p_permission,p_data_table,p_object;
     set search_path to housedb_security,housedb,public;
 
     if can_perform__(p_username,p_permission,p_data_table,p_object) THEN

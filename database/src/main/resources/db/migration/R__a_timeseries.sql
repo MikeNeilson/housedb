@@ -68,7 +68,7 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION housedb_timeseries.store_timeseries_data(ts_name character varying, data data_triple[], overwrite boolean DEFAULT false) RETURNS bigint    
+CREATE OR REPLACE FUNCTION housedb_timeseries.store_timeseries_data(ts_name character varying, data housedb.data_triple[], overwrite boolean DEFAULT false) RETURNS bigint    
     AS $$
 DECLARE
     ts_id bigint;
@@ -117,7 +117,7 @@ LANGUAGE 'plpgsql';
 
 
 CREATE OR REPLACE FUNCTION housedb_timeseries.retrieve_timeseries_data(ts_name text, start_time timestamp with time zone, end_time timestamp with time zone, timezone text DEFAULT 'UTC', exclude_missing boolean DEFAULT false )
-RETURNS SETOF data_triple
+RETURNS SETOF housedb.data_triple
 AS $$
 DECLARE
 	ts_id bigint;
