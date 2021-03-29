@@ -78,7 +78,7 @@ begin
     set search_path to housedb_security,housedb,public;
 
     select current_setting('housedb.user',true) into l_username;
-    if l_username is null then 
+    if l_username is null or l_username = '' then 
         --raise notice 'user not set, defaulting to guest';
         perform set_session_user('guest');
         l_username := 'guest';
