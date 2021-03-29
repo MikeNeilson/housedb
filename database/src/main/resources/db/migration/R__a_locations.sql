@@ -10,7 +10,7 @@ BEGIN
     select name, parent_id into location,cur_parent_id from locations where id = location_id;        
     while cur_parent_id is not NULL AND depth < 10 LOOP
         select name,parent_id into cur_loc, cur_parent_id from locations where id = cur_parent_id;
-        raise notice 'current name: %', location;
+        --raise notice 'current name: %', location;
         location = cur_loc || '-' || location;
         depth = depth + 1;        
     end loop;        
@@ -34,7 +34,7 @@ BEGIN
     if expect_new = true and the_id is not null then
         raise exception 'Location %s already exists and you indicated a new location id is expected', location USING ERRCODE = 'unique_violation';
     elsif expect_new = false and the_id is not null then
-        raise notice 'found existing location';
+        --raise notice 'found existing location';
         return the_id;
     end if;
 
@@ -46,15 +46,15 @@ BEGIN
     foreach cur_level in ARRAY parts
     loop        
         -- search for existing object at this level
-        raise info 'Search for (%,%)', cur_level,the_parent_id;
+        --raise info 'Search for (%,%)', cur_level,the_parent_id;
         select id,parent_id into the_id,found_parent_id from locations where name=cur_level and (parent_id = the_parent_id or parent_id is null);
         if the_id is NULL THEN
-            raise notice 'insert new value';    
-            raise notice '%',found_parent_id    ;
+            --raise notice 'insert new value';    
+            --raise notice '%',found_parent_id    ;
             insert into locations(name,parent_id) values (cur_level,the_parent_id) returning id into the_id;
             the_parent_id = the_id;
         else
-            raise notice 'this level exists, carrying on';
+            --raise notice 'this level exists, carrying on';
             the_parent_id = the_id; -- skip over this one, it already exists, but track it for the next run
         end if;
 

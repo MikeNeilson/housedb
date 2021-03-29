@@ -11,11 +11,11 @@ BEGIN
     RETURN NEXT ok(housedb.create_location(simple_location) > 0, 'unable to create a simple location');
     RETURN NEXT ok(housedb.create_location(complex_location) > 0, 'unable to create a complex location' );
 
-    RAISE NOTICE 'showing locations that exist';    
-    for query_res in execute 'select * from housedb.locations'
-    loop
-        raise notice 'row: %', query_res;
-    end loop;
+    --RAISE NOTICE 'showing locations that exist';    
+    --for query_res in execute 'select * from housedb.locations'
+    --loop
+    --    raise notice 'row: %', query_res;
+    --end loop;
 
     RETURN NEXT isnt_empty( 'select * from housedb.locations where parent_id is not null', 'no locations have been created' );
 
@@ -23,7 +23,7 @@ BEGIN
     RETURN NEXT ok(sub_id > 0,'sub location not made' );
     RETURN NEXT ok(housedb.expand_location_name(sub_id) = sub_location);
 
-    RAISE NOTICE 'checking case issues';
+    --RAISE NOTICE 'checking case issues';
     RETURN NEXT throws_ok('select housedb.create_location(''SiMPle1'',true)', 23505 );
     RETURN NEXT ok(housedb.create_location('SiMPle1',false) > 0);
 
@@ -47,9 +47,9 @@ BEGIN
     insert into housedb.locations(name) values ('This') returning id into a_parent_id;
     insert into housedb.locations(name,parent_id) values ('Is',a_parent_id) returning id into a_parent_id;
     insert into housedb.locations(name,parent_id) values ('Complex',a_parent_id) returning id into the_complex_id;
-    RAISE NOTICE 'Simple -> %', housedb.expand_location_name(the_simple_id);
-    RAISE NOTICE 'Complex -> ';
-    RAISE NOTICE '%', housedb.expand_location_name(the_complex_id);
+    --RAISE NOTICE 'Simple -> %', housedb.expand_location_name(the_simple_id);
+    --RAISE NOTICE 'Complex -> ';
+    --RAISE NOTICE '%', housedb.expand_location_name(the_complex_id);
     RETURN NEXT is( housedb.expand_location_name(the_simple_id), simple_location );
     RETURN NEXT is( housedb.expand_location_name(the_complex_id), complex_location );
 END;
