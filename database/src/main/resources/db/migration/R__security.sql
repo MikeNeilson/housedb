@@ -61,7 +61,7 @@ begin
 
     select id into l_userid from users where username = p_username;
     if l_userid is not null then 
-        set session "housedb.user" = p_username;
+        perform set_config('housedb.user', p_username::text, false);
         return true;
     else 
         raise exception 'User % does not exist in this database', p_username;
@@ -79,9 +79,11 @@ begin
 
     select current_setting('housedb.user',true) into l_username;
     if l_username is null then 
+        --raise notice 'user not set, defaulting to guest';
         perform set_session_user('guest');
         l_username := 'guest';
     end if;
+    raise notice 'setting user to %', l_username;
     return l_username;
 end;
 $$ language plpgsql;
