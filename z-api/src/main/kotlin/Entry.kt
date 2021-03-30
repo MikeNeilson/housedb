@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.treeToValue
+import org.jooq.exception.*
 
 
 
@@ -30,10 +31,21 @@ fun main(args: Array<String>) {
     ds.setMinIdle(2);
         
     val app = Javalin.create()            
-        .apply {
-            exception(Exception::class.java){ e, _ -> e.printStackTrace() }
-            error(404){ ctx -> ctx.json("not found") }
-           
+        .apply { 
+            exception(DataAccessException::class.java) { e, ctx ->       
+                println("General error")
+                println(e.sqlState())          
+                if( e.sqlState() == "PX001" ){
+                    ctx.status(401)
+                    ctx.json("Not Authorized")
+                } else {
+                    ctx.status(500)
+                    ctx.json("Internal Error")
+                    e.printStackTrace()
+                }
+            }           
+            exception(Exception::class.java){ e, _ -> e.printStackTrace() }            
+            error(404){ ctx -> ctx.json("not found") }           
         }.attribute(javax.sql.DataSource::class.java,ds)
         .before { ctx -> 
             val header = ctx.header("Authorization")
@@ -58,6 +70,5 @@ fun main(args: Array<String>) {
         get("/") { ctx -> ctx.result("Hello World") }
         crud("locations/:location-name", LocationController())
     }
-     
 }
 

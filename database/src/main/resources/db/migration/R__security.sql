@@ -43,7 +43,7 @@ begin
     elsif can_perform__('guest',p_permission,p_data_table,p_object) then 
         raise notice 'guest has permission'; --return -- all users can always do what a guest can
     else 
-        raise exception 'User % has no % permission to object %s',p_username,p_permission,p_object;
+        raise exception 'User % has no % permission to object %s',p_username,p_permission,p_object USING ERRCODE= 'PX001';
     end if;    
 end;
 $$ language plpgsql;
@@ -86,7 +86,7 @@ begin
         perform set_config('housedb.user', p_username::text, false);
         return true;
     else 
-        raise exception 'User % does not exist in this database', p_username;
+        raise exception 'User % does not exist in this database', p_username using ERRCODE = 'PX000';
     end if;
 end;
 $$ language plpgsql;

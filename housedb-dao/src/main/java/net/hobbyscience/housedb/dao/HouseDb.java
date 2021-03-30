@@ -1,6 +1,8 @@
 package net.hobbyscience.housedb.dao;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+
 import javax.sql.DataSource;
 import java.util.logging.*;
 import java.util.List;
@@ -12,6 +14,7 @@ import net.hobbyscience.housedb.*;
 import static org.jooq.impl.DSL.*;
 
 import org.jooq.*;
+import org.jooq.exception.*;
 import org.jooq.impl.DSL;
 
 public class HouseDb {
@@ -26,7 +29,15 @@ public class HouseDb {
 
     public HouseDb(Connection conn, String username ){
         dsl = DSL.using(conn,SQLDialect.POSTGRES);
-        Routines.setSessionUser(dsl.configuration(),username);
+        try {
+            Routines.setSessionUser(dsl.configuration(),username);
+        } catch( DataAccessException err ){  
+            logger.info(err.sqlState());
+            if( !err.sqlState().equalsIgnoreCase("PX000") ){
+                throw err;
+            } // else continue as guest
+        }
+        
         this.username = username;
     }
 
@@ -55,6 +66,8 @@ public class HouseDb {
     }
 
     public void saveLocation(Location loc) throws Exception {
+        logger.info(username);
+        logger.info(Routines.getSessionUser(dsl.configuration()));
         net.hobbyscience.housedb.housedb_locations.Routines.createLocation(dsl.configuration(),loc.getName(),true);
     }
 
