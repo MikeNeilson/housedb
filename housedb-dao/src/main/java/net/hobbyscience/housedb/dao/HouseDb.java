@@ -6,7 +6,8 @@ import java.util.logging.*;
 import java.util.List;
 import java.util.ArrayList;
 
-import net.hobbyscience.housedb.tables.*;
+import net.hobbyscience.housedb.housedb.tables.*;
+import net.hobbyscience.housedb.housedb_security.Routines;
 import net.hobbyscience.housedb.*;
 import static org.jooq.impl.DSL.*;
 
@@ -17,14 +18,15 @@ public class HouseDb {
     private static final Logger logger = Logger.getLogger(HouseDb.class.getName());
     private DataSource ds = null;
     private String username = null;
-
+    private DSLContext dsl = null;
 
     public HouseDb(){
 
     }
 
-    public HouseDb(DataSource ds, String username ){
-        this.ds = ds;
+    public HouseDb(Connection conn, String username ){
+        dsl = DSL.using(conn,SQLDialect.POSTGRES);
+        Routines.setSessionUser(dsl.configuration(),username);
         this.username = username;
     }
 
@@ -40,27 +42,15 @@ public class HouseDb {
 
     public List<String> getAllLocations() throws Exception{
         ArrayList<String> locations = new ArrayList<>();
-        try( Connection conn = ds.getConnection(); ){        
-            DSLContext dsl = DSL.using(conn,SQLDialect.POSTGRES);
 
-            Result<Record> result = dsl.selectDistinct().from(Locations.LOCATIONS).fetch();
-            for( Record r: result ){
-                long id = r.getValue(Locations.LOCATIONS.ID);
-                String loc = r.getValue(Locations.LOCATIONS.NAME);
-                Long parent_id = r.getValue(Locations.LOCATIONS.PARENT_ID);                
-                if ( Routines.canPerform(dsl.configuration(),username,"READ","locations",loc)){
-                    if ( parent_id != null ){
-                        logger.info("expanding name");
-                        locations.add( Routines.expandLocationName(dsl.configuration(),id));
-                    } else {
-                        locations.add(loc);
-                    }
-                }
-            }
-            return locations;
-        } catch(Exception ex){
-            logger.info(ex.getLocalizedMessage());
-            throw ex;
-        }        
+        Result<Record> result = dsl.selectDistinct().from(ViewLocations.VIEW_LOCATIONS).fetch();
+        for( Record r: result ){
+            long id = r.getValue(Locations.LOCATIONS.ID);
+            String loc = r.getValue(Locations.LOCATIONS.NAME);
+            Long parent_id = r.getValue(Locations.LOCATIONS.PARENT_ID);                
+            Routines.canPerform(dsl.configuration(),username,"READ","locations",loc);
+            locations.add(loc);                
+        }
+        return locations;        
     }
 }

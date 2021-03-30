@@ -34,7 +34,21 @@ jooq {
                     name = 'org.jooq.codegen.DefaultGenerator'
                     database {
                         name = 'org.jooq.meta.postgres.PostgresDatabase'                        
-                        inputSchema = project(":database").flyway.schemas[0]
+                        //inputSchemas = project(":database").flyway.schemas
+                        schemata {
+                            schema {
+                                inputSchema = 'housedb'
+                            }
+                            schema {
+                                inputSchema = 'housedb_locations'
+                            }
+                            schema {
+                                inputSchema = 'housedb_timeseries'
+                            }
+                            schema {
+                                inputSchema = 'housedb_security'
+                            }
+                        }
                         includes = '.*'
                         excludes = ''
                     }
