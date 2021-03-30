@@ -18,9 +18,9 @@ begin
         alter function housedb.set_session_user set schema housedb_security;
         alter function housedb.get_session_user set schema housedb_security;    
     else
-        create schema housedb_locations;
+        /*create schema housedb_locations;
         create schema housedb_timeseries;
-        create schema housedb_security;
+        create schema housedb_security;*/
     end if;
 end;
 $$ ;
