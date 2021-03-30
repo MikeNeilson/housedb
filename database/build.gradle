@@ -24,7 +24,7 @@ flyway {
     user = DBUSER
     password = DBPASSWORD
     mixed = true
-    schemas = ['housedb','housedb_security','housedb_locations','housedb_security']
+    schemas = ['housedb','housedb_security','housedb_locations','housedb_timeseries']
 }
 
 
