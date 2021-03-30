@@ -53,4 +53,9 @@ public class HouseDb {
         }
         return locations;        
     }
+
+    public void saveLocation(Location loc) throws Exception {
+        net.hobbyscience.housedb.housedb_locations.Routines.createLocation(dsl.configuration(),loc.getName(),true);
+    }
+
 }

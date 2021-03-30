@@ -18,11 +18,17 @@ class LocationController : CrudHandler {
     }
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-    override fun getOne(ctx: Context, LocationName: String){
+    override fun getOne(ctx: Context, LocationName: String){}
 
+    override fun create(ctx: Context){
+        val loc = ctx.bodyAsClass(Location::class.java)
+        val ds = ctx.appAttribute(DataSource::class.java)        
+        var conn = ds.getConnection()
+        conn.use {
+            val db = HouseDb(conn,ctx.attribute("username"))        
+            db.saveLocation(loc);
+        }
     }
-
-    override fun create(ctx: Context){}
 
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 
