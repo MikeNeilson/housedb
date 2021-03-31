@@ -16,6 +16,11 @@ BEGIN
     RETURN NEXT lives_ok('select housedb_security.can_perform(''guest'',''WRITE'',''locations'',''public.sidewalk'')', 'should have passed');
     RETURN NEXT throws_like('select housedb_security.can_perform(''guest'',''WRITE'',''locations'',''notpublic.driveway'')','%has no%', 'should have failed');    
     raise notice 'done with can_perform';
+
+    PERFORM housedb_security.add_permission('guest','WRITE','locations','^private\.ok-?.*');
+    RETURN NEXT lives_ok('select housedb_security.can_perform(''guest'',''WRITE'',''locations'',''private.ok-?a test'')', 'should have passed');
+    RETURN NEXT throws_like('select housedb_security.can_perform(''guest'',''WRITE'',''locations'',''private.not ok-?a test'')', '%has no%', 'should have failed');
+
 END;
 $$ LANGUAGE plpgsql;
 

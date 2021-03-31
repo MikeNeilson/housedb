@@ -4,10 +4,11 @@ AS $$
 DECLARE
     l_regex text;
     l_cando boolean;
+    row record;
 BEGIN
     set search_path to housedb_security,housedb,public;
-    select 
-        up.regex into l_regex 
+    for row in select 
+        up.regex as regex
         from 
            user_permissions up
         join users u on u.id = up.user_id
@@ -18,13 +19,14 @@ BEGIN
             and
             p.name = p_permission
             and
-            dt.name = p_data_table;
+            dt.name = p_data_table
+    loop
+        if p_object ~ row.regex THEN
+            return true;
+        end if;
+    end loop;
 
-    if l_regex is null THEN
-        return false;
-    else
-        return p_object ~ l_regex;
-    end if;
+    return false;
     
 END;
 $$ language plpgsql;
@@ -56,8 +58,10 @@ DECLARE
     l_userid bigint;
     l_perm_id int;
     l_dt_id int;
+    l_granter_id bigint;
 BEGIN
-    set search_path to housedb,public;
+    set search_path to housedb_security,housedb,public;
+    select id into l_granter_id from users where username = get_session_user();
     select id into l_userid from users where username = p_username;
     select id into l_perm_id from permissions where name = p_permission;
     select id into l_dt_id from data_tables where name = p_data_table;
@@ -68,7 +72,7 @@ BEGIN
     elsif l_dt_id is null THEN
         raise exception 'Unrecognized data table %', p_data_table;
     end if;
-    insert into user_permissions(user_id,permission_id,data_table_id,regex) values (l_userid,l_perm_id,l_dt_id,p_regex);
+    insert into user_permissions(user_id,permission_id,data_table_id,regex,granter_id) values (l_userid,l_perm_id,l_dt_id,p_regex,l_granter_id);
     return true;
 END;
 $$ language plpgsql;
