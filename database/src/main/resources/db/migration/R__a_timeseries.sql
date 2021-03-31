@@ -1,3 +1,6 @@
+create or replace function housedb_timeseries.error_bad_tsname() returns text as $$ begin return 'ZX081'; end; $$ language plpgsql;
+create or replace function housedb_timeseries.error_bad_data() returns text as $$ begin return 'ZX082'; end; $$ language plpgsql;
+
 --
 -- Name: create_timeseries(character varying); Type: FUNCTION; Schema: public; Owner: -
 --
@@ -29,7 +32,12 @@ BEGIN
 	ELSE
 		--perform housedb_security.can_perform(housedb_security.get_session_user(),'CREATE','timeseries',ts_name);
 			
-        select regexp_split_to_array(ts_name,'\.') into ts_parts;				    
+        select regexp_split_to_array(ts_name,'\.') into ts_parts;	
+		if array_length(ts_parts,1) > 6 then
+			raise exception 'TS Name (%) has more than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		elsif array_length(ts_parts,1) < 6 then
+			raise exception 'TS Name (%) has less than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		end if;
 		location := ts_parts[1];
 		param := ts_parts[2];
 		data_type := ts_parts[3];
