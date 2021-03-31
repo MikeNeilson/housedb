@@ -1,11 +1,53 @@
 create or replace function housedb_timeseries.error_bad_tsname() returns text as $$ begin return 'ZX081'; end; $$ language plpgsql;
 create or replace function housedb_timeseries.error_bad_data() returns text as $$ begin return 'ZX082'; end; $$ language plpgsql;
+create or replace function housedb_timeseries.duplicate_timeseries() returns text as $$ begin return 'ZX083'; end; $$ language plpgsql;
 
+/**
+* Used to make sure data going into the system has a consistent offset from some point
+* 
+*/
+create or replace function housedb_timeseries.check_interval( p_date_time timestamp with time zone, p_interval int, p_offset interval)
+returns void
+as $$
+declare
+	l_interval interval;
+	l_dt_epoch bigint;
+	l_interval_epoch int;
+	l_offset_epoch int;
+	l_mod int;
+begin
+	SET search_path TO housedb_timeseries,housedb,public;    	
+
+	select time_interval into l_interval from intervals where id=p_interval;
+	if l_interval != '00:00:00' then		
+		-- regular data, data should match offset
+		select extract(epoch from p_date_time) into l_dt_epoch;
+		select extract(epoch from l_interval) into l_interval_epoch;
+		select extract(epoch from p_offset) into l_offset_epoch;
+		l_mod := l_dt_epoch % l_interval_epoch;
+		if l_mod != l_offset_epoch then
+			raise exception 'Offset (% seconds) of date_time (%) doesn''t match expected offset (%)(%s seconds)', l_mod,p_date_time,l_interval,l_offset_epoch USING ERRCODE='ZX082';
+		end if;
+	else
+		-- irregular interval data
+	end if;
+
+end;
+$$ language plpgsql;
 --
 -- Name: create_timeseries(character varying); Type: FUNCTION; Schema: public; Owner: -
 --
+create or replace function housedb_timeseries.create_timeseries(ts_name character varying) returns bigint
+as $$ begin
+	return housedb_timeseries.create_timeseries(ts_name, '00:00:00', false);
+end; $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION housedb_timeseries.create_timeseries(ts_name character varying) RETURNS bigint
+create or replace function housedb_timeseries.create_timeseries(ts_name character varying, interval_offset interval) returns bigint
+as $$ begin
+	return housedb_timeseries.create_timeseries(ts_name,interval_offset);
+end; $$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION housedb_timeseries.create_timeseries(ts_name character varying, interval_offset interval, expect_new boolean) RETURNS bigint
 AS  $$
 DECLARE    
 	ts_id integer;
@@ -27,9 +69,11 @@ BEGIN
 	perform housedb_security.can_perform(housedb_security.get_session_user(),'CREATE','timeseries',ts_name);
 	SELECT id INTO ts_id FROM catalog WHERE UPPER(ts_name)=UPPER(timeseries_name);
 	
-    IF FOUND THEN
+    IF FOUND and expect_new = false THEN
 		RETURN ts_id;
-	ELSE
+	elseif FOUND and expect_new = true then
+		raise exception 'timeseries (%s) already exists', ts_name USING ERRCODE = 'ZX083';
+	else
 		--perform housedb_security.can_perform(housedb_security.get_session_user(),'CREATE','timeseries',ts_name);
 			
         select regexp_split_to_array(ts_name,'\.') into ts_parts;	
@@ -67,8 +111,8 @@ BEGIN
 			RAISE EXCEPTION 'Duration % not defined in this system', duration;
 		END IF;
 
-		INSERT INTO timeseries(location_id,parameter_id,type_id,interval_id,duration_id,version)
-		VALUES (location_id,param_id,data_type_id,interval_id,duration_id,version) RETURNING id INTO ts_id;		
+		INSERT INTO timeseries(location_id,parameter_id,type_id,interval_id,duration_id,version,interval_offset)
+		VALUES (location_id,param_id,data_type_id,interval_id,duration_id,version,interval_offset) RETURNING id INTO ts_id;		
 		RETURN ts_id;
 
 	END IF;
@@ -81,13 +125,24 @@ CREATE OR REPLACE FUNCTION housedb_timeseries.store_timeseries_data(ts_name char
 DECLARE
     ts_id bigint;
     tuple housedb.data_triple;
+	l_offset interval;
+	l_interval_id int;
 BEGIN
 	set search_path to housedb_timeseries,housedb,public;
 	perform 'housedb_security.can_perform(housedb_security.get_session_user(),''STORE'',''timeseries'',ts_name)';
 
     SELECT create_timeseries($1) INTO ts_id;
+	select 
+		into l_offset,l_interval_id 
+			 interval_offset, interval_id
+	  from 
+	  	timeseries
+	  where 
+	  	id = ts_id;
     
+
     FOREACH tuple IN array $2 LOOP
+		perform housedb_timeseries.check_interval(tuple.date_time,l_interval_id,l_offset);
         INSERT INTO housedb.timeseries_values(timeseries_id,date_time,value,quality) VALUES (ts_id,tuple.date_time,tuple.value,tuple.quality);
     END LOOP;
 

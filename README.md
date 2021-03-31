@@ -37,7 +37,8 @@ The three primary function are
 
 | Function | Descrption |
 | -------- | ---------- |
-| create_timeseries(ts_name text) | creates a time series, without data, in the database|
+| create_timeseries(ts_name text) | creates a time series, without data, in the database within default interval_offset|
+| create_timeseries(ts_name text, interval_offset interval) | create a new time series with the specified offset from <br />- daily -> midnight<br />- hourly -> the top the hour<br />- minutes -> the top of the hour |
 | store_timeseries_data(ts_name, array of (time timestamp,value double,quality integer)| stores data into the database, creating a time series as needed |
 | retrieve_timeseries_data(ts_name, start, end)| retrieve data from the database|
 | catalog | lists the available time series in the database|

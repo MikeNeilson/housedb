@@ -75,6 +75,21 @@ begin
         ('2020-01-01T03:00:00Z',2,1)::data_triple
     ],false);
     RETURN NEXT lives_ok('insert_data', 'Can insert properly formatted regular data');
-    --RETURN NEXT throws_ok('insert_data_bad','PX082'); -- bad offset
+    RETURN NEXT throws_ok('insert_data_bad',housedb_timeseries.error_bad_data()); -- bad offset
+
+
+    ts_id := housedb_timeseries.create_timeseries('Test1-Test1.Stage.Inst.1Hour.0.offset','00:30:00')
+    PREPARE insert_data as select housedb_timeseries.store_timeseries_data('Test1-Test1.Stage.Inst.1Hour.0.offset',array[ 
+        ('2020-01-01T01:30:00Z',0,0)::data_triple,
+        ('2020-01-01T02:30:00Z',1,1)::data_triple,
+        ('2020-01-01T03:30:00Z',2,1)::data_triple
+    ],false);
+    PREPARE insert_data_bad as select housedb_timeseries.store_timeseries_data('Test1-Test1.Stage.Inst.1Hour.0.offset',array[ 
+        ('2020-01-01T01:00:00Z',0,0)::data_triple,
+        ('2020-01-01T02:30:00Z',1,1)::data_triple,
+        ('2020-01-01T03:00:00Z',2,1)::data_triple
+    ],false);
+    RETURN NEXT lives_ok('insert_data', 'Can insert properly formatted regular data with specified offset');
+    RETURN NEXT throws_ok('insert_data_bad',housedb_timeseries.error_bad_data()); -- bad offset
 end;
 $$ language plpgsql;
