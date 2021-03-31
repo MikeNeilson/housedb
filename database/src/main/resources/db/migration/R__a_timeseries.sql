@@ -21,7 +21,7 @@ DECLARE
 	version text;
 BEGIN
 	SET search_path TO housedb_timeseries,housedb,public;    	
-
+	perform housedb_security.can_perform(housedb_security.get_session_user(),'CREATE','timeseries',ts_name);
 	SELECT id INTO ts_id FROM catalog WHERE UPPER(ts_name)=UPPER(timeseries_name);
 	
     IF FOUND THEN
@@ -75,6 +75,8 @@ DECLARE
     tuple housedb.data_triple;
 BEGIN
 	set search_path to housedb_timeseries,housedb,public;
+	perform 'housedb_security.can_perform(housedb_security.get_session_user(),''STORE'',''timeseries'',ts_name)';
+
     SELECT create_timeseries($1) INTO ts_id;
     
     FOREACH tuple IN array $2 LOOP

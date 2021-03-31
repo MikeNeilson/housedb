@@ -6,6 +6,7 @@ DECLARE
     tsid2 bigint;
 BEGIN
     perform housedb_security.add_permission('guest', 'CREATE', 'locations','.*');
+    perform housedb_security.add_permission('guest', 'CREATE', 'timeseries','.*');
 
     RAISE NOTICE 'creating timeseries';
     tsid1 := housedb_timeseries.create_timeseries('Zone 1-Box 1.Moisture.Inst.1Hour.0.raw');
@@ -25,6 +26,8 @@ DECLARE
     thecount int;
 BEGIN
     perform housedb_security.add_permission('guest', 'CREATE', 'locations','.*');
+    perform housedb_security.add_permission('guest', 'CREATE', 'timeseries','.*');
+    perform housedb_security.add_permission('guest', 'STORE', 'timeseries','Test1-.*');
 
     inputdata = array[ ('2020-01-17T17:00:00Z-08:00',0,0), ('2020-01-17T08:00:00Z-08:00',0,0) ];
     SELECT housedb_timeseries.store_timeseries_data(ts_name, inputdata) INTO ts_id;
