@@ -12,7 +12,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.treeToValue
 import org.jooq.exception.*
-
+import org.postgresql.util.PSQLException
 
 
 fun main(args: Array<String>) {
@@ -37,6 +37,8 @@ fun main(args: Array<String>) {
                 println(e.sqlState())          
                 if( e.sqlState() == "PX001" ){
                     ctx.status(401)
+                    val err: PSQLException = e.getCause(PSQLException::class.java)
+                    println(err.getServerErrorMessage())
                     ctx.json("Not Authorized")
                 } else {
                     ctx.status(500)
