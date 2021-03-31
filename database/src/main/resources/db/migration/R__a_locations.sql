@@ -45,7 +45,7 @@ BEGIN
     select regexp_split_to_array($1,'-') into parts;				
     select array_length(parts,1) into length;
     if length > 10 THEN
-        raise exception 'Location names can only nest 10 levels deep';
+        raise exception 'Location names can only nest 10 levels deep' USING ERRCODE = 'PX091';
     end if;    
     foreach cur_level in ARRAY parts
     loop        

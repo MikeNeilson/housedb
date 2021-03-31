@@ -10,19 +10,20 @@ DECLARE
 BEGIN
     perform housedb_security.add_permission('guest', 'CREATE', 'locations','.*');
 
-    RETURN NEXT ok(housedb_locations.create_location(simple_location) > 0, 'unable to create a simple location');
-    RETURN NEXT ok(housedb_locations.create_location(complex_location) > 0, 'unable to create a complex location' );
+    RETURN NEXT ok(housedb_locations.create_location(simple_location) > 0, 'can create a simple location');
+    RETURN NEXT ok(housedb_locations.create_location(complex_location) > 0, 'can create a complex location' );
 
-    RETURN NEXT isnt_empty( 'select * from housedb.locations where parent_id is not null', 'no locations have been created' );
+    RETURN NEXT isnt_empty( 'select * from housedb.locations where parent_id is not null', 'locations have been created' );
 
     sub_id = housedb_locations.create_location(sub_location);
-    RETURN NEXT ok(sub_id > 0,'sub location not made' );
-    RETURN NEXT ok(housedb_locations.expand_location_name(sub_id) = sub_location);
+    RETURN NEXT ok(sub_id > 0,'sub location is made' );
+    RETURN NEXT ok(housedb_locations.expand_location_name(sub_id) = sub_location, 'expand_location_name expands correctly');
 
     --RAISE NOTICE 'checking case issues';
-    RETURN NEXT throws_ok('select housedb_locations.create_location(''SiMPle1'',true)', 23505 );
-    RETURN NEXT ok(housedb_locations.create_location('SiMPle1',false) > 0);
+    RETURN NEXT throws_ok('select housedb_locations.create_location(''SiMPle1'',true)', 23505 );-- 'create_location does not allow mixed case' );
+    RETURN NEXT ok(housedb_locations.create_location('SiMPle1',false) > 0, 'create_location return original if passed altered case');
 
+    RETURN NEXT throws_ok('select housedb_locations.create_location(''Test0-Test1-Test2-Test3-Test4-Test5-Test6-Test7-Test8-Test9-Test11'')', 'PX091'); -- can't nest more than 10 deep
 END;
 $$ LANGUAGE plpgsql;
 
@@ -46,8 +47,9 @@ BEGIN
     --RAISE NOTICE 'Simple -> %', housedb_locations.expand_location_name(the_simple_id);
     --RAISE NOTICE 'Complex -> ';
     --RAISE NOTICE '%', housedb_locations.expand_location_name(the_complex_id);
-    RETURN NEXT is( housedb_locations.expand_location_name(the_simple_id), simple_location );
-    RETURN NEXT is( housedb_locations.expand_location_name(the_complex_id), complex_location );
+    RETURN NEXT is( housedb_locations.expand_location_name(the_simple_id), simple_location, 'doesn''t ruin simple location' );
+    RETURN NEXT is( housedb_locations.expand_location_name(the_complex_id), complex_location, 'complex location expands correctly' );
+    
 END;
 $$ LANGUAGE plpgsql;
 
