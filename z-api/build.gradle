@@ -39,5 +39,6 @@ compileKotlin {
     //classpath = files(tasks.jar)
     //classpath += configurations.compile.collect    
 run {
+    jvmArgs "-Djava.util.logging.ConsoleHandler.level=ALL"
     args project(":database").flyway.url, project(":database").flyway.user, project(":database").flyway.password
 }    

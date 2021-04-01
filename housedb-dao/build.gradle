@@ -17,6 +17,18 @@ sourceSets {
 
 dependencies {
     jooqGenerator "org.postgresql:postgresql:$PG_VERSION"
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.3'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.10.3'
+    implementation "io.swagger.core.v3:swagger-core:2.0.9"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.10"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.5.2'    
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+}
+
+test {
+    useJUnitPlatform()    
 }
    
 jooq {    
