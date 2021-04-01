@@ -59,7 +59,7 @@ jobs:
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
       - name: Install database
-        run: ./gradlew flywayMigrate -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword
+        run: ./gradlew flywayMigrate --info -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword
       - name: Run tests
         run: ./gradlew testdb -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword        
       - name: Build JOOQ Library

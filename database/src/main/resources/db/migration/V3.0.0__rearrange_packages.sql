@@ -1,6 +1,6 @@
 do $$
 begin 
-    if exists (select 1 from information_schema.routines where specific_schema = 'housedb' and specific_name = 'create_location') then
+    if exists (select 1 from information_schema.routines where specific_schema = 'housedb' and routine_name = 'create_location') then        
         create schema housedb_locations;
         create schema housedb_timeseries;
         create schema housedb_security;
@@ -16,11 +16,7 @@ begin
         alter function housedb.add_user set schema housedb_security;
         alter function housedb.add_permission set schema housedb_security;
         alter function housedb.set_session_user set schema housedb_security;
-        alter function housedb.get_session_user set schema housedb_security;    
-    else
-        /*create schema housedb_locations;
-        create schema housedb_timeseries;
-        create schema housedb_security;*/
+        alter function housedb.get_session_user set schema housedb_security;        
     end if;
 end;
 $$ ;
