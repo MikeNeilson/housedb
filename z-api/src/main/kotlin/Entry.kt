@@ -3,7 +3,10 @@ import java.sql.DriverManager;
 
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
+
 import controllers.*;
+import net.hobbyscience.housedb.api.ErrorResponse;
+
 import org.apache.tomcat.jdbc.pool.DataSource;
 import java.util.Base64;
 import com.fasterxml.jackson.databind.JsonNode
@@ -13,7 +16,28 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.treeToValue
 import org.jooq.exception.*
 import org.postgresql.util.PSQLException
+import io.javalin.plugin.openapi.OpenApiOptions
+import io.javalin.plugin.openapi.OpenApiPlugin
+import io.javalin.plugin.openapi.ui.ReDocOptions
+import io.javalin.plugin.openapi.ui.SwaggerOptions
+import io.swagger.v3.oas.models.info.Info
 
+fun getOpenApiPlugin() = OpenApiPlugin(
+    OpenApiOptions(
+        Info().apply {
+            version("1.0")
+            description("HouseDB API")
+        }
+    ). apply {
+        path("/swagger-docs")
+        swagger(SwaggerOptions("/swagger-ui"))
+        reDoc(ReDocOptions("/redoc"))
+        defaultDocumentation { doc ->
+            doc.json("500", ErrorResponse::class.java)
+            doc.json("503", ErrorResponse::class.java)
+        }
+    }
+)
 
 fun main(args: Array<String>) {
     println("********")
@@ -30,8 +54,12 @@ fun main(args: Array<String>) {
     ds.setMaxIdle(5);
     ds.setMinIdle(2);
         
-    val app = Javalin.create()            
+    val app = Javalin.create(){ config ->
+            config.registerPlugin(getOpenApiPlugin())
+            config.defaultContentType = "application/json"
+        }            
         .apply { 
+            
             exception(DataAccessException::class.java) { e, ctx ->       
                 println("General error")
                 println(e.sqlState())          
