@@ -7,6 +7,9 @@ import io.javalin.apibuilder.ApiBuilder.*
 
 import controllers.*;
 import net.hobbyscience.housedb.api.ErrorResponse;
+import net.hobbyscience.housedb.dao.*
+import net.hobbyscience.housedb.housedb.udt.records.*
+import net.hobbyscience.housedb.jackson.*
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import java.util.Base64;
@@ -16,6 +19,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.module.SimpleModule
 import org.jooq.exception.*
 import org.postgresql.util.PSQLException
 import io.javalin.plugin.openapi.OpenApiOptions
@@ -23,6 +28,8 @@ import io.javalin.plugin.openapi.OpenApiPlugin
 import io.javalin.plugin.openapi.ui.ReDocOptions
 import io.javalin.plugin.openapi.ui.SwaggerOptions
 import io.swagger.v3.oas.models.info.Info
+
+
 
 fun getOpenApiPlugin() = OpenApiPlugin(
     OpenApiOptions(
@@ -32,6 +39,7 @@ fun getOpenApiPlugin() = OpenApiPlugin(
         }
     ). apply {
         path("/swagger-docs")        
+        //.toJsonMapper(JacksonToJsonMapper.INSTANCE)
         swagger(SwaggerOptions("/swagger-ui"))
         reDoc(ReDocOptions("/redoc"))
         defaultDocumentation { doc ->
@@ -55,7 +63,12 @@ fun main(args: Array<String>) {
     ds.setMaxActive(10)
     ds.setMaxIdle(5);
     ds.setMinIdle(2);
-    JavalinJackson.getObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    val om = JavalinJackson.getObjectMapper()
+    om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    om.registerModule(SimpleModule().addDeserializer(DataTriple::class.java, DataTripleDeserializer()));
+    om.registerModule(SimpleModule().addSerializer(DataTriple::class.java, DataTripleSerializer()));
+    om.setAnnotationIntrospector(IgnoreJooq());
+
     val app = Javalin.create(){ config ->
             config.registerPlugin(getOpenApiPlugin())
             config.defaultContentType = "application/json"
@@ -85,8 +98,7 @@ fun main(args: Array<String>) {
                 // verification will be handled at the gateway
                 //val jwt = Jwts.parserBuilder().build().parseClaimsJws(ctx.header("Authorization"))
                 val jwt = header.split(".")
-                val jwtClaims = Base64.getDecoder().decode(jwt[1])
-                val om = ObjectMapper()
+                val jwtClaims = Base64.getDecoder().decode(jwt[1])                
                 val jsonClaims = om.readTree(jwtClaims)
                 //val user = jwt.subject()
                 println(jsonClaims)

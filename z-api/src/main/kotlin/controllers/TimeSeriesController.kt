@@ -33,7 +33,18 @@ class TimeSeriesController : CrudHandler {
             OpenApiResponse(status="200", content = [OpenApiContent( from = TimeSeries::class)])
         ]
     )
-    override fun getOne(ctx: Context, LocationName: String){}
+    override fun getOne(ctx: Context, LocationName: String){
+        println(ctx.attribute("username"))
+        val ds = ctx.appAttribute(DataSource::class.java)        
+        var conn = ds.getConnection()
+        var ts = TimeSeries()
+        ts.setName(ctx.pathParam("timeseries-name"))
+        conn.use {
+            val db = HouseDb(conn,ctx.attribute("username"))        
+            val ts = db.getTimeSeries(ts)         
+            ctx.json(ts)
+        }
+    }
 
     @OpenApi(
         tags = ["TimeSeries"],
@@ -50,7 +61,7 @@ class TimeSeriesController : CrudHandler {
         println(ts)
         conn.use {
             val db = HouseDb(conn,ctx.attribute("username"))        
-            //db.saveLocation(loc);
+            db.saveTimeSeries(ts);
         }
     }
 
