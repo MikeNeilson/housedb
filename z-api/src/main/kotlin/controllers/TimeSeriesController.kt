@@ -6,6 +6,7 @@ import net.hobbyscience.housedb.dao.*;
 import javax.sql.DataSource;
 import net.hobbyscience.housedb.api.*;
 import org.jooq.exception.*
+import java.time.*
 
 class TimeSeriesController : CrudHandler {
     @OpenApi(
@@ -19,7 +20,7 @@ class TimeSeriesController : CrudHandler {
         //throw NotImplemented("unable to retrieve all timeseries")
         println(ctx.attribute("username"))
         val ds = ctx.appAttribute(DataSource::class.java)        
-        var conn = ds.getConnection()
+        var conn = ds.getConnection()        
         conn.use {
             val db = HouseDb(conn,ctx.attribute("username"))        
             val locations = db.getAllLocations()          
@@ -31,6 +32,12 @@ class TimeSeriesController : CrudHandler {
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     @OpenApi(
         tags = ["TimeSeries"],
+        queryParams = [
+            OpenApiParam(name="start", required = true, type = OffsetDateTime::class),
+            OpenApiParam(name="end", required = true, type = OffsetDateTime::class),
+            OpenApiParam(name="timezone"),
+            OpenApiParam(name="exclude_missing", type = Boolean::class, description = "For regular interval timeseries, do you want the elements that don't have values left out")
+        ],
         responses = [
             OpenApiResponse(status="200", content = [OpenApiContent( from = TimeSeries::class)]),  
             OpenApiResponse(status="404", content = [OpenApiContent( from = NotFoundResponse::class)])            
@@ -44,8 +51,16 @@ class TimeSeriesController : CrudHandler {
         ts.setName(ctx.pathParam("timeseries-name"))
         conn.use {
             val db = HouseDb(conn,ctx.attribute("username"))        
+            val start = ctx.queryParam<OffsetDateTime>("start").get()
+            val end = ctx.queryParam<OffsetDateTime>("end").check({it.isAfter(start)}).get()
             try {
-                ts = db.getTimeSeries(ts)         
+                ts = db.getTimeSeries(
+                        ts,
+                        start,
+                        end,
+                        ctx.queryParam("timezone","UTC"),
+                        ctx.queryParam<Boolean>("exclude_missing","false").get()
+                )         
                 ctx.json(ts)
             } catch (err: DataAccessException ){                
                 if( err.sqlState().equals("ZX084") ){                    
