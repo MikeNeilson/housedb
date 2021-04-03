@@ -2,7 +2,9 @@ package net.hobbyscience.housedb.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 
 import javax.sql.DataSource;
@@ -15,6 +17,7 @@ import net.hobbyscience.housedb.housedb.tables.*;
 import net.hobbyscience.housedb.housedb.udt.records.DataTripleRecord;
 import net.hobbyscience.housedb.housedb_security.Routines;
 import net.hobbyscience.housedb.housedb_timeseries.Tables;
+import net.hobbyscience.housedb.housedb_timeseries.tables.RetrieveTimeseriesData;
 import net.hobbyscience.housedb.housedb_timeseries.tables.records.RetrieveTimeseriesDataRecord;
 
 import static net.hobbyscience.housedb.housedb_timeseries.Tables.*;
@@ -86,18 +89,34 @@ public class HouseDb {
     }
 
     public TimeSeries getTimeSeries(TimeSeries ts) throws Exception {
-        List<DataTriple> dts = new ArrayList<DataTriple>();        
-        Result<RetrieveTimeseriesDataRecord> results = dsl.selectFrom(
-                                    RETRIEVE_TIMESERIES_DATA( 
+        List<DataTriple> dts = new ArrayList<DataTriple>();    
+        RetrieveTimeseriesData rts = new RetrieveTimeseriesData();    
+        
+
+        SelectWhereStep<Record3<OffsetDateTime, Double,Integer>> query = 
+            dsl.select(
+                    field("date_time",OffsetDateTime.class),
+                    field("value",Double.class),
+                    field("quality",Integer.class)
+                ).from(
+                    rts.call(ts.getName(),
+        OffsetDateTime.of(0, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(0)),
+        OffsetDateTime.of(2022, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(0)),
+        "UTC", false)
+        /*                            RETRIEVE_TIMESERIES_DATA( 
                                         ts.getName(),
                                         OffsetDateTime.of(0, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(0)),
                                         OffsetDateTime.of(2022, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(0)),
-                                        "UTC", false)).fetch();
+                                        "UTC", false)                                        */
+                                        );
+        logger.info(query.getSQL());                                        
+        Result<Record3<OffsetDateTime, Double,Integer>> results =  query.fetch();
         dts = results.stream().map( dtr -> {
+            logger.info(dtr.toString());
             DataTriple dt = new DataTriple();
-            dt.dateTime = (OffsetDateTime) dtr.get("DateTime");
-            dt.value = (double) dtr.get("value");
-            dt.quality = (int) dtr.get("quality");
+            dt.dateTime = dtr.value1();
+            dt.value = dtr.value2();
+            dt.quality = dtr.value3();
             return dt;
         } ).collect( Collectors.toList());
         ts.setData(dts);
