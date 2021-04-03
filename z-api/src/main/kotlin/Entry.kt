@@ -2,7 +2,9 @@
 import java.sql.DriverManager;
 
 import io.javalin.Javalin
+import io.javalin.core.validation.JavalinValidation
 import io.javalin.plugin.json.JavalinJackson
+
 import io.javalin.apibuilder.ApiBuilder.*
 
 import controllers.*;
@@ -13,6 +15,7 @@ import net.hobbyscience.housedb.jackson.*
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import java.util.Base64;
+import java.time.*;
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -68,6 +71,10 @@ fun main(args: Array<String>) {
     om.registerModule(SimpleModule().addDeserializer(DataTriple::class.java, DataTripleDeserializer()));
     om.registerModule(SimpleModule().addSerializer(DataTriple::class.java, DataTripleSerializer()));
     om.setAnnotationIntrospector(IgnoreJooq());
+
+    JavalinValidation.register(OffsetDateTime::class.java){
+        OffsetDateTime.parse(it)
+    }
 
     val app = Javalin.create(){ config ->
             config.registerPlugin(getOpenApiPlugin())

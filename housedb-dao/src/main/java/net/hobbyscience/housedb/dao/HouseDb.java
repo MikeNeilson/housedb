@@ -72,7 +72,7 @@ public class HouseDb {
         net.hobbyscience.housedb.housedb_timeseries.Routines.storeTimeseriesData(dsl.configuration(),ts.getName(),dtrs,Boolean.TRUE);
     }
 
-    public TimeSeries getTimeSeries(TimeSeries ts) throws Exception {
+    public TimeSeries getTimeSeries(TimeSeries ts, OffsetDateTime start, OffsetDateTime end, String timeZone, boolean excludeMissing) throws Exception {
         List<DataTriple> dts = new ArrayList<DataTriple>();    
         RetrieveTimeseriesData rts = new RetrieveTimeseriesData();    
         
@@ -83,16 +83,12 @@ public class HouseDb {
                     field("value",Double.class),
                     field("quality",Integer.class)
                 ).from(
-                    rts.call(ts.getName(),
-        OffsetDateTime.of(0, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(0)),
-        OffsetDateTime.of(2022, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(0)),
-        "UTC", false)
-        /*                            RETRIEVE_TIMESERIES_DATA( 
-                                        ts.getName(),
-                                        OffsetDateTime.of(0, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(0)),
-                                        OffsetDateTime.of(2022, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(0)),
-                                        "UTC", false)                                        */
-                                        );
+                    rts.call(ts.getName(),                    
+                    start,
+                    end,        
+                    timeZone, 
+                    excludeMissing)        
+        );
         logger.info(query.getSQL());                                        
         Result<Record3<OffsetDateTime, Double,Integer>> results =  query.fetch();
         dts = results.stream().map( dtr -> {
