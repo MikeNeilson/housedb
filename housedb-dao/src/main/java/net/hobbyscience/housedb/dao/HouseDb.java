@@ -2,7 +2,6 @@ package net.hobbyscience.housedb.dao;
 
 import java.sql.Connection;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 import java.util.logging.*;
 import java.util.stream.Collectors;
