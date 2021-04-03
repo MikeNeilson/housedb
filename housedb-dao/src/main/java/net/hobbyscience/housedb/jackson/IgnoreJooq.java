@@ -1,12 +1,9 @@
 package net.hobbyscience.housedb.jackson;
 
-import java.util.logging.Logger;
-
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 
 public class IgnoreJooq extends JacksonAnnotationIntrospector {
-    private static final Logger logger = Logger.getLogger(IgnoreJooq.class.getName());
     /**
      *
      */

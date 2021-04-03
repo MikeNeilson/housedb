@@ -41,7 +41,7 @@ class TimeSeriesController : CrudHandler {
         ts.setName(ctx.pathParam("timeseries-name"))
         conn.use {
             val db = HouseDb(conn,ctx.attribute("username"))        
-            val ts = db.getTimeSeries(ts)         
+            ts = db.getTimeSeries(ts)         
             ctx.json(ts)
         }
     }

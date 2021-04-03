@@ -1,15 +1,11 @@
 package net.hobbyscience.housedb.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import net.hobbyscience.housedb.housedb.udt.records.DataTripleRecord;
 /**
  * 
  */

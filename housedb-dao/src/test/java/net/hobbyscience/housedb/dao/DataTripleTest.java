@@ -32,5 +32,6 @@ public class DataTripleTest{
 
         DataTripleRecord dtr2 = om.readValue(om.writeValueAsString(dtr),DataTripleRecord.class);
         System.out.println(dtr2.getDateTime());
+        assertTrue(true);
     }
 }

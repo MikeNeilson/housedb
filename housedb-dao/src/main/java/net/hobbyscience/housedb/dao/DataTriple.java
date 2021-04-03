@@ -1,12 +1,9 @@
 package net.hobbyscience.housedb.dao;
 
 import java.time.OffsetDateTime;
-import java.util.Date;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import net.hobbyscience.housedb.housedb.udt.records.*;
 /**
