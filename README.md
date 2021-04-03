@@ -17,13 +17,13 @@ A time series is identified with the following format:
 
 For example:
 
-	Front Yard.Rose Rushes nr Road.Soil Moisture.Inst.15Minutes.0.raw
+	Front Yard-Rose Rushes nr Road.Soil Moisture.Inst.15Minutes.0.raw
 
 Is the identifier for a time series the contains soil moisture for the roses in my front yard near the road. The data is Instantaneous sampled at 15 minute intervals and has no duration ( the value applies to a point in time. ) The version is arbitrary.
 
 The duration would be used for average data. For example if we were to take the above data and average it for an hour (an average of 4 fifteen minute values) it would look like this:
 
-	Front Yard.Rose Rushes nr Road.Soil Moisture.Ave.1Hour.1Hour.raw
+	Front Yard-Rose Rushes nr Road.Soil Moisture.Ave.1Hour.1Hour.raw
 
 Valid types are:
 	
@@ -37,7 +37,8 @@ The three primary function are
 
 | Function | Descrption |
 | -------- | ---------- |
-| create_timeseries(ts_name text) | creates a time series, without data, in the database|
+| create_timeseries(ts_name text) | creates a time series, without data, in the database within default interval_offset|
+| create_timeseries(ts_name text, interval_offset interval) | create a new time series with the specified offset from <br />- daily -> midnight<br />- hourly -> the top the hour<br />- minutes -> the top of the hour |
 | store_timeseries_data(ts_name, array of (time timestamp,value double,quality integer)| stores data into the database, creating a time series as needed |
 | retrieve_timeseries_data(ts_name, start, end)| retrieve data from the database|
 | catalog | lists the available time series in the database|

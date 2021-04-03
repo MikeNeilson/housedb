@@ -24,7 +24,7 @@ flyway {
     user = DBUSER
     password = DBPASSWORD
     mixed = true
-    schemas = ['housedb']
+    schemas = ['housedb','housedb_security','housedb_locations','housedb_timeseries']
 }
 
 
@@ -48,7 +48,7 @@ task testdb( type: Exec ){
         executable "pg_prove"
     }
     
-    args "pg_prove", "--host", PGHOST, "--port", PGPORT, "--dbname", PGDATABASE, "--username", "housedb_user", "--runtests", "--schema", "housedb_tests"
+    args "pg_prove", "--host", PGHOST, "--port", PGPORT, "--dbname", PGDATABASE, "--username", "housedb_user", "--runtests", "--schema", "housedb_tests", "-v", "-o"
 
     finalizedBy teardown_tests
 }
