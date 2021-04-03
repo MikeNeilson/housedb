@@ -36,7 +36,7 @@ class TimeSeriesController : CrudHandler {
             OpenApiParam(name="start", required = true, type = OffsetDateTime::class),
             OpenApiParam(name="end", required = true, type = OffsetDateTime::class),
             OpenApiParam(name="timezone"),
-            OpenApiParam(name="exclude_missing", default= false type = Boolean::class, description = "For regular interval timeseries, do you want the elements that don't have values left out")
+            OpenApiParam(name="exclude_missing", type = Boolean::class, description = "For regular interval timeseries, do you want the elements that don't have values left out")
         ],
         responses = [
             OpenApiResponse(status="200", content = [OpenApiContent( from = TimeSeries::class)]),  

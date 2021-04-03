@@ -30,8 +30,8 @@ public class DataTripleTest{
         System.out.println(om.writeValueAsString(dtr));
         
 
-        DataTripleRecord dtr2 = om.readValue(om.writeValueAsString(dtr),DataTripleRecord.class);
-        System.out.println(dtr2.getDateTime());
+        DataTriple dtr2 = om.readValue(om.writeValueAsString(dtr),DataTriple.class);
+        System.out.println(dtr2.dateTime);
         assertTrue(true);
     }
 }
