@@ -1,1 +1,0 @@
-alter table housedb.locations add constraint unique_name unique (name) ;
