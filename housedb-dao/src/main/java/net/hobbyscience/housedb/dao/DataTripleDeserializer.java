@@ -9,8 +9,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-import net.hobbyscience.housedb.housedb.udt.records.DataTripleRecord;
-
 public class DataTripleDeserializer extends StdDeserializer<DataTriple>{
     public static final Logger logger = Logger.getLogger(DataTripleDeserializer.class.getName());
     public DataTripleDeserializer(){

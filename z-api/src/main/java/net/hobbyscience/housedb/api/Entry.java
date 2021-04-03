@@ -9,10 +9,9 @@ import io.javalin.plugin.json.JavalinJackson;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
-import controllers.*;
+import net.hobbyscience.housedb.api.controllers.*;
 import net.hobbyscience.housedb.api.ErrorResponse;
 import net.hobbyscience.housedb.dao.*;
-import net.hobbyscience.housedb.housedb.udt.records.*;
 import net.hobbyscience.housedb.jackson.*;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
