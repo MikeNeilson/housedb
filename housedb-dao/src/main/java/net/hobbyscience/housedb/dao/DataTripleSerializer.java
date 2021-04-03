@@ -7,8 +7,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import net.hobbyscience.housedb.housedb.udt.records.DataTripleRecord;
-
 public class DataTripleSerializer extends StdSerializer<DataTriple>{
 
     /**
