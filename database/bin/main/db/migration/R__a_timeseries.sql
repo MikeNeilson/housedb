@@ -1,7 +1,7 @@
 create or replace function housedb_timeseries.error_bad_tsname() returns text as $$ begin return 'ZX081'; end; $$ language plpgsql;
 create or replace function housedb_timeseries.error_bad_data() returns text as $$ begin return 'ZX082'; end; $$ language plpgsql;
 create or replace function housedb_timeseries.duplicate_timeseries() returns text as $$ begin return 'ZX083'; end; $$ language plpgsql;
-
+create or replace function housedb_timeseries.error_no_timeseries() returns text as $$ begin return 'ZX084'; end; $$ language plpgsql;
 /**
 * Used to make sure data going into the system has a consistent offset from some point
 * 
@@ -190,7 +190,7 @@ DECLARE
 BEGIN
 	select id into ts_id from catalog where UPPER(timeseries_name)=UPPER(ts_name);
 	if not found then
-		raise exception 'TimeSeries, %, not found', ts_name;
+		raise exception 'TimeSeries, %, not found', ts_name USING ERRCODE = 'ZX084';
 	end if;
 	for thedata in select date_time,value,quality from housedb.timeseries_values where timeseries_id = ts_id and date_time between start_time and end_time
 	loop

@@ -90,7 +90,7 @@ fun main(args: Array<String>) {
                 }
             }           
             exception(Exception::class.java){ e, _ -> e.printStackTrace() }            
-            error(404){ ctx -> ctx.json("not found") }           
+            //error(404){ ctx -> ctx.json("not found") }           
         }.attribute(javax.sql.DataSource::class.java,ds)
         .before { ctx -> 
             val header = ctx.header("Authorization")

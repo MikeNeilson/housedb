@@ -4,6 +4,8 @@ import io.javalin.http.*;
 import io.javalin.plugin.openapi.annotations.*
 import net.hobbyscience.housedb.dao.*;
 import javax.sql.DataSource;
+import net.hobbyscience.housedb.api.*;
+import org.jooq.exception.*
 
 class TimeSeriesController : CrudHandler {
     @OpenApi(
@@ -30,7 +32,8 @@ class TimeSeriesController : CrudHandler {
     @OpenApi(
         tags = ["TimeSeries"],
         responses = [
-            OpenApiResponse(status="200", content = [OpenApiContent( from = TimeSeries::class)])
+            OpenApiResponse(status="200", content = [OpenApiContent( from = TimeSeries::class)]),  
+            OpenApiResponse(status="404", content = [OpenApiContent( from = NotFoundResponse::class)])            
         ]
     )
     override fun getOne(ctx: Context, LocationName: String){
@@ -41,8 +44,16 @@ class TimeSeriesController : CrudHandler {
         ts.setName(ctx.pathParam("timeseries-name"))
         conn.use {
             val db = HouseDb(conn,ctx.attribute("username"))        
-            ts = db.getTimeSeries(ts)         
-            ctx.json(ts)
+            try {
+                ts = db.getTimeSeries(ts)         
+                ctx.json(ts)
+            } catch (err: DataAccessException ){                
+                if( err.sqlState().equals("ZX084") ){                    
+                    throw NotFoundResponse(message ="No Timeseries by this name: " + ts.getName())                                                                                        
+                }
+                throw err;
+            }
+            
         }
     }
 
@@ -51,7 +62,7 @@ class TimeSeriesController : CrudHandler {
         requestBody = OpenApiRequestBody(content = [OpenApiContent(from = TimeSeries::class)]),
         summary = "data triples are not required when creating a timeseries, but will be immediately stored if present",
         responses = [
-            OpenApiResponse(status="200", content = [OpenApiContent( from = TimeSeries::class)])
+            OpenApiResponse(status="200", content = [OpenApiContent( from = TimeSeries::class)])            
         ]
     )
     override fun create(ctx: Context){

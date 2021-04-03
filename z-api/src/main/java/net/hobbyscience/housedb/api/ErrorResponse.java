@@ -6,4 +6,5 @@ public class ErrorResponse {
     public int status;
     public String type;
     public Map<String, String> details;
+    
 }
