@@ -2,3 +2,8 @@ build/**
 **/bin/**
 **/build/**
 .gradle/**
+.idea
+**/.classpath
+**/.project
+**/.settings
+local.properties
