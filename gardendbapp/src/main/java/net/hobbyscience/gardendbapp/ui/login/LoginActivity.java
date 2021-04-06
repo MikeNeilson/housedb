@@ -1,4 +1,4 @@
-package com.example.gardendbapp.ui.login;
+package net.hobbyscience.gardendbapp.ui.login;
 
 import android.app.Activity;
 import androidx.lifecycle.Observer;
@@ -18,7 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.gardendbapp.R;
+import net.hobbyscience.gardendbapp.R;
 
 public class LoginActivity extends AppCompatActivity {
 

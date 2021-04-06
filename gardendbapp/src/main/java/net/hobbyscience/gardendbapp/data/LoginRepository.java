@@ -1,6 +1,6 @@
-package com.example.gardendbapp.data;
+package net.hobbyscience.gardendbapp.data;
 
-import com.example.gardendbapp.data.model.LoggedInUser;
+import net.hobbyscience.gardendbapp.data.model.LoggedInUser;
 
 /**
  * Class that requests authentication and user information from the remote data source and

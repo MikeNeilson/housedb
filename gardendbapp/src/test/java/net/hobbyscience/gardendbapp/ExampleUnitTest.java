@@ -1,4 +1,4 @@
-package com.example.gardendbapp;
+package net.hobbyscience.gardendbapp;
 
 import org.junit.Test;
 

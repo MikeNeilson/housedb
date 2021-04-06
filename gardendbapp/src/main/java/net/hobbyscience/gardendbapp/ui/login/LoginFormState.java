@@ -1,4 +1,4 @@
-package com.example.gardendbapp.ui.login;
+package net.hobbyscience.gardendbapp.ui.login;
 
 import androidx.annotation.Nullable;
 

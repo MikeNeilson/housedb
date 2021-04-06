@@ -1,11 +1,11 @@
-package com.example.gardendbapp.ui.login;
+package net.hobbyscience.gardendbapp.ui.login;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 
-import com.example.gardendbapp.data.LoginDataSource;
-import com.example.gardendbapp.data.LoginRepository;
+import net.hobbyscience.gardendbapp.data.LoginDataSource;
+import net.hobbyscience.gardendbapp.data.LoginRepository;
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.

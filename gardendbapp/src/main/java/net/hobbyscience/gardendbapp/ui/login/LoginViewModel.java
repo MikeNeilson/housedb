@@ -1,14 +1,14 @@
-package com.example.gardendbapp.ui.login;
+package net.hobbyscience.gardendbapp.ui.login;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import android.util.Patterns;
 
-import com.example.gardendbapp.data.LoginRepository;
-import com.example.gardendbapp.data.Result;
-import com.example.gardendbapp.data.model.LoggedInUser;
-import com.example.gardendbapp.R;
+import net.hobbyscience.gardendbapp.data.LoginRepository;
+import net.hobbyscience.gardendbapp.data.Result;
+import net.hobbyscience.gardendbapp.data.model.LoggedInUser;
+import net.hobbyscience.gardendbapp.R;
 
 public class LoginViewModel extends ViewModel {
 

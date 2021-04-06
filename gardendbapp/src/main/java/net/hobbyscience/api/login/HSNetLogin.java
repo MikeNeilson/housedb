@@ -2,7 +2,7 @@ package net.hobbyscience.api.login;
 
 import android.util.Log;
 
-import com.example.gardendbapp.data.model.LoggedInUser;
+import net.hobbyscience.gardendbapp.data.model.LoggedInUser;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;

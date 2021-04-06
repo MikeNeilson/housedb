@@ -1,9 +1,8 @@
-package com.example.gardendbapp.data;
+package net.hobbyscience.gardendbapp.data;
 
-import com.example.gardendbapp.data.model.LoggedInUser;
+import net.hobbyscience.gardendbapp.data.model.LoggedInUser;
 
 import java.io.IOException;
-import com.loopj.android.http.*;
 
 import net.hobbyscience.api.login.HSNetLogin;
 

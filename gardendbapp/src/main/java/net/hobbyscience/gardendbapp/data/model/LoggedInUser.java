@@ -1,4 +1,4 @@
-package com.example.gardendbapp.data.model;
+package net.hobbyscience.gardendbapp.data.model;
 
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository
