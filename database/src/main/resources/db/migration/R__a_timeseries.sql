@@ -34,6 +34,30 @@ begin
 
 end;
 $$ language plpgsql;
+
+create or replace function housedb_timeseries.get_interval_offset( p_date_time timestamp with time zone, p_interval_id int)
+returns interval
+as $$
+declare
+	l_interval interval;
+	l_dt_epoch bigint;
+	l_interval_epoch int;
+	l_offset_epoch int;
+	l_mod int;
+begin
+	SET search_path TO housedb_timeseries,housedb,public;    	
+
+	select time_interval into l_interval from intervals where id=p_interval_id;
+	if l_interval != '00:00:00' then
+		select extract(epoch from p_date_time) into l_dt_epoch;
+		select extract(epoch from l_interval) into l_interval_epoch;		
+		l_mod := l_dt_epoch % l_interval_epoch;
+		return l_mod::interval;
+	else
+		return '0s'::interval;
+	end if;
+end;
+$$ language plpgsql;
 --
 -- Name: create_timeseries(character varying); Type: FUNCTION; Schema: public; Owner: -
 --
@@ -143,7 +167,7 @@ BEGIN
 
     FOREACH tuple IN array $2 LOOP
 		perform housedb_timeseries.check_interval(tuple.date_time,l_interval_id,l_offset);
-        INSERT INTO housedb.timeseries_values(timeseries_id,date_time,value,quality) VALUES (ts_id,tuple.date_time,tuple.value,tuple.quality);
+        INSERT INTO housedb.internal_timeseries_values(timeseries_id,date_time,value,quality) VALUES (ts_id,tuple.date_time,tuple.value,tuple.quality);
     END LOOP;
 
     RETURN ts_id;
@@ -192,12 +216,59 @@ BEGIN
 	if not found then
 		raise exception 'TimeSeries, %, not found', ts_name USING ERRCODE = 'ZX084';
 	end if;
-	for thedata in select date_time,value,quality from housedb.timeseries_values where timeseries_id = ts_id and date_time between start_time and end_time
+	for thedata in select date_time,value,quality from housedb.internal_timeseries_values where timeseries_id = ts_id and date_time between start_time and end_time
 	loop
 		return next thedata;
 	end loop;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+create or replace function housedb_timeseries.insert_tsv()
+returns trigger
+as $$
+declare	
+	ts_info housedb.timeseries%rowtype;
+	ts_id bigint;
+	ts_name text;
+begin 
+	set search_path to housedb_timeseries,housedb,public;
+
+	raise notice 'Inserting value %', NEW;
+	if NEW.ts_id is not null and NEW.name is not null THEN
+		raise exception 'Specify only timeseries_id or name, not both' using ERRCODE = 'ZX082';
+	elsif NEW.ts_id is not null then
+	 	select * from timeseries into ts_info where id=NEW.timeseries_id;
+		if ts_info is null THEN
+			raise exception 'Insertion by ts_id but time series does not exist' USING ERRCODE = 'ZX084';
+		end if;
+		select timeseries_name into ts_name from catalog where NEW.ts_id;
+	elsif NEW.name is not null THEN
+		select * from timeseries into ts_info where id=(select id from catalog where timeseries_name=NEW.name);
+		if ts_info is null THEN
+			ts_id := housedb_timeseries.create_timeseries(NEW.name::character varying); -- TODO: update to handle the interval offset setting with the first value
+			select * from timeseries into ts_info where id=ts_id;
+		end if;
+		ts_name := NEW.name;
+	end if;	
+	raise notice 'Working with ts %', ts_info;
+	-- consider moving to before trigger
+	perform 'housedb_security.can_perform(housedb_security.get_session_user(),''STORE'',''timeseries'',ts_name)';
+
+	perform housedb_timeseries.check_interval(NEW.date_time,ts_info.interval_id,ts_info.interval_offset);
+
+	insert into 
+		housedb.internal_timeseries_values(timeseries_id,date_time,value,quality)
+	VALUES (ts_info.id,NEW.date_time,NEW.value,NEW.quality);
+
+	return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists insert_tsv_trigger on housedb.timeseries_values;
+create trigger insert_tsv_trigger instead of insert on housedb.timeseries_values 
+    for each row execute procedure housedb_timeseries.insert_tsv();
 
 /*
 
