@@ -230,7 +230,7 @@ returns trigger
 as $$
 declare	
 	ts_info housedb.timeseries%rowtype;
-	ts_id bigint;
+	l_ts_id bigint;
 	ts_name text;
 begin 
 	set search_path to housedb_timeseries,housedb,public;
@@ -247,8 +247,9 @@ begin
 	elsif NEW.name is not null THEN
 		select * from timeseries into ts_info where id=(select id from catalog where timeseries_name=NEW.name);
 		if ts_info is null THEN
-			ts_id := housedb_timeseries.create_timeseries(NEW.name::character varying); -- TODO: update to handle the interval offset setting with the first value
-			select * from timeseries into ts_info where id=ts_id;
+			l_ts_id := housedb_timeseries.create_timeseries(NEW.name::character varying); -- TODO: update to handle the interval offset setting with the first value
+			select * from timeseries into ts_info where id=l_ts_id;
+			NEW.ts_id = l_ts_id;
 		end if;
 		ts_name := NEW.name;
 	end if;	

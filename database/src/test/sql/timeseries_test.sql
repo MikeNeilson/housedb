@@ -25,7 +25,7 @@ RETURNS SETOF TEXT AS $$
 DECLARE
     inputdata housedb.data_triple[];
     ts_name varchar(255) = 'Test1-Test1.Precip.Total.0.0.raw';
-    ts_id bigint;
+    l_ts_id bigint;
     thecount int;
 BEGIN
     perform housedb_security.add_permission('guest', 'CREATE', 'locations','.*');
@@ -33,8 +33,13 @@ BEGIN
     perform housedb_security.add_permission('guest', 'STORE', 'timeseries','Test1-.*');
 
     inputdata = array[ ('2020-01-17T17:00:00Z-08:00',0,0), ('2020-01-17T08:00:00Z-08:00',0,0) ];
-    SELECT housedb_timeseries.store_timeseries_data(ts_name, inputdata) INTO ts_id;
-    SELECT count(*) into thecount from housedb.timeseries_values where timeseries_id = ts_id;
+    insert into housedb.timeseries_values(name,date_time,value,quality) 
+        values 
+            (ts_name,'2020-01-17T17:00:00Z-08:00',0,0),
+            (ts_name,'2020-01-17T08:00:00Z-08:00',0,0);
+    select ts_id into l_tsid from housedb.catalog where timeseries_name = ts_name;
+    --SELECT housedb_timeseries.store_timeseries_data(ts_name, inputdata) INTO ts_id;
+    SELECT count(*) into thecount from housedb.timeseries_values where timeseries_id = l_ts_id;
     RETURN NEXT is( thecount, 2, 'can add data to timeseries values' );
 END;
 $$ LANGUAGE plpgsql;
