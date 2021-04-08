@@ -24,6 +24,9 @@ BEGIN
     RETURN NEXT ok(housedb_locations.create_location('SiMPle1',false) > 0, 'create_location return original if passed altered case');
 
     RETURN NEXT throws_ok('select housedb_locations.create_location(''Test0-Test1-Test2-Test3-Test4-Test5-Test6-Test7-Test8-Test9-Test11'')', 'PX091'); -- can't nest more than 10 deep
+
+    sub_id := housedb_locations.create_location('Simple1-Simple1');
+    RETURN NEXT ok( housedb_locations.expand_location_name(sub_id) = 'Simple1-Simple1','Can duplicate name in sublocations');
 END;
 $$ LANGUAGE plpgsql;
 
@@ -52,6 +55,8 @@ BEGIN
     
 END;
 $$ LANGUAGE plpgsql;
+
+
 
 
 

@@ -68,12 +68,12 @@ public class HouseDb {
 
     public void saveTimeSeries(TimeSeries ts) throws Exception {    
         //DataTripleRecord []dtrs = ts.getData().stream().map( dt -> dt.asDataTripleRecord() ).collect( Collectors.toList() ).toArray(new DataTripleRecord[0]);
-        
+
         dsl.transaction( config -> {
             var insert = DSL.using(config).insertInto(TIMESERIES_VALUES, TIMESERIES_VALUES.NAME, TIMESERIES_VALUES.DATE_TIME, TIMESERIES_VALUES.VALUE, TIMESERIES_VALUES.QUALITY);
             ts.getData().stream().forEach( dt -> {
                 insert.values( ts.getName(), dt.dateTime, dt.value, dt.quality);
-            });  
+            });              
             insert.execute(); // TODO: consider returning to user;
         });        
         
