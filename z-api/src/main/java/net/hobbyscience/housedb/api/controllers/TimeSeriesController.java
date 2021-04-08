@@ -46,7 +46,7 @@ public class TimeSeriesController implements CrudHandler {
         }
     )
     public void getOne(Context ctx, String locationName){
-        logger.log(ctx.attribute("username"));
+        logger.info(ctx.attribute("username").toString());
         var ds = ctx.appAttribute(DataSource.class);
         var ts = new TimeSeries();
         ts.setName(ctx.pathParam("timeseries-name"));

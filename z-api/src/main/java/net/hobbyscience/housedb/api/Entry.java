@@ -4,6 +4,7 @@ package net.hobbyscience.housedb.api;
 import java.sql.DriverManager;
 
 import io.javalin.Javalin;
+import io.javalin.core.util.Header;
 import io.javalin.core.validation.JavalinValidation;
 import io.javalin.plugin.json.JavalinJackson;
 
@@ -97,11 +98,14 @@ public class Entry {
                 //error(404){ ctx -> ctx.json("not found") }           
             .attribute(javax.sql.DataSource.class,ds)
             .before( ctx -> {
-                var header = ctx.header("Authorization");
+                var header = ctx.header(Header.AUTHORIZATION);
                 if( header != null ){
                     // verification will be handled at the gateway
                     //val jwt = Jwts.parserBuilder().build().parseClaimsJws(ctx.header("Authorization"))
-                    var jwt = header.split(".");
+                    logger.info(header);
+                    var parts = header.split("\\\\s+");
+                    var jwt = parts[parts.length-1].split("\\.");
+                    logger.info(""+jwt.length);
                     var jwtClaims = Base64.getDecoder().decode(jwt[1]);
                     var jsonClaims = om.readTree(jwtClaims);
                     //val user = jwt.subject()
