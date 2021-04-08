@@ -1,0 +1,2 @@
+drop function housedb_timeseries.store_timeseries_data;
+drop function housedb_timeseries.retrieve_timeseries_data;
