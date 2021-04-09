@@ -97,3 +97,30 @@ begin
     RETURN NEXT throws_ok('insert_data_bad2',housedb_timeseries.error_bad_data()); -- bad offset
 end;
 $$ language plpgsql;
+
+create or replace function housedb_tests.test_store_with_first_data_setting_office()
+returns setof text as $$
+declare    
+    ts_id bigint;
+    l_offset interval;
+    l_row housedb.catalog%rowtype;
+begin
+    set search_path = housedb,public;
+    perform housedb_security.add_permission('guest', 'CREATE', 'locations','.*');
+    perform housedb_security.add_permission('guest', 'CREATE', 'timeseries','.*');
+    perform housedb_security.add_permission('guest', 'STORE', 'timeseries','.*');
+        
+    PREPARE insert_data_first_ts as insert into housedb.timeseries_values(name,date_time,value,quality) values
+        ('Test1-Offset5min.Stage.Inst.1Hour.0.raw','2020-01-01T01:05:00Z',0,0),
+        ('Test1-Offset5min.Stage.Inst.1Hour.0.raw','2020-01-01T02:05:00Z',1,1),
+        ('Test1-Offset5min.Stage.Inst.1Hour.0.raw','2020-01-01T03:05:00Z',2,1)
+    ;
+    PREPARE insert_data_first_ts_bad as insert into housedb.timeseries_values(name,date_time,value,quality) values
+        ('Test2-Reg.Stage.Inst.1Hour.0.raw','2020-01-01T01:05:00Z',0,0),
+        ('Test2-Reg.Stage.Inst.1Hour.0.raw','2020-01-01T02:30:00Z',1,1),
+        ('Test2-Reg.Stage.Inst.1Hour.0.raw','2020-01-01T03:00:00Z',2,1)
+    ;
+    RETURN NEXT lives_ok('insert_data_first_ts', 'Can insert properly formatted regular data');
+    RETURN NEXT throws_ok('insert_data_first_ts_bad',housedb_timeseries.error_bad_data()); -- bad offset
+end;
+$$ language plpgsql;

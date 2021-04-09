@@ -35,7 +35,7 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function housedb_timeseries.get_interval_offset( p_date_time timestamp with time zone, p_interval_id int)
+create or replace function housedb_timeseries.get_interval_offset( p_date_time timestamp with time zone, p_interval_id bigint)
 returns interval
 as $$
 declare
@@ -44,6 +44,7 @@ declare
 	l_interval_epoch int;
 	l_offset_epoch int;
 	l_mod int;
+	l_interval_offset interval;
 begin
 	SET search_path TO housedb_timeseries,housedb,public;    	
 
@@ -52,7 +53,9 @@ begin
 		select extract(epoch from p_date_time) into l_dt_epoch;
 		select extract(epoch from l_interval) into l_interval_epoch;		
 		l_mod := l_dt_epoch % l_interval_epoch;
-		return l_mod::interval;
+		l_interval_offset := make_interval(secs=>l_mod);
+		raise notice 'calculated offset %', l_interval_offset;
+		return l_interval_offset;
 	else
 		return '0s'::interval;
 	end if;
@@ -145,6 +148,31 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
+-- TODO: make a check valid ts name function
+create or replace function housedb_timeseries.extract_interval_id_from_name( p_timeseries_name text )
+returns bigint	
+as $$
+declare
+	l_interval text;
+	l_interval_id bigint;
+	ts_parts text[];
+begin
+	select regexp_split_to_array(p_timeseries_name,'\.') into ts_parts;	
+	if array_length(ts_parts,1) > 6 then
+		raise exception 'TS Name (%) has more than 7 parts',ts_name USING ERRCODE = 'ZX081';
+	elsif array_length(ts_parts,1) < 6 then
+		raise exception 'TS Name (%) has less than 7 parts',ts_name USING ERRCODE = 'ZX081';
+	end if;
+	l_interval = ts_parts[4];
+	select into l_interval_id id from housedb.intervals where lower(l_interval) = lower(name);
+	if l_interval_id is not null THEN
+		return l_interval_id;
+	else 
+		raise exception 'Unable to extract interval from (%s) likely not defined yet', p_timeseries_name;
+	end if;
+end;
+$$ language plpgsql;
+
 create or replace function housedb_timeseries.insert_tsv()
 returns trigger
 as $$
@@ -152,6 +180,8 @@ declare
 	ts_info housedb.timeseries%rowtype;
 	l_ts_id bigint;
 	ts_name text;
+	l_new_interval_id bigint;
+	l_calculated_offset interval;
 begin 
 	set search_path to housedb_timeseries,housedb,public;
 	if TG_OP = 'DELETE' then		
@@ -174,7 +204,9 @@ begin
 			select * from timeseries into ts_info where id=(select id from housedb.catalog where timeseries_name=NEW.name);
 			if ts_info is null THEN
 				raise notice 'creating ts info';
-				l_ts_id := housedb_timeseries.create_timeseries(NEW.name::character varying); -- TODO: update to handle the interval offset setting with the first value
+				l_new_interval_id = housedb_timeseries.extract_interval_id_from_name(NEW.name);
+				l_calculated_offset = housedb_timeseries.get_interval_offset(NEW.date_time, l_new_interval_id);
+				l_ts_id := housedb_timeseries.create_timeseries(NEW.name::character varying, l_calculated_offset ); --,l_calculated_offset); -- TODO: update to handle the interval offset setting with the first value
 				select * from timeseries into ts_info where id=l_ts_id;
 				NEW.ts_id = l_ts_id;
 				raise notice 'got ts info';
