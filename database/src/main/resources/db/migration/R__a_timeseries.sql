@@ -17,7 +17,7 @@ declare
 	l_mod int;
 begin
 	SET search_path TO housedb_timeseries,housedb,public;    	
-	raise notice 'Checking interval with offset %',p_offset;
+	--raise notice 'Checking interval with offset %',p_offset;
 	select into l_interval time_interval from intervals where id=p_interval;	
 	if l_interval != '00:00:00' then
 		-- regular data, data should match offset
@@ -54,7 +54,7 @@ begin
 		select extract(epoch from l_interval) into l_interval_epoch;		
 		l_mod := l_dt_epoch % l_interval_epoch;
 		l_interval_offset := make_interval(secs=>l_mod);
-		raise notice 'calculated offset %', l_interval_offset;
+		--raise notice 'calculated offset %', l_interval_offset;
 		return l_interval_offset;
 	else
 		return '0s'::interval;
@@ -188,7 +188,7 @@ begin
 		raise notice 'deleting %', OLD;
 		return OLD;
 	else
-		raise notice 'Inserting or updating value %', NEW;
+		--raise notice 'Inserting or updating value %', NEW;
 		if NEW.ts_id is not null and NEW.name is not null THEN
 			raise exception 'Specify only timeseries_id or name, not both' using ERRCODE = 'ZX082';
 		elsif NEW.ts_id is not null then
@@ -197,38 +197,32 @@ begin
 				raise exception 'Insertion by ts_id but time series does not exist' USING ERRCODE = 'ZX084';
 			end if;
 			select timeseries_name into ts_name from catalog where NEW.ts_id;
-		elsif NEW.name is not null THEN
-			raise notice 'getting info for %', NEW.name;
-			select into l_ts_id id from housedb.catalog where upper(timeseries_name)=upper(NEW.name);
-			raise notice 'found id %',l_ts_id;
+		elsif NEW.name is not null THEN			
+			select into l_ts_id id from housedb.catalog where upper(timeseries_name)=upper(NEW.name);			
 			select * from timeseries into ts_info where id=(select id from housedb.catalog where timeseries_name=NEW.name);
-			if ts_info is null THEN
-				raise notice 'creating ts info';
+			if ts_info is null THEN				
 				l_new_interval_id = housedb_timeseries.extract_interval_id_from_name(NEW.name);
 				l_calculated_offset = housedb_timeseries.get_interval_offset(NEW.date_time, l_new_interval_id);
 				l_ts_id := housedb_timeseries.create_timeseries(NEW.name::character varying, l_calculated_offset ); --,l_calculated_offset); -- TODO: update to handle the interval offset setting with the first value
 				select * from timeseries into ts_info where id=l_ts_id;
-				NEW.ts_id = l_ts_id;
-				raise notice 'got ts info';
-			end if;
-			raise notice 'have ts info';
+				NEW.ts_id = l_ts_id;				
+			end if;			
 			ts_name := NEW.name;
-		end if;	
-		raise notice 'Working with ts %', ts_info;
+		end if;			
 		-- consider moving to before trigger
 		if TG_OP = 'UPDATE' then
-			raise notice 'check can update';
+			--raise notice 'check can update';
 			perform 'housedb_security.can_perform(housedb_security.get_session_user(),''UPDATE'',''timeseries'',ts_name)';
-			raise notice 'check can update down';
+			--raise notice 'check can update down';
 		else 
-			raise notice 'check can store';
+			--raise notice 'check can store';
 			perform 'housedb_security.can_perform(housedb_security.get_session_user(),''STORE'',''timeseries'',ts_name)';
-			raise notice 'check can store';
+			--raise notice 'check can store';
 		end if ;
-		raise notice 'security checks passed';
+		--raise notice 'security checks passed';
 		perform housedb_timeseries.check_interval(NEW.date_time,ts_info.interval_id,ts_info.interval_offset);
 		
-		raise notice 'Inserting, all checks passed';
+		--raise notice 'Inserting, all checks passed';
 		insert into 
 			housedb.internal_timeseries_values(timeseries_id,date_time,value,quality)
 		values (ts_info.id,NEW.date_time,NEW.value,NEW.quality)
