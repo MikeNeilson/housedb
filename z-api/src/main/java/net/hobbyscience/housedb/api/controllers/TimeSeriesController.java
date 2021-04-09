@@ -36,8 +36,8 @@ public class TimeSeriesController implements CrudHandler {
         tags = {"TimeSeries"},
         queryParams = {
             @OpenApiParam(name="start", required = true, type = OffsetDateTime.class),
-            @OpenApiParam(name="end", required = true, type = OffsetDateTime.class),
-            @OpenApiParam(name="timezone"),
+            @OpenApiParam(name="end", required = true, type = OffsetDateTime.class),            
+            @OpenApiParam(name="units",required=false),
             @OpenApiParam(name="exclude_missing", type = Boolean.class, description = "For regular interval timeseries, do you want the elements that don't have values left out")
         },
         responses = {

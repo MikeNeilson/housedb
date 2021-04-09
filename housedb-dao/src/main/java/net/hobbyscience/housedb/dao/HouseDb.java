@@ -9,7 +9,11 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.hobbyscience.housedb.housedb.tables.*;
+import net.hobbyscience.housedb.housedb.tables.Catalog;
+
 import static net.hobbyscience.housedb.housedb.tables.TimeseriesValues.*;
+import static net.hobbyscience.housedb.housedb.tables.Timeseries.*;
+import static net.hobbyscience.housedb.housedb.tables.Catalog.*;
 import net.hobbyscience.housedb.housedb.udt.records.DataTripleRecord;
 import net.hobbyscience.housedb.housedb_security.Routines;
 import net.hobbyscience.housedb.housedb_timeseries.tables.RetrieveTimeseriesData;
@@ -83,23 +87,36 @@ public class HouseDb {
     public TimeSeries getTimeSeries(TimeSeries ts, OffsetDateTime start, OffsetDateTime end, String timeZone, boolean excludeMissing) throws Exception {
         List<DataTriple> dts = new ArrayList<DataTriple>();    
 
-        Result<Record3<OffsetDateTime, Double, Integer>> results = 
+        Record1<String> offset = dsl.select(
+                                    TIMESERIES.INTERVAL_OFFSET.concat("")
+                                  ).from(TIMESERIES)
+                                   .join(CATALOG).on(TIMESERIES.ID.eq(CATALOG.ID))
+                                   .where(
+                                        upper(CATALOG.TIMESERIES_NAME).eq( upper(ts.getName() ))
+                                    ).fetchOne();
+                                  ;
+        
+        Result<Record4<OffsetDateTime, Double, Integer,String>> results = 
             dsl.select(                
                 field("date_time",OffsetDateTime.class),
                 field("value",Double.class),
-                field("quality",Integer.class)
+                field("quality",Integer.class),
+                field("units",String.class)
             ).from(TIMESERIES_VALUES)
              .where(TIMESERIES_VALUES.NAME.equalIgnoreCase(ts.getName()))
              .and(TIMESERIES_VALUES.DATE_TIME.between(start,end)).fetch();
-
+        final String units[]= new String[1];
         dts = results.stream().map( dtr -> {
             logger.info(dtr.toString());
             DataTriple dt = new DataTriple();
             dt.dateTime = dtr.value1();
             dt.value = dtr.value2();
             dt.quality = dtr.value3();
+            units[0] = dtr.value4();
             return dt;
         } ).collect( Collectors.toList());
+        ts.setUnits(units[0]);
+        ts.setIntervalOffset(offset.component1());
         ts.setData(dts);
         return ts;
          

@@ -2,6 +2,7 @@ create or replace function housedb_timeseries.error_bad_tsname() returns text as
 create or replace function housedb_timeseries.error_bad_data() returns text as $$ begin return 'ZX082'; end; $$ language plpgsql;
 create or replace function housedb_timeseries.duplicate_timeseries() returns text as $$ begin return 'ZX083'; end; $$ language plpgsql;
 create or replace function housedb_timeseries.error_no_timeseries() returns text as $$ begin return 'ZX084'; end; $$ language plpgsql;
+create or replace function housedb_timeseries.no_units_provided() returns text as $$ begin return 'ZX085'; end; $$ language plpgsql;
 /**
 * Used to make sure data going into the system has a consistent offset from some point
 * 
@@ -221,7 +222,9 @@ begin
 		end if ;
 		--raise notice 'security checks passed';
 		perform housedb_timeseries.check_interval(NEW.date_time,ts_info.interval_id,ts_info.interval_offset);
-		
+		if NEW.units is null THEN
+			raise exception 'You must provide units with the provided data' USING ERRCODE = 'ZX085';
+		end if;
 		--raise notice 'Inserting, all checks passed';
 		insert into 
 			housedb.internal_timeseries_values(timeseries_id,date_time,value,quality)
