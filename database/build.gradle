@@ -15,7 +15,8 @@ configurations {
 }
 
 dependencies {
-    compile "org.flywaydb:flyway-core:7.7.0"
+    compile "net.objecthunter:exp4j:0.4.8"
+    compile "org.flywaydb:flyway-core:7.7.0"    
     flywayMigration "org.postgresql:postgresql:$PG_VERSION"
     flywayMigration sourceSets.main.runtimeClasspath
 }

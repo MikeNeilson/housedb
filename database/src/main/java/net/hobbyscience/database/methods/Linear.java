@@ -10,7 +10,7 @@ public class Linear implements ConversionMethod{
     public Linear(String data){
         String []parts = data.split("\\s+");
         if( parts.length != 2){
-            throw new BadMethodData("Linear conversions consist of only 2 values");
+            throw new BadMethodData("Linear conversions consist of only 2 values. (" + data + ") has " + parts.length + " values");
         }
         try {
             a = Double.parseDouble(parts[0]);
