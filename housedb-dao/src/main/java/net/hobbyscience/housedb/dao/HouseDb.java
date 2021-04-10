@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.hobbyscience.housedb.housedb.tables.*;
-import net.hobbyscience.housedb.housedb.tables.Catalog;
 
 import static net.hobbyscience.housedb.housedb.tables.TimeseriesValues.*;
 import static net.hobbyscience.housedb.housedb.tables.Timeseries.*;
 import static net.hobbyscience.housedb.housedb.tables.Catalog.*;
-import net.hobbyscience.housedb.housedb.udt.records.DataTripleRecord;
 import net.hobbyscience.housedb.housedb_security.Routines;
 
 import static org.jooq.impl.DSL.*;

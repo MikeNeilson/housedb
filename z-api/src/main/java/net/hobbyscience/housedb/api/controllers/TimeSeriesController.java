@@ -4,7 +4,6 @@ import io.javalin.http.*;
 import io.javalin.plugin.openapi.annotations.*;
 import net.hobbyscience.housedb.dao.*;
 import javax.sql.DataSource;
-import net.hobbyscience.housedb.api.*;
 import org.jooq.exception.*;
 import java.time.*;
 import java.util.logging.Logger;

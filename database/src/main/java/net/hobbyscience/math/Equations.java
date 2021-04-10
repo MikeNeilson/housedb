@@ -2,7 +2,6 @@ package net.hobbyscience.math;
 
 import java.util.HashSet;
 
-import net.objecthunter.exp4j.*;
 import net.objecthunter.exp4j.shuntingyard.ShuntingYard;
 import net.objecthunter.exp4j.tokenizer.*;
 

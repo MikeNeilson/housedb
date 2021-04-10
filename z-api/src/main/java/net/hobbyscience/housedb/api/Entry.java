@@ -1,8 +1,5 @@
 package net.hobbyscience.housedb.api;
 
-
-import java.sql.DriverManager;
-
 import io.javalin.Javalin;
 import io.javalin.core.util.Header;
 import io.javalin.core.validation.JavalinValidation;
@@ -11,7 +8,6 @@ import io.javalin.plugin.json.JavalinJackson;
 import static io.javalin.apibuilder.ApiBuilder.*;
 
 import net.hobbyscience.housedb.api.controllers.*;
-import net.hobbyscience.housedb.api.ErrorResponse;
 import net.hobbyscience.housedb.dao.*;
 import net.hobbyscience.housedb.jackson.*;
 
@@ -20,11 +16,7 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.time.*;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.jooq.exception.*;
 import org.postgresql.util.PSQLException;
