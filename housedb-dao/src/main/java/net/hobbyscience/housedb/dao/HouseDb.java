@@ -16,7 +16,6 @@ import static net.hobbyscience.housedb.housedb.tables.Timeseries.*;
 import static net.hobbyscience.housedb.housedb.tables.Catalog.*;
 import net.hobbyscience.housedb.housedb.udt.records.DataTripleRecord;
 import net.hobbyscience.housedb.housedb_security.Routines;
-import net.hobbyscience.housedb.housedb_timeseries.tables.RetrieveTimeseriesData;
 
 import static org.jooq.impl.DSL.*;
 
