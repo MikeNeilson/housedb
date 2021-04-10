@@ -5,7 +5,11 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
 import org.flywaydb.core.api.ResourceProvider;
@@ -19,14 +23,14 @@ import net.hobbyscience.database.exceptions.InvalidMethod;
 import net.hobbyscience.database.methods.Function;
 import net.hobbyscience.database.methods.Linear;
 import net.hobbyscience.database.methods.USGS;
+import net.hobbyscience.math.Equations;
 
-import net.objecthunter.exp4j.*;
-import net.objecthunter.exp4j.shuntingyard.ShuntingYard;
-import net.objecthunter.exp4j.tokenizer.Token;
+
 
 public class R__unit_conversions extends BaseJavaMigration{
     public HashSet<Conversion> conversions = new HashSet<>();
     public HashSet<Unit> units = new HashSet<>();
+
     //public ArrayList<Parameters> parameters = new ArrayList<>();
     public int checksum;
 
@@ -43,7 +47,9 @@ public class R__unit_conversions extends BaseJavaMigration{
             System.out.println("reading lines");
             String line = null;
             while( (line = br.readLine()) != null ){
+
                 if( line.trim().startsWith("#") ) continue;
+                System.out.println("processing: " + line);
                 crc.update(line.getBytes());                
                 String parts[] = line.trim().split(",");
                 Unit from = new Unit(parts[0].trim(),parts[1].trim(),parts[3].trim(),parts[4].trim());
@@ -64,18 +70,7 @@ public class R__unit_conversions extends BaseJavaMigration{
                 if( !conversions.add(new Conversion(from,to,method))){
                     System.out.println("You have a duplicate conversion on line " + line_num);
                 }   
-                HashSet<String> vars = new HashSet<>();  
-                vars.add("i");        
-                for( Conversion c: conversions ){                
-                    Expression e = new ExpressionBuilder(c.getMethod().getAlgebra()).variables("i").build();
-                    System.out.println(e.toString());
-                    
-                    Token tokens[] = ShuntingYard.convertToRPN(c.getMethod().getAlgebra(), null, null, vars, false);
-                    for( Token tok: tokens ){
-                        System.out.print(tok.toString()+ " ");
-                    }
-                    System.out.println();
-                }   
+
                 line_num += 1;
             }
             Long crc_long = crc.getValue();
@@ -91,6 +86,25 @@ public class R__unit_conversions extends BaseJavaMigration{
     }
     
 
+    private Set<Conversion> expandConversions(Set<String> unitClasses,
+            Set<Conversion> conversions) {
+        HashSet<Conversion> new_conversions = new HashSet<>();
+        new_conversions.addAll(conversions); // 
+        List<String> units = conversions.stream().map( c -> c.getFrom().getName() ).distinct().collect( Collectors.toList() );
+        units.addAll( conversions.stream().map( c -> c.getTo().getName() ).distinct().collect( Collectors.toList() ) );
+
+        // forward
+        for( String from: units ){
+            for( String to: units){
+                if( from.equals(to) ) continue;
+                System.out.println(String.format("Fiding conversion from %s to %s",from,to));
+            }
+        }        
+
+        return new_conversions;
+    }
+
+
     @Override
     public void migrate(Context context) throws Exception {
         System.out.println("Showing resource files");
@@ -99,6 +113,25 @@ public class R__unit_conversions extends BaseJavaMigration{
         var conn = context.getConnection();
         var stmt = conn.createStatement();
         stmt.executeQuery("select 'making units'");              
+
+        HashSet<Conversion> toUpload = new HashSet<>();
+        Set<String> unitClasses = conversions.stream().map( c -> c.getFrom().getUnit_class() ).distinct().collect(Collectors.toSet());
+        for( String unitClass: unitClasses){
+            System.out.println ("Expanding unit conversions for unit class " + unitClass);
+            Set<Conversion> _conversions = 
+                conversions.stream()
+                            .filter( c -> c.getFrom().getUnit_class().equalsIgnoreCase(unitClass) == true )
+                            .collect( Collectors.toSet() );
+            toUpload.addAll( expandConversions(unitClasses, _conversions));
+        }
+        
+        for( Conversion c: toUpload ){
+            System.out.print(c.getFrom().getName() + " -> " + c.getTo().getName() + ": ");
+            System.out.println( Equations.infixToPostfix(c.getMethod().getAlgebra()) );                
+            
+        }
+
+
     }
 
     @Override

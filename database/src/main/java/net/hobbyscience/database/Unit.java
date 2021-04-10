@@ -2,14 +2,17 @@ package net.hobbyscience.database;
 
 public class Unit {
 
-    public Unit(String unit_class, String name, String system, String description ){
-
-    }
-
     private String unit_class;
     private String name;
     private String system;
     private String description;
+
+    public Unit(String unit_class, String name, String system, String description ){
+        this.unit_class = unit_class;
+        this.name = name;
+        this.system = system;
+        this.description = description;
+    }
     
     public String getUnit_class() {
         return this.unit_class;
