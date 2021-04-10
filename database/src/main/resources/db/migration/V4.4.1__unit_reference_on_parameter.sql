@@ -2,7 +2,8 @@
 insert into housedb.units(unit,system,description) values
     ('%','EN_SI','percentage of 100'),
     ('in','EN','small lenght (inches)'),
-    ('degC','SI','measure of temperature')
+    ('degC','SI','measure of temperature'),
+    ('raw','EN_SI','no units or not yet set')
 ;
 
 
