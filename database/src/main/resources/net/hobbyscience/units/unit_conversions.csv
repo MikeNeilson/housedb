@@ -4,5 +4,5 @@
 #                                                                                    func: infix notation, input is i
 Temp, degC, degF, Tempurature in Celsius, SI, Tempurature in Fehrenheight, EN, func, (i * 9/5)+32
 Temp, degC, K, Tempurature in Celsius, SI, Temperature in Kelvin, SI, linear, 1 273.15
-Length, in, mm, Length in inches, SI, Length in millimeters, SI, linear, linear, 25.4 0
+Length, in, mm, Length in inches, SI, Length in millimeters, SI, linear, 25.4 0
 Length, in, ft, Length in inches, EN, Length in feet, EN, linear, 12 0
