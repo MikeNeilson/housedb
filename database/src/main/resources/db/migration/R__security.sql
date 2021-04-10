@@ -41,9 +41,9 @@ begin
     set search_path to housedb_security,housedb,public;
 
     if can_perform__(p_username,p_permission,p_data_table,p_object) THEN
-        raise notice 'user has permission';--return
+        return; --raise notice 'user has permission';--return
     elsif can_perform__('guest',p_permission,p_data_table,p_object) then 
-        raise notice 'guest has permission'; --return -- all users can always do what a guest can
+        return; --raise notice 'guest has permission'; --return -- all users can always do what a guest can
     else 
         raise exception 'User % has no % permission to object %s',p_username,p_permission,p_object USING ERRCODE= 'PX001';
     end if;    
@@ -109,7 +109,7 @@ begin
         perform set_session_user('guest');
         l_username := 'guest';
     end if;
-    raise notice 'setting user to %', l_username;
+    --raise notice 'setting user to %', l_username;
     return l_username;
 end;
 $$ language plpgsql;

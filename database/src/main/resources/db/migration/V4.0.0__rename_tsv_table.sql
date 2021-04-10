@@ -1,0 +1,1 @@
+alter table housedb.timeseries_values rename to internal_timeseries_values;

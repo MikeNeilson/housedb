@@ -1,0 +1,6 @@
+#Name,Storage Unit, Description
+Precip,mm,Measure of rainfall
+Soil-Moisture,%,Water Content
+Temp-Air,degC,Measure of engery in the air
+Temp-Soil,degC,Measure of engery in the soil
+Plant-Height,cm,How tall a plant is

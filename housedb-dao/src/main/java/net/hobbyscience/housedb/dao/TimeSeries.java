@@ -6,17 +6,21 @@ import com.fasterxml.jackson.annotation.*;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-/**
+/** 
  * 
  */
 @Schema(description = "Collection of timeseries values")
 public class TimeSeries{
     @Schema(required = false)
     private String name;
-    @Schema(required = false,name = "interval-offset")
+    @Schema(required = false,name = "interval-offset", example = "00:00:00", description = "the hours:minute:seconds these values should be offset from the top of the interval.")
     @JsonAlias("interval-offset")    
     @JsonProperty(value = "interval-offset")
     private String intervalOffset;
+
+    @Schema(required = true)
+    private String units;
+
     //@Schema(required = false,allOf = DataTripleRecord.class)    
     //@ArraySchema()    
     @ArraySchema(
@@ -46,5 +50,13 @@ public class TimeSeries{
 
     public void setIntervalOffset(String intervalOffset) {
         this.intervalOffset = intervalOffset;
+    }
+
+    public String getUnits() {
+        return this.units;
+    }
+
+    public void setUnits(String units) {
+        this.units = units;
     }
 }
