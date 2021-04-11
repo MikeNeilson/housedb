@@ -22,5 +22,18 @@ public class Conversion {
     public ConversionMethod getMethod() {
         return this.method;
     }
+
+    public Conversion getInverse(){
+        return new Conversion(to,from, method.getInversion());
+    }
     
+    @Override
+    public boolean equals(Object other ){
+        if( !(other instanceof Conversion ) ) return false;
+        Conversion o = (Conversion)other;
+        if( this.from != o.from ) return false;
+        if( this.to != o.to ) return false;
+        return this.method == o.method;        
+    }
+
 }

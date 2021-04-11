@@ -30,4 +30,15 @@ public class Unit {
         return this.description;
     }
     
+    @Override
+    public boolean equals(Object other ){
+        if( !(other instanceof Unit)) return false;
+        Unit u = (Unit)other;
+        return this.name == u.name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

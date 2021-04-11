@@ -17,5 +17,17 @@ public class Function implements ConversionMethod{
     public String getAlgebra() {        
         return data;
     }
+
+	@Override
+	public ConversionMethod getInversion() {
+		// TODO: actually invert
+		return new Function(data);
+	}
+
+    @Override
+    public boolean equals(Object other){
+        if( !(other instanceof Function )) return false;
+        return this.data.equals(((Function)other).data);
+    }
     
 }
