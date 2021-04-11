@@ -1,5 +1,7 @@
 package net.hobbyscience.database.methods;
 
+import java.util.Objects;
+
 import net.hobbyscience.database.ConversionMethod;
 import net.hobbyscience.database.exceptions.BadMethodData;
 
@@ -27,7 +29,7 @@ public class Linear implements ConversionMethod{
 
     @Override
     public String getAlgebra() {
-        return String.format("i*%.04f+%.0f",a,b);
+        return String.format("i*%.04f+%.04f",a,b);
     }
 
 	@Override
@@ -41,4 +43,10 @@ public class Linear implements ConversionMethod{
         return getAlgebra().equals(((Linear)other).getAlgebra());
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(a, b);
+    }
 }
+
+    

@@ -27,7 +27,7 @@ public class InvLinear implements ConversionMethod{
 
     @Override
     public String getAlgebra() {
-        return String.format("(i-%.04f)/%.0f",b,a);
+        return String.format("(i-%.04f)/%.04f",b,a);
     }
 
 	@Override

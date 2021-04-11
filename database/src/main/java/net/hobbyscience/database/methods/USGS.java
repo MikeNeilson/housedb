@@ -1,5 +1,7 @@
 package net.hobbyscience.database.methods;
 
+import java.util.Objects;
+
 import net.hobbyscience.database.ConversionMethod;
 import net.hobbyscience.database.exceptions.BadMethodData;
 
@@ -36,7 +38,6 @@ public class USGS implements ConversionMethod {
         return String.format("%0.4f * (%0.4f + i)^%0.4f + %0.4f",a,b,c,d);
     }
 
-	@Override
 	public ConversionMethod getInversion() {
 		return new InvUSGS(a,b,c,d);
 	}
@@ -46,5 +47,9 @@ public class USGS implements ConversionMethod {
         if( !(other instanceof InvLinear)) return false;
         return getAlgebra().equals(((InvLinear)other).getAlgebra());
     }
-    
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(a, b, c, d);
+    }
 }

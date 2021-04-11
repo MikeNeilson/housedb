@@ -31,10 +31,15 @@ public class Unit {
     }
     
     @Override
+    public int hashCode(){
+        return this.name.hashCode();
+    }
+
+    @Override
     public boolean equals(Object other ){
         if( !(other instanceof Unit)) return false;
         Unit u = (Unit)other;
-        return this.name == u.name;
+        return this.name.equals(u.name);
     }
 
     @Override
