@@ -236,16 +236,8 @@ public class R__unit_conversions extends BaseJavaMigration{
         return justMethods;
     }
 
-
-    @Override
-    public void migrate(Context context) throws Exception {        
-        this.init();  
-        System.err.println("Building unit conversions");
-        var conn = context.getConnection();
-        var stmt = conn.createStatement();
-        stmt.executeQuery("select 'making units'");              
-
-        HashSet<Conversion> toUpload = new HashSet<>();
+    public HashSet<Conversion> generateConversions(){
+        HashSet<Conversion> retVal = new HashSet<>();
         Set<String> unitClasses = conversions.stream().map( c -> c.getFrom().getUnit_class() ).distinct().collect(Collectors.toSet());
         for( String unitClass: unitClasses){
             System.out.println ("Expanding unit conversions for unit class " + unitClass);
@@ -253,16 +245,24 @@ public class R__unit_conversions extends BaseJavaMigration{
                 conversions.stream()
                             .filter( c -> c.getFrom().getUnit_class().equalsIgnoreCase(unitClass) == true )
                             .collect( Collectors.toSet() );
-            toUpload.addAll( expandConversions(unitClasses, _conversions));
+            retVal.addAll( expandConversions(unitClasses, _conversions));
         }
+        return retVal;
+    }
+
+    @Override
+    public void migrate(Context context) throws Exception {        
+        this.init();  
+        System.err.println("Building unit conversions");
+        var conn = context.getConnection();
+        var stmt = conn.createStatement();
+        stmt.executeQuery("select 'making units'");
         
-        for( Conversion c: toUpload ){
+        for( Conversion c: generateConversions() ){
             System.out.print(c.getFrom().getName() + " -> " + c.getTo().getName() + ": ");
             System.out.println( Equations.infixToPostfix(c.getMethod().getAlgebra()) );                
             
         }
-
-
     }
 
     @Override
