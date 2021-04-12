@@ -59,7 +59,7 @@ jobs:
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
       - name: Build and Test Unit Generation code
-        run: ./gradlew :database:build
+        run: ./gradlew :database:build --info -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword
       - name: Install database
         run: ./gradlew flywayMigrate --info -PPGHOST=localhost -PPGPORT=5432 -PPGDATABASE=housedb -PDBUSER=housedb_owner -PDBPASSWORD=housepassword
       - name: Run tests
