@@ -2,6 +2,7 @@ package net.hobbyscience.database.methods;
 
 import net.hobbyscience.database.ConversionMethod;
 import net.hobbyscience.database.exceptions.BadMethodData;
+import net.hobbyscience.math.Equations;
 
 public class InvLinear implements ConversionMethod{
     private double a;
@@ -29,6 +30,11 @@ public class InvLinear implements ConversionMethod{
     public String getAlgebra() {
         return String.format("(i-%.04f)/%.04f",b,a);
     }
+    
+    @Override
+    public String getPostfix() {        
+        return Equations.infixToPostfix(getAlgebra());
+    }
 
 	@Override
 	public ConversionMethod getInversion() {		
@@ -40,5 +46,7 @@ public class InvLinear implements ConversionMethod{
         if( !(other instanceof InvLinear)) return false;
         return getAlgebra().equals(((InvLinear)other).getAlgebra());
     }
+
+    
 
 }

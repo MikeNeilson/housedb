@@ -2,6 +2,7 @@ package net.hobbyscience.database.methods;
 
 import net.hobbyscience.database.ConversionMethod;
 import net.hobbyscience.database.exceptions.BadMethodData;
+import net.hobbyscience.math.Equations;
 
 public class InvUSGS implements ConversionMethod {
     public double a;
@@ -38,6 +39,11 @@ public class InvUSGS implements ConversionMethod {
     @Override
     public String getAlgebra() {        
         return String.format("( (i-%0.4f)/%0.4f)^(1.0/%0.4f) - %0.4f",d,a,c,b);
+    }
+
+    @Override
+    public String getPostfix() {        
+        return Equations.infixToPostfix(getAlgebra());
     }
 
 	@Override

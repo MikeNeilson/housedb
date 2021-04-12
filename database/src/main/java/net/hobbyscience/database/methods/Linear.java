@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import net.hobbyscience.database.ConversionMethod;
 import net.hobbyscience.database.exceptions.BadMethodData;
+import net.hobbyscience.math.Equations;
 
 public class Linear implements ConversionMethod{
     private double a;
@@ -30,6 +31,11 @@ public class Linear implements ConversionMethod{
     @Override
     public String getAlgebra() {
         return String.format("i*%.04f+%.04f",a,b);
+    }
+
+    @Override
+    public String getPostfix() {        
+        return Equations.infixToPostfix(getAlgebra());
     }
 
 	@Override

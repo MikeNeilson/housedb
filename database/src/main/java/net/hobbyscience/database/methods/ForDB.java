@@ -1,6 +1,8 @@
 package net.hobbyscience.database.methods;
 
 import net.hobbyscience.database.ConversionMethod;
+import net.hobbyscience.database.exceptions.NotImplemented;
+import net.hobbyscience.math.Equations;
 
 public class ForDB implements ConversionMethod{
     private String postfix;
@@ -11,13 +13,17 @@ public class ForDB implements ConversionMethod{
 
     @Override
     public String getAlgebra() {
-        return postfix;
+        throw new NotImplemented("Infix notation for ForDB class is not implemented");
     }
 
 	@Override
+	public String getPostfix() {		
+		return postfix;
+	}
+
+	@Override
 	public ConversionMethod getInversion() {
-		// TODO: Actually invert
-		return new ForDB(postfix);
+		return new ForDB(Equations.invertPostfix(postfix));
 	}
 
 	@Override
@@ -26,6 +32,4 @@ public class ForDB implements ConversionMethod{
 		return this.postfix.equals( ((ForDB)other).postfix );
 	}
 
-    
-    
 }

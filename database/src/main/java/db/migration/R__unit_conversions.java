@@ -105,16 +105,16 @@ public class R__unit_conversions extends BaseJavaMigration{
                     throw new NoConversionFound("Unabled to find conversion from " + from + " to " + to);
                 }
                 System.out.println("Reducing/combining conversion steps");
-                String infix = steps.poll().getAlgebra();
+                String postfix = steps.poll().getPostfix();
                 ConversionMethod step = null;
                 while( (step = steps.poll()) != null){
-                    infix = Equations.combine(infix, step.getAlgebra());
+                    postfix = Equations.combine(postfix, step.getPostfix());
                 }
                 new_conversions.add( 
                         new Conversion(
                             from,
                             to,
-                            new ForDB(infix)
+                            new ForDB(postfix)
                         )
                     );
             }
@@ -260,7 +260,7 @@ public class R__unit_conversions extends BaseJavaMigration{
         
         for( Conversion c: generateConversions() ){
             System.out.print(c.getFrom().getName() + " -> " + c.getTo().getName() + ": ");
-            System.out.println( Equations.infixToPostfix(c.getMethod().getAlgebra()) );                
+            System.out.println( c.getMethod().getPostfix() );                
             
         }
     }

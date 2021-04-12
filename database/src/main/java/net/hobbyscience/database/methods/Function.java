@@ -2,6 +2,7 @@ package net.hobbyscience.database.methods;
 
 import net.hobbyscience.database.ConversionMethod;
 import net.hobbyscience.database.exceptions.BadMethodData;
+import net.hobbyscience.math.Equations;
 
 public class Function implements ConversionMethod{
     private String data;
@@ -18,10 +19,14 @@ public class Function implements ConversionMethod{
         return data;
     }
 
+    @Override
+    public String getPostfix() {        
+        return Equations.infixToPostfix(data);
+    }
+
 	@Override
-	public ConversionMethod getInversion() {
-		// TODO: actually invert
-		return new Function(data);
+	public ConversionMethod getInversion() {		
+		return new ForDB(Equations.invertPostfix(getPostfix()));
 	}
 
     @Override
@@ -29,5 +34,7 @@ public class Function implements ConversionMethod{
         if( !(other instanceof Function )) return false;
         return this.data.equals(((Function)other).data);
     }
+
+    
     
 }

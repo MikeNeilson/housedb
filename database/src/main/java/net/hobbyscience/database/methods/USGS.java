@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import net.hobbyscience.database.ConversionMethod;
 import net.hobbyscience.database.exceptions.BadMethodData;
+import net.hobbyscience.math.Equations;
 
 public class USGS implements ConversionMethod {
     public double a;
@@ -36,6 +37,11 @@ public class USGS implements ConversionMethod {
     @Override
     public String getAlgebra() {        
         return String.format("%0.4f * (%0.4f + i)^%0.4f + %0.4f",a,b,c,d);
+    }
+
+    @Override
+    public String getPostfix() {        
+        return Equations.infixToPostfix(getAlgebra());
     }
 
 	public ConversionMethod getInversion() {
