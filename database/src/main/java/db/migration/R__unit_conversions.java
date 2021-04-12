@@ -3,6 +3,7 @@ package db.migration;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -255,14 +256,34 @@ public class R__unit_conversions extends BaseJavaMigration{
         this.init();  
         System.err.println("Building unit conversions");
         var conn = context.getConnection();
-        var stmt = conn.createStatement();
-        stmt.executeQuery("select 'making units'");
-        
-        for( Conversion c: generateConversions() ){
-            System.out.print(c.getFrom().getName() + " -> " + c.getTo().getName() + ": ");
-            System.out.println( c.getMethod().getPostfix() );                
-            
+        var conversions = generateConversions();
+        try( 
+            var insert_conv = conn.prepareStatement("insert into housedb_units.conversions(unit_from,unit_to,postfix_func) values (?,?,?) on conflict do nothing");
+            var insert_unit = conn.prepareStatement("insert into housedb.units(unit,unitClass,system,description) values (?,?,?,?) on conflict do nothing");
+        ){
+            for( Unit unit: units){
+                insert_unit.setString(1,unit.getName());
+                insert_unit.setString(2,unit.getUnit_class());
+                insert_unit.setString(3,unit.getSystem());
+                insert_unit.setString(4,unit.getDescription());
+                insert_unit.addBatch();
+                System.out.println(unit);
+            }
+            insert_unit.executeBatch();
+
+            for( Conversion c: conversions ){
+                System.out.print(c.getFrom().getName() + " -> " + c.getTo().getName() + ": ");
+                System.out.println( c.getMethod().getPostfix() );                
+                insert_conv.setString(1,c.getFrom().getName());
+                insert_conv.setString(2,c.getTo().getName());
+                insert_conv.setString(3,c.getMethod().getPostfix());       
+                insert_conv.addBatch();
+            }
+            insert_conv.executeBatch();
+        } catch( SQLException e ){
+            throw new RuntimeException("Error adding unit conversions.",e);
         }
+
     }
 
     @Override
