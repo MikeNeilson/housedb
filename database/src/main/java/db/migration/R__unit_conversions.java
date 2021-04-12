@@ -186,14 +186,13 @@ public class R__unit_conversions extends BaseJavaMigration{
                     if( q2.isPresent() ){
                         queues.add(q2.get());
                     }                    
-                });
-                
+                });                
                 // return the shortest path
                 return Optional.ofNullable(queues.stream().sorted( (l,r) -> {
                     if( l.size() < r.size() ) return -1;
                     else if ( l.size() == r.size() ) return 0;
                     else return 1;
-                }).findFirst().get());
+                }).findFirst().orElseGet( () -> null ));
 
             }                        
         }
