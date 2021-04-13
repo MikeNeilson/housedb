@@ -257,7 +257,7 @@ public class R__unit_conversions extends BaseJavaMigration{
         var conn = context.getConnection();
         var conversions = generateConversions();
         try( 
-            var insert_conv = conn.prepareStatement("insert into housedb_units.conversions(unit_from,unit_to,postfix_func) values (?,?,?) on conflict do nothing");
+            var insert_conv = conn.prepareStatement("insert into housedb_units.conversions(unit_from,unit_to,postfix_func) values (?,?,?) on conflict do update set postfix_func = EXCLUDED.postfix_func");
             var insert_unit = conn.prepareStatement("insert into housedb.units(unit,unitClass,system,description) values (?,?,?,?) on conflict do nothing");
         ){
             for( Unit unit: units){

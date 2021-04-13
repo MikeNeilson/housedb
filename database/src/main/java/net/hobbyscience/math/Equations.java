@@ -47,7 +47,7 @@ public class Equations {
             case "*": // fallthrough
             case "/": // fallthrough
             case "i": //
-            case "sqrt": {
+            case "nroot": {
                 return true;
             }
             default: {
@@ -60,10 +60,10 @@ public class Equations {
         switch( operand ){
             case "+": return "-";
             case "-": return "+";
-            case "^": return "sqrt";
+            case "^": return "nroot";
             case "*": return "/";
             case "/": return "*";
-            case "sqrt": return "^";
+            case "nroot": return "^";
             default: {
                 throw new NoInverse("Cannot find inverser for operator " + operand);
             }
@@ -79,7 +79,7 @@ public class Equations {
             case "^": return Double.toString( Math.pow(r1,r2) );
             case "*": return Double.toString( r1*r2 );
             case "/": return Double.toString( r1/r2 );
-            case "sqrt": return Double.toString( Math.pow(r1,1.0/r2) );
+            case "nroot": return Double.toString( Math.pow(r1,1.0/r2) );
             default: {
                 throw new NotImplemented("Cannot calculate for operator " + operand);
             }
@@ -110,7 +110,7 @@ public class Equations {
                 case "^": // fallthrough
                 case "*": // fallthrough
                 case "/": // fallthrough
-                case "sqrt": {
+                case "nroot": {
                     String r = rhs.pop();
                     String l = rhs.pop();
                     if( r.equals("i") ){
