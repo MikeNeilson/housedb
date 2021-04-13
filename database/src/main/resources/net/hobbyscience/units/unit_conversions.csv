@@ -4,5 +4,25 @@
 #                                                                                    func: infix notation, input is i
 Temp, degC, degF, Tempurature in Celsius, SI, Tempurature in Fehrenheight, EN, func, (i * 9/5)+32
 Temp, degC, K, Tempurature in Celsius, SI, Temperature in Kelvin, SI, linear, 1 273.15
+Length, cm, mm, Length in centimeters, SI, Length in millimeters, SI, linear, 10 0
+Length, cm, m, Length in centimeters, SI, Length in meteres, SI, linear, 10 0
+Length, m,  km, Length in meters, SI, Length in kilometers, SI, linear, 100 0
 Length, in, mm, Length in inches, SI, Length in millimeters, SI, linear, 25.4 0
 Length, in, ft, Length in inches, EN, Length in feet, EN, linear, 12 0
+Length, ft, yard, Length in feet, EN, Length in yards, EN, linear, 3 0
+Length, ft, mi, Length in feet, EN, Length in miles, EN, linear, 5280 0
+#
+Flow, cms, cfs, Flow in cubic meters per second, SI, Flow in cubic feet per second, EN, linear, 35.3147 0  
+#
+Storage, m^3, gal, Volume in cubic meters, SI, Volume in gallons, EN, linear, 264.172 0
+Storage, gal, pint, Volume in gallons, EN, Volume in pints, EN, linear, 8 0
+Storage, pint, cup, Volume in pints, EN, Volume in cups, EN, linear, 2 0
+#
+Power, hp, watts, Power in hoursepower, EN, Power in Watts, SI, linear, 745.7 0
+#
+Current, amps, amps, Measure of current, EN_SI, Measure of current, EN_SI, linear, 1 0
+Volts, volts, volts, Measure of potential energy, EN_SI, Measure of potential engery, EN_SI, linear, 1 0
+PowerDensity, w/m^2, w/m^2, Watts per area, EN_SI, Watts per area, EN_SI, linear, 1 0 
+#
+Speed, km/s, mph, Speed in kilometers per second, SI, Speed in miles per hour, EN, linear, 2.23694 0 
+

@@ -7,7 +7,8 @@ end;
 $$ ;
 create table housedb.units(
     unit text primary key,
-    system varchar(255),
+    unitClass text not null,
+    system varchar(255) not null,
     description text
 );
 
@@ -21,14 +22,11 @@ create table housedb.units_parameters(
 create table housedb_units.conversions(
     unit_from text references housedb.units(unit),
     unit_to text references housedb.units(unit),
-    a double precision not null,
-    b double precision not null default 0,
-    c double precision not null default 1,
-    d double precision not null default 0,
+    postfix_func text not null,
     primary key (unit_from,unit_to)
 );
 
-create or replace view units_for_parameters as 
+create or replace view housedb.units_for_parameters as 
     select 
         p.name,
         u.unit,

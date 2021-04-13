@@ -174,6 +174,30 @@ begin
 end;
 $$ language plpgsql;
 
+create or replace function housedb_timeseries.extract_parameter_id_from_name( p_timeseries_name text )
+returns bigint	
+as $$
+declare
+	l_parameter text;
+	l_parameter_id bigint;
+	ts_parts text[];
+begin
+	select regexp_split_to_array(p_timeseries_name,'\.') into ts_parts;	
+	if array_length(ts_parts,1) > 6 then
+		raise exception 'TS Name (%) has more than 7 parts',ts_name USING ERRCODE = 'ZX081';
+	elsif array_length(ts_parts,1) < 6 then
+		raise exception 'TS Name (%) has less than 7 parts',ts_name USING ERRCODE = 'ZX081';
+	end if;
+	l_parameter = ts_parts[2];
+	select into l_parameter_id id from housedb.parameters where lower(l_parameter) = lower(name);
+	if l_parameter_id is not null THEN
+		return l_parameter_id;
+	else 
+		raise exception 'Unable to extract Parameter from (%s) likely not defined yet', p_timeseries_name;
+	end if;
+end;
+$$ language plpgsql;
+
 create or replace function housedb_timeseries.insert_tsv()
 returns trigger
 as $$
@@ -183,8 +207,10 @@ declare
 	ts_name text;
 	l_new_interval_id bigint;
 	l_calculated_offset interval;
+	l_storage_unit text;
+	l_value double precision;
 begin 
-	set search_path to housedb_timeseries,housedb,public;
+	set search_path to housedb_timeseries,housedb_units,housedb,public;
 	if TG_OP = 'DELETE' then		
 		raise notice 'deleting %', OLD;
 		return OLD;
@@ -202,7 +228,7 @@ begin
 			select into l_ts_id id from housedb.catalog where upper(timeseries_name)=upper(NEW.name);			
 			select * from timeseries into ts_info where id=(select id from housedb.catalog where timeseries_name=NEW.name);
 			if ts_info is null THEN				
-				l_new_interval_id = housedb_timeseries.extract_interval_id_from_name(NEW.name);
+				l_new_interval_id = housedb_timeseries.extract_interval_id_from_name(NEW.name);				
 				l_calculated_offset = housedb_timeseries.get_interval_offset(NEW.date_time, l_new_interval_id);
 				l_ts_id := housedb_timeseries.create_timeseries(NEW.name::character varying, l_calculated_offset ); --,l_calculated_offset); -- TODO: update to handle the interval offset setting with the first value
 				select * from timeseries into ts_info where id=l_ts_id;
@@ -220,17 +246,20 @@ begin
 			perform 'housedb_security.can_perform(housedb_security.get_session_user(),''STORE'',''timeseries'',ts_name)';
 			--raise notice 'check can store';
 		end if ;
+		
 		--raise notice 'security checks passed';
 		perform housedb_timeseries.check_interval(NEW.date_time,ts_info.interval_id,ts_info.interval_offset);
 		if NEW.units is null THEN
 			raise exception 'You must provide units with the provided data' USING ERRCODE = 'ZX085';
 		end if;
 		--raise notice 'Inserting, all checks passed';
+		select into l_storage_unit units from parameters where id = extract_parameter_id_from_name(NEW.name);
+		l_value := convert_units(NEW.value,NEW.units::text,l_storage_unit::text);
 		insert into 
 			housedb.internal_timeseries_values(timeseries_id,date_time,value,quality)
-		values (ts_info.id,NEW.date_time,NEW.value,NEW.quality)
+		values (ts_info.id,NEW.date_time,l_value,NEW.quality)
 		on conflict (timeseries_id,date_time) 
-		  do update set value = NEW.value, quality=NEW.quality;
+		  do update set value = l_value, quality=NEW.quality;
 		
 	end if;
 	

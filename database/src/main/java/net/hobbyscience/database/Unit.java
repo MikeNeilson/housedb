@@ -30,4 +30,20 @@ public class Unit {
         return this.description;
     }
     
+    @Override
+    public int hashCode(){
+        return this.name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other ){
+        if( !(other instanceof Unit)) return false;
+        Unit u = (Unit)other;
+        return this.name.equals(u.name);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

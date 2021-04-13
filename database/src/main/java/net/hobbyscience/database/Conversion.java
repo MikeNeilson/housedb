@@ -1,5 +1,7 @@
 package net.hobbyscience.database;
 
+import java.util.Objects;
+
 public class Conversion {
     private Unit from;
     private Unit to;
@@ -22,5 +24,23 @@ public class Conversion {
     public ConversionMethod getMethod() {
         return this.method;
     }
+
+    public Conversion getInverse(){
+        return new Conversion(to,from, method.getInversion());
+    }
     
+    @Override
+    public boolean equals(Object other ){
+        if( !(other instanceof Conversion ) ) return false;
+        Conversion o = (Conversion)other;
+        if( this.from != o.from ) return false;
+        if( this.to != o.to ) return false;
+        return this.method.equals(o.method);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(from, to, method);
+    }
+
 }

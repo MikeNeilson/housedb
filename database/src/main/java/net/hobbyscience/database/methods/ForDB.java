@@ -1,17 +1,35 @@
 package net.hobbyscience.database.methods;
 
 import net.hobbyscience.database.ConversionMethod;
+import net.hobbyscience.database.exceptions.NotImplemented;
+import net.hobbyscience.math.Equations;
 
 public class ForDB implements ConversionMethod{
-    private String data;
+    private String postfix;
 
     public ForDB(String data){
-        this.data = data;
+        this.postfix = data;
     }
 
     @Override
     public String getAlgebra() {
-        return data;
+        throw new NotImplemented("Infix notation for ForDB class is not implemented");
     }
-    
+
+	@Override
+	public String getPostfix() {		
+		return postfix;
+	}
+
+	@Override
+	public ConversionMethod getInversion() {
+		return new ForDB(Equations.invertPostfix(postfix));
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if( !( other instanceof ForDB )) return false;
+		return this.postfix.equals( ((ForDB)other).postfix );
+	}
+
 }

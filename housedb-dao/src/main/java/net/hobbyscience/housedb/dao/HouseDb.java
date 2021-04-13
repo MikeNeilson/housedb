@@ -8,11 +8,13 @@ import java.util.stream.Collectors;
 import java.util.List;
 import java.util.ArrayList;
 
+import static net.hobbyscience.housedb.housedb.Routines.*;
 import net.hobbyscience.housedb.housedb.tables.*;
 
 import static net.hobbyscience.housedb.housedb.tables.TimeseriesValues.*;
 import static net.hobbyscience.housedb.housedb.tables.Timeseries.*;
 import static net.hobbyscience.housedb.housedb.tables.Catalog.*;
+import static net.hobbyscience.housedb.housedb.tables.Parameters.*;
 import net.hobbyscience.housedb.housedb_security.Routines;
 
 import static org.jooq.impl.DSL.*;
@@ -71,9 +73,9 @@ public class HouseDb {
         //DataTripleRecord []dtrs = ts.getData().stream().map( dt -> dt.asDataTripleRecord() ).collect( Collectors.toList() ).toArray(new DataTripleRecord[0]);
 
         dsl.transaction( config -> {
-            var insert = DSL.using(config).insertInto(TIMESERIES_VALUES, TIMESERIES_VALUES.NAME, TIMESERIES_VALUES.DATE_TIME, TIMESERIES_VALUES.VALUE, TIMESERIES_VALUES.QUALITY);
+            var insert = DSL.using(config).insertInto(TIMESERIES_VALUES, TIMESERIES_VALUES.NAME, TIMESERIES_VALUES.DATE_TIME, TIMESERIES_VALUES.VALUE, TIMESERIES_VALUES.QUALITY, TIMESERIES_VALUES.UNITS);
             ts.getData().stream().forEach( dt -> {
-                insert.values( ts.getName(), dt.dateTime, dt.value, dt.quality);
+                insert.values( ts.getName(), dt.dateTime, dt.value, dt.quality, ts.getUnits() );
             });              
             insert.execute(); // TODO: consider returning to user;
         });        
@@ -81,39 +83,41 @@ public class HouseDb {
         //net.hobbyscience.housedb.housedb_timeseries.Routines.storeTimeseriesData(dsl.configuration(),ts.getName(),dtrs,Boolean.TRUE);
     }
 
-    public TimeSeries getTimeSeries(TimeSeries ts, OffsetDateTime start, OffsetDateTime end, String timeZone, boolean excludeMissing) throws Exception {
+    public TimeSeries getTimeSeries(TimeSeries ts, OffsetDateTime start, OffsetDateTime end, String timeZone, String units, boolean excludeMissing) throws Exception {
         List<DataTriple> dts = new ArrayList<DataTriple>();    
 
-        Record1<String> offset = dsl.select(
-                                    TIMESERIES.INTERVAL_OFFSET.concat("")
+        Record2<String,String> offset_units = dsl.select(
+                                    TIMESERIES.INTERVAL_OFFSET.concat(""),
+                                    PARAMETERS.UNITS
                                   ).from(TIMESERIES)
                                    .join(CATALOG).on(TIMESERIES.ID.eq(CATALOG.ID))
+                                   .join(PARAMETERS).on(TIMESERIES.PARAMETER_ID.eq(PARAMETERS.ID))
                                    .where(
                                         upper(CATALOG.TIMESERIES_NAME).eq( upper(ts.getName() ))
                                     ).fetchOne();
                                   ;
-        
+        String unitsFrom = offset_units.value2();
+        String unitsTo = units != null ? units : unitsFrom;
+
         Result<Record4<OffsetDateTime, Double, Integer,String>> results = 
             dsl.select(                
                 field("date_time",OffsetDateTime.class),
-                field("value",Double.class),
+                convertUnits(field("value",Double.class),value(unitsFrom), value(unitsTo) ),
                 field("quality",Integer.class),
                 field("units",String.class)
             ).from(TIMESERIES_VALUES)
              .where(TIMESERIES_VALUES.NAME.equalIgnoreCase(ts.getName()))
-             .and(TIMESERIES_VALUES.DATE_TIME.between(start,end)).fetch();
-        final String units[]= new String[1];
+             .and(TIMESERIES_VALUES.DATE_TIME.between(start,end)).fetch();        
         dts = results.stream().map( dtr -> {
             logger.info(dtr.toString());
             DataTriple dt = new DataTriple();
             dt.dateTime = dtr.value1();
             dt.value = dtr.value2();
-            dt.quality = dtr.value3();
-            units[0] = dtr.value4();
+            dt.quality = dtr.value3();            
             return dt;
         } ).collect( Collectors.toList());
-        ts.setUnits(units[0]);
-        ts.setIntervalOffset(offset.component1());
+        ts.setUnits(unitsTo);
+        ts.setIntervalOffset(offset_units.component1());
         ts.setData(dts);
         return ts;
          

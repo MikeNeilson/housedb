@@ -59,6 +59,7 @@ public class TimeSeriesController implements CrudHandler {
                         start,
                         end,
                         ctx.queryParam("timezone","UTC"),
+                        ctx.queryParam("units"),
                         ctx.queryParam("exclude_missing",Boolean.class,"false").get()
                 );
                 ctx.json(ts);
@@ -70,7 +71,7 @@ public class TimeSeriesController implements CrudHandler {
             }
             
         } catch( Exception err ){
-            throw new RuntimeException("Error retrieving time series data");
+            throw new RuntimeException("Error retrieving time series data",err);
         }
     }
 

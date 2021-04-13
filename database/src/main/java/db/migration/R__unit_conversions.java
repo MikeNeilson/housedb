@@ -3,8 +3,12 @@ package db.migration;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
@@ -14,8 +18,10 @@ import org.flywaydb.core.api.migration.Context;
 
 import net.hobbyscience.database.Conversion;
 import net.hobbyscience.database.ConversionMethod;
+import net.hobbyscience.database.Parameter;
 import net.hobbyscience.database.Unit;
 import net.hobbyscience.database.exceptions.InvalidMethod;
+import net.hobbyscience.database.methods.ForDB;
 import net.hobbyscience.database.methods.Function;
 import net.hobbyscience.database.methods.Linear;
 import net.hobbyscience.database.methods.USGS;
@@ -26,6 +32,7 @@ import net.hobbyscience.math.Equations;
 public class R__unit_conversions extends BaseJavaMigration{
     public HashSet<Conversion> conversions = new HashSet<>();
     public HashSet<Unit> units = new HashSet<>();
+    public HashSet<Parameter> parameters = new HashSet<>();
 
     //public ArrayList<Parameters> parameters = new ArrayList<>();
     public int checksum;
@@ -36,15 +43,16 @@ public class R__unit_conversions extends BaseJavaMigration{
         int line_num = 1;
         try(             
             InputStream units_conversions = this.getClass().getClassLoader().getResourceAsStream("net/hobbyscience/units/unit_conversions.csv");
-            //InputStream parameters = this.getClass().getResourceAsStream("net/hobbyscience/units/parameters.csv");
+            InputStream parameters_csv =        this.getClass().getClassLoader().getResourceAsStream("net/hobbyscience/units/parameters.csv");
             
             BufferedReader br = new BufferedReader( new InputStreamReader( units_conversions ) );
+            BufferedReader parm_br = new BufferedReader( new InputStreamReader( parameters_csv ) );
         ){            
             System.out.println("reading lines");
             String line = null;
             while( (line = br.readLine()) != null ){
 
-                if( line.trim().startsWith("#") ) continue;
+                if( line.trim().startsWith("#") || line.trim().isEmpty() ) continue;
                 System.out.println("processing: " + line);
                 crc.update(line.getBytes());                
                 String parts[] = line.trim().split(",");
@@ -69,8 +77,18 @@ public class R__unit_conversions extends BaseJavaMigration{
 
                 line_num += 1;
             }
+                        
+            while( (line = parm_br.readLine()) != null ){
+
+                if( line.trim().startsWith("#") || line.trim().isEmpty() ) continue;
+                System.out.println("processing: " + line);
+                crc.update(line.getBytes());                
+                String parts[] = line.trim().split(",");
+                parameters.add( new Parameter(parts[0],parts[1],parts[2]));
+            }
             Long crc_long = crc.getValue();
             checksum = crc_long.intValue();
+
             System.out.println("Checksum = " + checksum);
 
         } catch(NullPointerException ex){
@@ -80,37 +98,159 @@ public class R__unit_conversions extends BaseJavaMigration{
         }
         
     }
-    
 
     private Set<Conversion> expandConversions(Set<String> unitClasses,
             Set<Conversion> conversions) {
         HashSet<Conversion> new_conversions = new HashSet<>();
-        new_conversions.addAll(conversions); // 
-        List<String> units = conversions.stream().map( c -> c.getFrom().getName() ).distinct().collect( Collectors.toList() );
-        units.addAll( conversions.stream().map( c -> c.getTo().getName() ).distinct().collect( Collectors.toList() ) );
-
+        //new_conversions.addAll(conversions); // 
+        List<Unit> units = conversions.stream().map( c -> c.getFrom() ).distinct().collect( Collectors.toList() );
+        units.addAll( conversions.stream().map( c -> c.getTo() ).distinct().collect( Collectors.toList() ) );
+        units = units.stream().sorted( (l,r) -> {
+            return l.getName().compareTo(r.getName());
+        }).distinct().collect(Collectors.toList());
         // forward
-        for( String from: units ){
-            for( String to: units){
+        units.forEach( u -> System.out.println("*"+u+"*"));
+        for( Unit from: units ){
+            for( Unit to: units ){
                 if( from.equals(to) ) continue;
-                System.out.println(String.format("Fiding conversion from %s to %s",from,to));
+                System.out.println(String.format("Finding conversion from %s to %s",from,to));
+                Queue<ConversionMethod> steps = findConversion(from,to,conversions);
+                if( steps.isEmpty() ){
+                    throw new NoConversionFound("Unabled to find conversion from " + from + " to " + to);
+                }
+                System.out.println("Reducing/combining conversion steps");
+                String postfix = steps.poll().getPostfix();
+                ConversionMethod step = null;
+                while( (step = steps.poll()) != null){
+                    postfix = Equations.combine(postfix, step.getPostfix());
+                }
+                new_conversions.add( 
+                        new Conversion(
+                            from,
+                            to,
+                            new ForDB(postfix)
+                        )
+                    );
             }
         }        
 
         return new_conversions;
     }
 
+    private class Node {
+        private Conversion conversion = null;
+        private Set<Node> children = new HashSet<>();
+        private int dir;
 
-    @Override
-    public void migrate(Context context) throws Exception {
-        System.out.println("Showing resource files");
-        this.init();  
-        System.err.println("Building unit conversions");
-        var conn = context.getConnection();
-        var stmt = conn.createStatement();
-        stmt.executeQuery("select 'making units'");              
+        public static final int FWD = 0;
+        public static final int INV = 1;
 
-        HashSet<Conversion> toUpload = new HashSet<>();
+        public Node( Conversion conversion, int dir ){
+            this.conversion = conversion;
+            this.dir = dir;
+        }
+
+        public void findConversions( Set<Conversion> conversions){            
+            var remaining = conversions.stream().filter( c -> !c.equals(this.conversion)  ).collect(Collectors.toSet());
+            
+            if( remaining.size() == 0 ) return;        
+
+            remaining.forEach( conv -> {                
+                Unit unit = dir == INV ? conversion.getFrom() : conversion.getTo();
+
+                if( conv.getFrom().equals(unit) ){                    
+                    children.add( new Node(conv,FWD));
+                } else if ( conv.getTo().equals(unit) ){                    
+                    children.add( new Node(conv,INV));
+                }
+            });
+            
+            children.forEach( child -> {
+                var for_next = new HashSet<Conversion>();
+                for_next.addAll(remaining);
+                child.findConversions(for_next); 
+            });
+            
+        }
+
+        public Optional<Queue<Conversion>> queue( Unit to, Queue<Conversion> queue ){
+            Queue<Conversion> q = queue == null ? new LinkedList<Conversion>() : queue;                        
+            
+            var conv = dir == FWD ? conversion : conversion.getInverse();
+
+            if( conv.getTo().equals(to) ){                
+                // we've found our destination
+                q.add( conv );
+                return Optional.of(q);
+            } else if ( !conv.getTo().equals(to) && children.isEmpty() ){                
+                return Optional.empty();
+            } else {
+                
+                q.add(conv);
+                Set<Queue<Conversion>> queues = new HashSet<>();
+
+                // build paths for each child            
+                children.forEach( child -> {
+                    Queue<Conversion> tmp = new LinkedList<>();
+            
+                    tmp.addAll(q);
+            
+                    var q2 = child.queue(to,tmp);
+                    if( q2.isPresent() ){
+                        queues.add(q2.get());
+                    }                    
+                });                
+                // return the shortest path
+                return Optional.ofNullable(queues.stream().sorted( (l,r) -> {
+                    if( l.size() < r.size() ) return -1;
+                    else if ( l.size() == r.size() ) return 0;
+                    else return 1;
+                }).findFirst().orElseGet( () -> null ));
+
+            }                        
+        }
+    }
+
+    private Queue<ConversionMethod> findConversion(Unit from, Unit to, Set<Conversion> conversions) {                
+        Set<Node> roots = new HashSet<>();
+
+        // find the roots
+        conversions.forEach( conv -> {
+            if( conv.getFrom().equals(from) ){
+                roots.add( new Node(conv,Node.FWD) );
+            } else if ( conv.getTo().equals(from) ) {
+                roots.add( new Node(conv,Node.INV));
+            }
+        });
+        // get all the possible root level conversions
+        Set<Conversion> rootConvs = roots.stream()
+            .map( rc -> rc.conversion ).collect(Collectors.toSet());
+        // find what conversions are left to do
+        Set<Conversion> remaining = conversions.stream()
+            .filter( c -> !rootConvs.contains(c) ).collect(Collectors.toSet());
+        Set<Queue<Conversion> > queues = new HashSet<>();
+        // find all possible paths
+        roots.forEach( root -> {
+            root.findConversions(remaining);
+            var steps = root.queue( to, null );
+            if( steps.isPresent() ){
+                queues.add(steps.get());
+            }
+        });
+        if( queues.isEmpty() ) throw new NoConversionFound("No conversion found from " + from + " to " + to );        
+        // got through each path and select the shortest.
+        Queue<Conversion> shortest = queues.stream().sorted( (l,r) -> {
+            if( l.size() < r.size() ) return -1;
+            else if ( l.size() == r.size() ) return 0;
+            else return 1;
+        }).findFirst().get();
+        var justMethods = shortest.stream().map( q -> q.getMethod() ).collect(Collectors.toCollection(LinkedList::new));
+        
+        return justMethods;
+    }
+
+    public HashSet<Conversion> generateConversions(){
+        HashSet<Conversion> retVal = new HashSet<>();
         Set<String> unitClasses = conversions.stream().map( c -> c.getFrom().getUnit_class() ).distinct().collect(Collectors.toSet());
         for( String unitClass: unitClasses){
             System.out.println ("Expanding unit conversions for unit class " + unitClass);
@@ -118,15 +258,57 @@ public class R__unit_conversions extends BaseJavaMigration{
                 conversions.stream()
                             .filter( c -> c.getFrom().getUnit_class().equalsIgnoreCase(unitClass) == true )
                             .collect( Collectors.toSet() );
-            toUpload.addAll( expandConversions(unitClasses, _conversions));
+            retVal.addAll( expandConversions(unitClasses, _conversions));
         }
-        
-        for( Conversion c: toUpload ){
-            System.out.print(c.getFrom().getName() + " -> " + c.getTo().getName() + ": ");
-            System.out.println( Equations.infixToPostfix(c.getMethod().getAlgebra()) );                
-            
-        }
+        return retVal;
+    }
 
+    public R__unit_conversions() throws Exception{
+        this.init();
+    }
+
+    @Override
+    public void migrate(Context context) throws Exception {        
+        
+        System.err.println("Building unit conversions");
+        var conn = context.getConnection();
+        var conversions = generateConversions();
+        try( 
+            var insert_conv = conn.prepareStatement("insert into housedb_units.conversions(unit_from,unit_to,postfix_func) values (?,?,?) on conflict (unit_from,unit_to) do update set postfix_func = EXCLUDED.postfix_func");
+            var insert_unit = conn.prepareStatement("insert into housedb.units(unit,unitClass,system,description) values (?,?,?,?) on conflict (unit) do nothing");
+            var insert_parameters = conn.prepareStatement("insert into housedb.parameters(name,units) values (?,?) on conflict do nothing");
+        ){
+            System.out.println("Inserting Units");
+            for( Unit unit: units){
+                insert_unit.setString(1,unit.getName());
+                insert_unit.setString(2,unit.getUnit_class());
+                insert_unit.setString(3,unit.getSystem());
+                insert_unit.setString(4,unit.getDescription());
+                insert_unit.addBatch();
+                System.out.println(unit);
+            }
+            insert_unit.executeBatch();
+            System.out.println("Inserting converions");
+            for( Conversion c: conversions ){
+                System.out.print(c.getFrom().getName() + " -> " + c.getTo().getName() + ": ");
+                System.out.println( c.getMethod().getPostfix() );                
+                insert_conv.setString(1,c.getFrom().getName());
+                insert_conv.setString(2,c.getTo().getName());
+                insert_conv.setString(3,c.getMethod().getPostfix());       
+                insert_conv.addBatch();
+            }
+            insert_conv.executeBatch();
+            System.out.println("Inserting parameters");
+            for( Parameter parm: parameters){
+                insert_parameters.setString(1,parm.getName());
+                insert_parameters.setString(2,parm.getStorageUnits());
+                insert_parameters.addBatch();
+            }
+            insert_parameters.executeBatch();
+
+        } catch( SQLException e ){
+            throw new RuntimeException("Error adding unit conversions.",e);
+        }
 
     }
 
@@ -135,9 +317,11 @@ public class R__unit_conversions extends BaseJavaMigration{
         return "Build a fully expanded unit conversion table.";
     }
 
+    
     @Override
     public Integer getChecksum(){
         return Integer.valueOf(checksum);
     }
+    
    
 }

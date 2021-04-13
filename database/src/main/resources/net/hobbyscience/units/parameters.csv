@@ -4,3 +4,11 @@ Soil-Moisture,%,Water Content
 Temp-Air,degC,Measure of engery in the air
 Temp-Soil,degC,Measure of engery in the soil
 Plant-Height,cm,How tall a plant is
+Flow,cms,Volume over stime
+Storage,m^3,Volume
+Volts,volts,Measure of potentional Energy
+Current,amps,Measure of amount of engery
+Power,watts,Measure of amount of power (volts*amps)
+Irradiance,w/m^2,Solar energy incoming
+Speed,km/s,Speed of something
+Stage,m,Height of water above a fixed point
