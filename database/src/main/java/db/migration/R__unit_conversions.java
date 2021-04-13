@@ -18,6 +18,7 @@ import org.flywaydb.core.api.migration.Context;
 
 import net.hobbyscience.database.Conversion;
 import net.hobbyscience.database.ConversionMethod;
+import net.hobbyscience.database.Parameter;
 import net.hobbyscience.database.Unit;
 import net.hobbyscience.database.exceptions.InvalidMethod;
 import net.hobbyscience.database.methods.ForDB;
@@ -31,6 +32,7 @@ import net.hobbyscience.math.Equations;
 public class R__unit_conversions extends BaseJavaMigration{
     public HashSet<Conversion> conversions = new HashSet<>();
     public HashSet<Unit> units = new HashSet<>();
+    public HashSet<Parameter> parameters = new HashSet<>();
 
     //public ArrayList<Parameters> parameters = new ArrayList<>();
     public int checksum;
@@ -41,15 +43,16 @@ public class R__unit_conversions extends BaseJavaMigration{
         int line_num = 1;
         try(             
             InputStream units_conversions = this.getClass().getClassLoader().getResourceAsStream("net/hobbyscience/units/unit_conversions.csv");
-            //InputStream parameters = this.getClass().getResourceAsStream("net/hobbyscience/units/parameters.csv");
+            InputStream parameters_csv =        this.getClass().getClassLoader().getResourceAsStream("net/hobbyscience/units/parameters.csv");
             
             BufferedReader br = new BufferedReader( new InputStreamReader( units_conversions ) );
+            BufferedReader parm_br = new BufferedReader( new InputStreamReader( parameters_csv ) );
         ){            
             System.out.println("reading lines");
             String line = null;
             while( (line = br.readLine()) != null ){
 
-                if( line.trim().startsWith("#") ) continue;
+                if( line.trim().startsWith("#") || line.trim().isEmpty() ) continue;
                 System.out.println("processing: " + line);
                 crc.update(line.getBytes());                
                 String parts[] = line.trim().split(",");
@@ -74,8 +77,18 @@ public class R__unit_conversions extends BaseJavaMigration{
 
                 line_num += 1;
             }
+                        
+            while( (line = parm_br.readLine()) != null ){
+
+                if( line.trim().startsWith("#") || line.trim().isEmpty() ) continue;
+                System.out.println("processing: " + line);
+                crc.update(line.getBytes());                
+                String parts[] = line.trim().split(",");
+                parameters.add( new Parameter(parts[0],parts[1],parts[2]));
+            }
             Long crc_long = crc.getValue();
             checksum = crc_long.intValue();
+
             System.out.println("Checksum = " + checksum);
 
         } catch(NullPointerException ex){
@@ -250,16 +263,22 @@ public class R__unit_conversions extends BaseJavaMigration{
         return retVal;
     }
 
+    public R__unit_conversions() throws Exception{
+        this.init();
+    }
+
     @Override
     public void migrate(Context context) throws Exception {        
-        this.init();  
+        
         System.err.println("Building unit conversions");
         var conn = context.getConnection();
         var conversions = generateConversions();
         try( 
-            var insert_conv = conn.prepareStatement("insert into housedb_units.conversions(unit_from,unit_to,postfix_func) values (?,?,?) on conflict do update set postfix_func = EXCLUDED.postfix_func");
-            var insert_unit = conn.prepareStatement("insert into housedb.units(unit,unitClass,system,description) values (?,?,?,?) on conflict do nothing");
+            var insert_conv = conn.prepareStatement("insert into housedb_units.conversions(unit_from,unit_to,postfix_func) values (?,?,?) on conflict (unit_from,unit_to) do update set postfix_func = EXCLUDED.postfix_func");
+            var insert_unit = conn.prepareStatement("insert into housedb.units(unit,unitClass,system,description) values (?,?,?,?) on conflict (unit) do nothing");
+            var insert_parameters = conn.prepareStatement("insert into housedb.parameters(name,units) values (?,?) on conflict do nothing");
         ){
+            System.out.println("Inserting Units");
             for( Unit unit: units){
                 insert_unit.setString(1,unit.getName());
                 insert_unit.setString(2,unit.getUnit_class());
@@ -269,7 +288,7 @@ public class R__unit_conversions extends BaseJavaMigration{
                 System.out.println(unit);
             }
             insert_unit.executeBatch();
-
+            System.out.println("Inserting converions");
             for( Conversion c: conversions ){
                 System.out.print(c.getFrom().getName() + " -> " + c.getTo().getName() + ": ");
                 System.out.println( c.getMethod().getPostfix() );                
@@ -279,6 +298,14 @@ public class R__unit_conversions extends BaseJavaMigration{
                 insert_conv.addBatch();
             }
             insert_conv.executeBatch();
+            System.out.println("Inserting parameters");
+            for( Parameter parm: parameters){
+                insert_parameters.setString(1,parm.getName());
+                insert_parameters.setString(2,parm.getStorageUnits());
+                insert_parameters.addBatch();
+            }
+            insert_parameters.executeBatch();
+
         } catch( SQLException e ){
             throw new RuntimeException("Error adding unit conversions.",e);
         }
@@ -290,9 +317,11 @@ public class R__unit_conversions extends BaseJavaMigration{
         return "Build a fully expanded unit conversion table.";
     }
 
+    
     @Override
     public Integer getChecksum(){
         return Integer.valueOf(checksum);
     }
+    
    
 }

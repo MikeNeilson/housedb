@@ -97,7 +97,7 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function housedb_tests.test_store_with_first_data_setting_office()
+create or replace function housedb_tests.test_store_with_first_data_setting_offset()
 returns setof text as $$
 declare    
     ts_id bigint;

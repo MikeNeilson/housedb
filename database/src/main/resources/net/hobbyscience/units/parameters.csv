@@ -11,3 +11,4 @@ Current,amps,Measure of amount of engery
 Power,watts,Measure of amount of power (volts*amps)
 Irradiance,w/m^2,Solar energy incoming
 Speed,km/s,Speed of something
+Stage,m,Height of water above a fixed point

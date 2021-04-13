@@ -20,4 +20,9 @@ Storage, pint, cup, Volume in pints, EN, Volume in cups, EN, linear, 2 0
 #
 Power, hp, watts, Power in hoursepower, EN, Power in Watts, SI, linear, 745.7 0
 #
+Current, amps, amps, Measure of current, EN_SI, Measure of current, EN_SI, linear, 1 0
+Volts, volts, volts, Measure of potential energy, EN_SI, Measure of potential engery, EN_SI, linear, 1 0
+PowerDensity, w/m^2, w/m^2, Watts per area, EN_SI, Watts per area, EN_SI, linear, 1 0 
+#
 Speed, km/s, mph, Speed in kilometers per second, SI, Speed in miles per hour, EN, linear, 2.23694 0 
+

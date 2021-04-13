@@ -53,6 +53,9 @@ jooq {
                             schema {
                                 inputSchema = 'housedb_security'
                             }
+                            schema {
+                                inputSchema = 'housedb_units'
+                            }
                         }
                         includes = '.*'
                         excludes = ''

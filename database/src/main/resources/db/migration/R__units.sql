@@ -1,3 +1,5 @@
+-- ${flyway:timestamp}
+
 create or replace function housedb_timeseries.error_no_conversion() returns text as $$ begin return 'ZX091'; end; $$ language plpgsql;
 create or replace function housedb_timeseries.error_bad_formula() returns text as $$ begin return 'ZX092'; end; $$ language plpgsql;
 
@@ -19,9 +21,9 @@ begin
             into conv_function postfix_func
         from housedb_units.conversions
         where unit_from = p_from and unit_to = p_to;
-
+            
         if not found then
-            raise exception 'Cannot find conversions from % to %', unit_from, unit_to using errcode ='ZX091';
+            raise exception 'Cannot find conversions from % to %', p_from, p_to using errcode ='ZX091';
         end if;
         select regexp_split_to_array(conv_function,' ') into conv_steps;
         create temp table stack(id serial primary key, val double precision );
