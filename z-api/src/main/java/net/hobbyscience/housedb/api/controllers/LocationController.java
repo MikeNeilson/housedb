@@ -38,7 +38,7 @@ public class LocationController implements CrudHandler {
         }
     )
     public void getOne( Context ctx, String locationName ){
-
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     @OpenApi(
@@ -63,11 +63,11 @@ public class LocationController implements CrudHandler {
     @OpenApi(
         tags = {"Locations"}
     )
-    public void update(Context ctx, String locationName){}
+    public void update(Context ctx, String locationName){ throw new UnsupportedOperationException("not implemented yet"); }
 
     @OpenApi(
         tags = {"Locations"}
     )
-    public void delete(Context ctx, String locationName){}
+    public void delete(Context ctx, String locationName){ throw new UnsupportedOperationException("not implemented yet"); }
 
 }

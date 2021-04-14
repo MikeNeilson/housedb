@@ -15,6 +15,9 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletResponse;
+
 import java.time.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -86,7 +89,15 @@ public class Entry {
                         logger.log(Level.WARNING,"database error",e);
                     }
                 })
-            .exception(Exception.class, (e, ctx) -> { logger.log(Level.WARNING,"error",e); } )
+            .exception(UnsupportedOperationException.class, (e,ctx) -> {
+                ctx.status(HttpServletResponse.SC_NOT_IMPLEMENTED);
+                logger.log(Level.WARNING,"error",e);
+            })            
+            .exception(Exception.class, (e, ctx) -> { 
+                ctx.status(500);
+                ctx.json("Error processing request");
+                logger.log(Level.WARNING,"error",e); } 
+            )
                 //error(404){ ctx -> ctx.json("not found") }           
             .attribute(javax.sql.DataSource.class,ds)
             .before( ctx -> {
@@ -107,7 +118,8 @@ public class Entry {
                     ctx.attribute("username",user);
                 } else {
                     ctx.attribute("username","guest");
-                }
+                }                
+                ctx.header("X-Content-Type-Options","nosniff");
             })
             .start(7000);
         app.routes( () -> {
