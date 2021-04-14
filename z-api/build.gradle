@@ -54,7 +54,7 @@ task prepareDockerBuild(type: Copy, dependsOn: jar ){
 task dockerBuild(type: Exec, dependsOn: prepareDockerBuild) {
     inputs.files configurations.docker.files
 
-    workingDir "$buildDIr/docker"
+    workingDir "$buildDir/docker"
     executable "docker"
     args "build", "--tag=housedb-api:"+project.version, "."
 }
