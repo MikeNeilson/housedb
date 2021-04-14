@@ -2,7 +2,7 @@ FROM adoptopenjdk/openjdk11
 VOLUME /tmp
 ARG JAVA_OPTS
 ENV JAVA_OPTS=$JAVA_OPTS
-COPY build/libs/z-api.jar z-api.jar
+COPY z-api.jar z-api.jar
 ENV HOUSEDB_JDBC_URL "jdbc:postgresql://<host>:<port>/<database>"
 ENV HOUSEDB_JDBC_USERNAME "must set username"
 ENV HOUSEDB_JDBC_PASSWORD "must set password"
