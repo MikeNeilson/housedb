@@ -20,7 +20,6 @@ public class LocationController implements CrudHandler {
     )
     @Override 
     public void getAll( Context ctx){
-        logger.log(ctx.attribute("username"));
         var ds = ctx.appAttribute(DataSource.class);
         try( var conn = ds.getConnection(); ){        
             var db = new HouseDb(conn,ctx.attribute("username"));
