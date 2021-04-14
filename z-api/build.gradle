@@ -37,7 +37,20 @@ run {
     environment "HOUSEDB_URL",  project(":database").flyway.url
     environment "HOUSEDB_USERNAME", project(":database").flyway.user
     environment "HOUSEDB_PASSWORD", project(":database").flyway.password
-}    
+}
+
+jar {
+  manifest {
+    attributes(
+      'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+      'Main-Class': application.mainClass
+    )
+  }
+  
+  from {
+	configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+}
 
 task prepareDockerBuild(type: Copy, dependsOn: jar ){
     doFirst {
@@ -48,7 +61,9 @@ task prepareDockerBuild(type: Copy, dependsOn: jar ){
     into "$buildDir/docker"
 
     from(configurations.docker)
-    from( jar.outputs.files.singleFile )
+    from( jar.outputs.files.singleFile ) {
+	rename "z-api.*\\.jar", "z-api.jar"
+    }
 }
 
 task dockerBuild(type: Exec, dependsOn: prepareDockerBuild) {
