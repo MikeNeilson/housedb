@@ -2,6 +2,10 @@ plugins {
     id 'application'
 }
 
+configurations {
+    docker
+}
+
 dependencies {
     implementation 'org.jooq:jooq:3.14.8'
     implementation 'org.slf4j:slf4j-simple:1.8.0-beta4'
@@ -30,5 +34,27 @@ application {
     //classpath += configurations.compile.collect    
 run {
     jvmArgs "-Djava.util.logging.ConsoleHandler.level=ALL"
-    args project(":database").flyway.url, project(":database").flyway.user, project(":database").flyway.password
+    environment "HOUSEDB_URL",  project(":database").flyway.url
+    environment "HOUSEDB_USERNAME", project(":database").flyway.user
+    environment "HOUSEDB_PASSWORD", project(":database").flyway.password
 }    
+
+task prepareDockerBuild(type: Copy, dependsOn: jar ){
+    doFirst {
+        project.mkdir("$buildDir/docker")
+    }
+
+    from "src/main/docker"
+    into "$buildDir/docker"
+
+    from(configurations.docker)
+    from( jar.outputs.files.singleFile )
+}
+
+task dockerBuild(type: Exec, dependsOn: prepareDockerBuild) {
+    inputs.files configurations.docker.files
+
+    workingDir "$buildDIr/docker"
+    executable "docker"
+    args "build", "--tag=housedb-api:"+project.version, "."
+}

@@ -47,16 +47,13 @@ public class Entry {
         
     }
 
-    public static void main(String []args) {
-        logger.info("********");
-        logger.info(args[0]);
-        logger.info(args[1]);
+    public static void main(String []args) {        
 
         var ds = new DataSource();
         ds.setDriverClassName("org.postgresql.Driver");
-        ds.setUrl(args[0]);
-        ds.setUsername(args[1]);
-        ds.setPassword(args[2]);
+        ds.setUrl(System.getenv("HOUSEDB_URL"));
+        ds.setUsername(System.getenv("HOUSEDB_USERNAME"));
+        ds.setPassword(System.getenv("HOUSEDB_PASSWORD"));
         ds.setInitialSize(5);
         ds.setMaxActive(10);
         ds.setMaxIdle(5);
