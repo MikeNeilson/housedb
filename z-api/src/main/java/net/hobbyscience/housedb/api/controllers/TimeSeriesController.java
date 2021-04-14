@@ -97,11 +97,11 @@ public class TimeSeriesController implements CrudHandler {
     @OpenApi(
         tags = {"TimeSeries"}
     )
-    public void update(Context ctx, String locationName){}
+    public void update(Context ctx, String locationName){ throw new UnsupportedOperationException("not implemented yet"); }
     
     @OpenApi(
         tags = {"TimeSeries"}
     )
-    public void delete(Context ctx , String locationName){}
+    public void delete(Context ctx , String locationName){ throw new UnsupportedOperationException("not implemented yet"); }
 
 }
