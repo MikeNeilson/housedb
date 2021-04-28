@@ -21,10 +21,12 @@ dependencies {
     flywayMigration sourceSets.main.runtimeClasspath
 }
 
+def (_,PGHOST,PGPORT,PGDATABASE) = (DBURL =~ /jdbc:postgresql:\/\/(.*):(.*)\/(.*)/)[0]
+
 flyway {
     locations = ["db/migration"]
     configurations = ['flywayMigration','compile']
-    url = "jdbc:postgresql://$PGHOST:$PGPORT/$PGDATABASE"
+    url = "$DBURL"
     user = DBUSER
     password = DBPASSWORD
     mixed = true

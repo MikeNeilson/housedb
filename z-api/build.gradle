@@ -2,6 +2,10 @@ plugins {
     id 'application'
 }
 
+configurations {
+    docker
+}
+
 dependencies {
     implementation 'org.jooq:jooq:3.14.8'
     implementation 'org.slf4j:slf4j-simple:1.8.0-beta4'
@@ -30,5 +34,42 @@ application {
     //classpath += configurations.compile.collect    
 run {
     jvmArgs "-Djava.util.logging.ConsoleHandler.level=ALL"
-    args project(":database").flyway.url, project(":database").flyway.user, project(":database").flyway.password
-}    
+    environment "HOUSEDB_URL",  project(":database").flyway.url
+    environment "HOUSEDB_USERNAME", project(":database").flyway.user
+    environment "HOUSEDB_PASSWORD", project(":database").flyway.password
+}
+
+jar {
+  manifest {
+    attributes(
+      'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+      'Main-Class': application.mainClass
+    )
+  }
+  
+  from {
+	configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+}
+
+task prepareDockerBuild(type: Copy, dependsOn: jar ){
+    doFirst {
+        project.mkdir("$buildDir/docker")
+    }
+
+    from "src/main/docker"
+    into "$buildDir/docker"
+
+    from(configurations.docker)
+    from( jar.outputs.files.singleFile ) {
+	rename "z-api.*\\.jar", "z-api.jar"
+    }
+}
+
+task dockerBuild(type: Exec, dependsOn: prepareDockerBuild) {
+    inputs.files configurations.docker.files
+
+    workingDir "$buildDir/docker"
+    executable "docker"
+    args "build", "--tag=housedb-api:"+project.version, "."
+}
