@@ -24,7 +24,7 @@ dependencies {
 flyway {
     locations = ["db/migration"]
     configurations = ['flywayMigration','compile']
-    url = "jdbc:postgresql://$PGHOST:$PGPORT/$PGDATABASE"
+    url = "$DBURL"
     user = DBUSER
     password = DBPASSWORD
     mixed = true
