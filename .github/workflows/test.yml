@@ -59,4 +59,4 @@ jobs:
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
       - name: Build and Test Unit Generation code        
-        run: ./gradlew :z-api:jar -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword        
+        run: ./gradlew :z-api:build -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword        
