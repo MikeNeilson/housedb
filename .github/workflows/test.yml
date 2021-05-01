@@ -91,7 +91,7 @@ jobs:
       - name: set version
         id: get_version
         run: |
-          VERSION=`./gradlew properties -q -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword | grep "^version:" | ask '{ print $2}'`
+          VERSION=`./gradlew properties -q -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword | grep "^version:" | awk '{ print $2}'`
           echo "::set-output name=VERSION::$VERSION"
       - name: tag repository
         uses: actions/github-script@v3
