@@ -9,7 +9,8 @@ jobs:
   test:
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
-
+    outputs:
+        debfile: ${{steps.deb.outputs.DEBFILE}}
     # Service containers to run with `container-job`
     services:
       # Label used to access the service container
@@ -120,5 +121,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: housedb-api.deb
-          asset_name: ${{needs.test.deb.outputs.DEBFILE}}
+          asset_name: ${{needs.test.deb.outputs.debfile}}
           asset_content_type: application/deb
