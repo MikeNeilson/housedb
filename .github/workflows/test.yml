@@ -70,7 +70,7 @@ jobs:
           name: housedb-api.deb
           path: z-api/build/distributions/${{steps.deb.outputs.DEBFILE}}
           retention-days: 1
-          if-no-files-found: fail
+          if-no-files-found: error
 
   deploy:    
     
