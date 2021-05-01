@@ -63,7 +63,7 @@ jobs:
         run: ./gradlew :z-api:build -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
       - name: Build Debian Package 
         id: deb
-        run: ./gradlew :z-api:dep -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword  
+        run: ./gradlew :z-api:deb -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword  
       - name: Upload Debian
         uses: actions/upload-artifact@v2
         with:
