@@ -96,10 +96,20 @@ task deb(type: Deb ){
     postInstall file('src/main/deb/postInstall.sh')
 
     into '/usr/local/housedb'
-    from( jar.outputs.files )
+    from( jar.outputs.files ) {
+        rename( "z-api-${project.version}.jar",'z-api.jar')
+    }
 
     from( "src/main/systemd")
 
     link('/etc/systemd/system/housedb-api.service','/usr/local/housedb/housedb-api.service')
+    doLast {
+        println( "::set-output name=DEBFILE::$deb.packageName-$project.version-${deb.release}.deb" )
+    }
+}
 
+task deb_name {
+    doLast {
+        println( "$deb.packageName-$project.version-${deb.release}.deb" )
+    }
 }

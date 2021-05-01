@@ -1,3 +1,4 @@
+---
 name: HouseDB tests
 on: push
 # includes code from https://github.com/francois2metz/pgtap-github-actions/blob/master/.github/workflows/pgtest.yml
@@ -58,5 +59,64 @@ jobs:
           POSTGRES_HOST: postgres
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
-      - name: Build and Test Unit Generation code        
-        run: ./gradlew :z-api:build -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword        
+      - name: Build API Jar
+        run: ./gradlew :z-api:build -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
+      - name: Build Debian Package 
+        id: deb
+        run: ./gradlew :z-api:dep -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword  
+      - name: Upload Debian
+        uses: actions/upload-artifact@v2
+        with:
+          name: housedb-api.deb
+          path: src/z-api/build/distributions/${steps.deb.DEBFILE}
+          retention-days: 1
+
+  deploy:    
+    
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+          java-package: jdk
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v2
+      - name: set version
+        id: get_version
+        run: |
+          VERSION=`./gradlew properties -q | grep "^version:" | ask '{ print $2}'`
+          echo "::set-output name=VERSION::$VERSION"
+      - name: tag repository
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              refs: "refs/tags${{steps.get_version.outputs.VERSION}}",
+              sha: context.sha
+            })
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env: 
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{steps.get_version.outputs.VERSION}}
+          release_name: Release ${{steps.get_version.outputs.VERSION}}
+      - name: Upload Tomcat Deb File
+        id: upload-deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.get_version.outputs.WAR_FILE}}
+          asset_name: ${{ steps.get_version.outputs.WAR_FILE}}
+          asset_content_type: application/rpm
