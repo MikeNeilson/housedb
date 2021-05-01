@@ -68,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: housedb-api.deb
-          path: src/z-api/build/distributions/${steps.deb.outputs.DEBFILE}
+          path: src/z-api/build/distributions/${{steps.deb.outputs.DEBFILE}}
           retention-days: 1
 
   deploy:    
