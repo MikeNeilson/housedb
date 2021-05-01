@@ -34,6 +34,7 @@ application {
     //classpath += configurations.compile.collect    
 run {
     jvmArgs "-Djava.util.logging.ConsoleHandler.level=ALL"
+    environment "HOUSEDB_PORT", project.hasProperty('HOUSEDB_PORT') ? HOUSEDB_PORT: 7000
     environment "HOUSEDB_URL",  project(":database").flyway.url
     environment "HOUSEDB_USERNAME", project(":database").flyway.user
     environment "HOUSEDB_PASSWORD", project(":database").flyway.password
