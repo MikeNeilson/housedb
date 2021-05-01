@@ -120,5 +120,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: housedb-api.deb
-          asset_name: ${{jobs.test.deb.outputs.DEBFILE}}
+          asset_name: ${{needs.test.deb.outputs.DEBFILE}}
           asset_content_type: application/deb
