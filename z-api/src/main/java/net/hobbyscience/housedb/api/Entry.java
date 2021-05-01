@@ -64,6 +64,13 @@ public class Entry {
         om.registerModule(new SimpleModule().addSerializer(DataTriple.class, new DataTripleSerializer()));
         om.setAnnotationIntrospector(new IgnoreJooq());
 
+        String _port = System.getenv("HOUSEDB_PORT");
+        int port = _port != null ? Integer.parseInt(_port) : 7000;
+
+        
+        String address = System.getenv("HOUSEDB_LISTEN_ADDRESS");
+        address = address != null ? address : "0.0.0.0";
+
         JavalinValidation.register(OffsetDateTime.class, it -> {
             return OffsetDateTime.parse(it);
         });
@@ -118,7 +125,7 @@ public class Entry {
                 }                
                 ctx.header("X-Content-Type-Options","nosniff");
             })
-            .start(7000);
+            .start(address,port);
         app.routes( () -> {
             get("/", ctx -> {ctx.result("Hello World"); });
             crud("/locations/:location-name", new LocationController());
