@@ -119,6 +119,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.artifacts.outputs.housedb-api}}
-          asset_name: housedb-api.deb
+          asset_path: housedb-api.deb
+          asset_name: ${{jobs.test.deb.outputs.DEBFILE}}
           asset_content_type: application/deb
