@@ -104,7 +104,7 @@ task deb(type: Deb ){
 
     link('/etc/systemd/system/housedb-api.service','/usr/local/housedb/housedb-api.service')
     doLast {
-        println( "::set-output name=DEBFILE::$deb.packageName_$project.version-${deb.release}_all.deb" )
+        println( "::set-output name=DEBFILE::${deb.packageName}_$project.version-${deb.release}_all.deb" )
     }
 }
 
