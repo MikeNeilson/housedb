@@ -90,7 +90,11 @@ jobs:
         id: artifacts
         uses: actions/download-artifact@v2      
         with:
-          path: ./              
+          path: ./        
+      - name: Show file system a bit 
+        run: |
+          ls -l
+          ls -l housedb-api.deb
       - name: set version
         id: get_version
         run: |
@@ -122,6 +126,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{needs.test.outputs.debfile}}
+          asset_path: housedb-api.deb/${{needs.test.outputs.debfile}}
           asset_name: ${{needs.test.outputs.debfile}}
           asset_content_type: application/deb
