@@ -88,11 +88,9 @@ jobs:
           java-package: jdk
       - name: Download all workflow run artifacts
         id: artifacts
-        uses: actions/download-artifact@v2              
-      - name: Show file system a bit 
-        run: |
-          ls -l
-          ls -l housedb-api.deb
+        uses: actions/download-artifact@v2      
+        with:
+          path: ./              
       - name: set version
         id: get_version
         run: |
@@ -124,6 +122,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: housedb/housedb-api.deb
+          asset_path: ${{needs.test.outputs.debfile}}
           asset_name: ${{needs.test.outputs.debfile}}
           asset_content_type: application/deb
