@@ -90,7 +90,9 @@ jobs:
         id: artifacts
         uses: actions/download-artifact@v2              
       - name: Show file system a bit 
-        run: ls -l
+        run: |
+          ls -l
+          ls -l housedb-api.deb
       - name: set version
         id: get_version
         run: |
