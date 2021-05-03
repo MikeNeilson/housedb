@@ -1,0 +1,6 @@
+echo "You must set the Following environment variables on the service"
+echo "Environment=\"HOUSEDB_LISTEN_ADDRESS=0.0.0.0\""
+echo "Environment=\"HOUSEDB_PORT=7000\""
+echo "Environment=\"HOUSEDB_URL=jdbc:postgresql://<host>:<port>/<db name>\""
+echo "Environment=\"HOUSEDB_USERNAME=housedb_user\""
+echo "Environment=\"HOUSEDB_PASSWORD=<the actual password>\""

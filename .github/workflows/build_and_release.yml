@@ -1,0 +1,130 @@
+---
+name: HouseDB tests
+on: push
+# includes code from https://github.com/francois2metz/pgtap-github-actions/blob/master/.github/workflows/pgtest.yml
+# francois2metz
+
+jobs:
+  # Label of the container job
+  test:
+    # Containers must run in Linux based operating systems
+    runs-on: ubuntu-latest
+    outputs:
+        debfile: ${{steps.deb.outputs.DEBFILE}}
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:13
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports: 
+          - "5432:5432"
+
+    steps:
+      # Downloads a copy of the code in your repository before running CI tests
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Install pg_prove
+        run: sudo cpan TAP::Parser::SourceHandler::pgTAP
+        env:
+          SHELL: /bin/bash
+      - name: Install postgres dev
+        run: sudo apt-get install -y --no-install-recommends postgresql-server-dev-all
+      - name: Checkout pgTAP
+        uses: actions/checkout@v2
+        with:
+          repository: theory/pgtap
+          path: pgtap
+          ref: v1.1.0
+      - name: install pgtap
+        working-directory: pgtap
+        run: make && psql --host localhost --username postgres --dbname template1 --file sql/pgtap.sql
+        env:
+          PGPASSWORD: postgres
+      - name: Create housedb database in postgres instance
+        # Runs a script that creates a PostgreSQL client, populates
+        # the client with data, and retrieves data
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -w -f .github/workflows/initial_db_setup.sql
+        # Environment variable used by the `client.js` script to create a new PostgreSQL client.
+        env:
+          # The hostname used to communicate with the PostgreSQL service container
+          POSTGRES_HOST: postgres
+          # The default PostgreSQL port
+          POSTGRES_PORT: 5432
+      - name: Build API Jar
+        run: ./gradlew :z-api:build -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
+      - name: Build Debian Package 
+        id: deb
+        run: ./gradlew :z-api:deb -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword  
+      - name: Upload Debian
+        uses: actions/upload-artifact@v2
+        with:
+          name: housedb-api.deb
+          path: z-api/build/distributions/${{steps.deb.outputs.DEBFILE}}
+          retention-days: 1
+          if-no-files-found: error
+
+  deploy:        
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+          java-package: jdk
+      - name: Download all workflow run artifacts
+        id: artifacts
+        uses: actions/download-artifact@v2      
+        with:
+          path: ./        
+      - name: Show file system a bit 
+        run: |
+          ls -l
+          ls -l housedb-api.deb
+      - name: set version
+        id: get_version
+        run: |
+          VERSION=`./gradlew properties -q -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword | grep "^version:" | awk '{ print $2}'`
+          echo "::set-output name=VERSION::$VERSION"
+      - name: tag repository
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{steps.get_version.outputs.VERSION}}",
+              sha: context.sha
+            })
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env: 
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{steps.get_version.outputs.VERSION}}
+          release_name: Release ${{steps.get_version.outputs.VERSION}}
+      - name: Upload Deb File
+        id: upload-deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: housedb-api.deb/${{needs.test.outputs.debfile}}
+          asset_name: ${{needs.test.outputs.debfile}}
+          asset_content_type: application/deb

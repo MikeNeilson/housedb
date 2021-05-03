@@ -1,5 +1,14 @@
+buildscript {
+    repositories { jcenter() }
+
+    dependencies {
+        classpath 'com.netflix.nebula:nebula-ospackage-plugin:3.+'
+    }
+}
+
 plugins {    
     id 'application'
+    id 'nebula.deb' version "8.5.6"
 }
 
 configurations {
@@ -73,4 +82,34 @@ task dockerBuild(type: Exec, dependsOn: prepareDockerBuild) {
     workingDir "$buildDir/docker"
     executable "docker"
     args "build", "--tag=housedb-api:"+project.version, "."
+}
+
+
+task deb(type: Deb ){
+    packageName = 'housedb-api'
+    summary = 'API jar for housedb API'
+    release = 1
+
+    requires('default-jre-headless','>=11')
+
+    preInstall file('src/main/deb/preInstall.sh')
+    postInstall file('src/main/deb/postInstall.sh')
+
+    into '/usr/local/housedb'
+    from( jar.outputs.files ) {
+        rename( "z-api-${project.version}.jar",'z-api.jar')
+    }
+
+    from( "src/main/systemd")
+
+    link('/etc/systemd/system/housedb-api.service','/usr/local/housedb/housedb-api.service')
+    doLast {
+        println( "::set-output name=DEBFILE::${deb.packageName}_$project.version-${deb.release}_all.deb" )
+    }
+}
+
+task deb_name {
+    doLast {
+        println( "$deb.packageName-$project.version-${deb.release}.deb" )
+    }
 }
