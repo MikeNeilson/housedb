@@ -1,4 +1,4 @@
-package db.migration;
+package db.migration.units;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -16,6 +16,7 @@ import java.util.zip.CRC32;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
+import db.migration.NoConversionFound;
 import net.hobbyscience.database.Conversion;
 import net.hobbyscience.database.ConversionMethod;
 import net.hobbyscience.database.Parameter;
