@@ -3,6 +3,8 @@ package net.hobbyscience.housedb.dao;
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import net.hobbyscience.housedb.housedb.udt.records.*;
@@ -19,11 +21,15 @@ public class DataTriple {
     @Schema(required = true,pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")    
     public OffsetDateTime dateTime;
     
-    @Schema(required = true)
+    @Schema(required = true,nullable = true)
+    //@JsonSerialize(as = Double.class)
+    //@JsonDeserialize(as = Double.class)
     public double value;    
     
     
-    @Schema(required = true)
+    @Schema(required = true, nullable = true)
+    //@JsonSerialize(as = Integer.class)
+    //@JsonDeserialize(as = Integer.class)
     public int quality;
 
     @JsonIgnore
