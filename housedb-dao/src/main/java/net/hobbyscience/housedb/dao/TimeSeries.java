@@ -13,6 +13,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class TimeSeries{
     @Schema(required = false)
     private String name;
+
+    @Schema(required = false, example="00:15:00", description = " the hours:minuts:seconds each value should be in time from each other")    
+    private String interval;
+
     @Schema(required = false,name = "interval-offset", example = "00:00:00", description = "the hours:minute:seconds these values should be offset from the top of the interval.")
     @JsonAlias("interval-offset")    
     @JsonProperty(value = "interval-offset")
@@ -58,5 +62,13 @@ public class TimeSeries{
 
     public void setUnits(String units) {
         this.units = units;
+    }
+
+    public String getInterval() {
+        return this.interval;
+    }
+
+    public void setInterval(String interval) {
+        this.interval = interval;
     }
 }

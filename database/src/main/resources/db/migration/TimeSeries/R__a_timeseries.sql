@@ -267,6 +267,4 @@ begin
 end;
 $$ language plpgsql;
 
-drop trigger if exists insert_tsv_trigger on housedb.timeseries_values;
-create trigger insert_tsv_trigger instead of insert or update or delete on housedb.timeseries_values 
-    for each row execute procedure housedb_timeseries.insert_tsv();
+
