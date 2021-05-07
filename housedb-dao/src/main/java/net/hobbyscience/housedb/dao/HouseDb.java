@@ -24,7 +24,6 @@ import org.jooq.*;
 import org.jooq.conf.ParamType;
 import org.jooq.exception.*;
 import org.jooq.impl.DSL;
-import org.jooq.types.YearToSecond;
 
 public class HouseDb {
     private static final Logger logger = Logger.getLogger(HouseDb.class.getName());    
