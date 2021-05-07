@@ -90,7 +90,7 @@ task deb(type: Deb ){
     summary = 'API jar for housedb API'
     release = 1
 
-    requires('default-jre-headless','>=11')
+    requires('default-jre-headless','>= 2:1.11').or('openjdk-11-jre-headless')
 
     preInstall file('src/main/deb/preInstall.sh')
     postInstall file('src/main/deb/postInstall.sh')
