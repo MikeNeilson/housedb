@@ -128,3 +128,13 @@ jobs:
           asset_path: housedb-api.deb/${{needs.test.outputs.debfile}}
           asset_name: ${{needs.test.outputs.debfile}}
           asset_content_type: application/deb
+  make_live:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Setup SSH Key
+        run: echo ${secrets.SSH_KEY} > .ssh/id_rsa
+      - name: Runs
+        run: ${secrets.UPDATE_COMMAND}
+          
