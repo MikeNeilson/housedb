@@ -94,6 +94,7 @@ task deb(type: Deb, dependsOn: build ){
 
     preInstall file('src/main/deb/preInstall.sh')
     postInstall file('src/main/deb/postInstall.sh')
+    preUninstall file('src/main/deb/preRm.sh')
 
     into '/usr/local/housedb'
     from( jar.outputs.files ) {
@@ -101,7 +102,7 @@ task deb(type: Deb, dependsOn: build ){
     }
 
     from( "src/main/systemd") {
-        into( "/lib/systemd/systemhousedb-api.service")
+        into( "/lib/systemd/system")
     }
     
     
