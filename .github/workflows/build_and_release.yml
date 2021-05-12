@@ -134,7 +134,7 @@ jobs:
     needs: deploy
     steps:
       - name: Setup SSH Key
-        run: echo ${secrets.SSH_KEY} > .ssh/id_rsa
+        run: echo ${{secrets.SSH_KEY}} > .ssh/id_rsa
       - name: Runs
-        run: ${secrets.UPDATE_COMMAND}
+        run: ${{secrets.UPDATE_COMMAND}}
           
