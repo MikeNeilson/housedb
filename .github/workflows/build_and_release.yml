@@ -134,7 +134,17 @@ jobs:
     needs: deploy
     steps:
       - name: Setup SSH Key
-        run: echo ${{secrets.SSH_KEY}} > .ssh/id_rsa
-      - name: Runs
-        run: ${{secrets.UPDATE_COMMAND}}
+        run: |
+          echo "${SSH_KEY}" > .ssh/id_rsa
+          echo "${KNOWN_HOSTS}" > .ssh/known_hosts
+        shell: bash
+        env:
+          SSH_KEY: ${{secrets.SSH_KEY}}
+          KNOWN_HOSTS: ${{secrets.KNOWN_HOSTS}}
+      - name: Run Update
+        run: |
+          ${COMMAND}
+        shell: bash
+        env:
+          COMMAND: ${{secrets.UPDATE_COMMAND}}
           
