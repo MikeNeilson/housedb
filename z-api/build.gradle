@@ -85,7 +85,7 @@ task dockerBuild(type: Exec, dependsOn: prepareDockerBuild) {
 }
 
 
-task deb(type: Deb ){
+task deb(type: Deb, dependsOn: build ){
     packageName = 'housedb-api'
     summary = 'API jar for housedb API'
     release = 1
@@ -94,15 +94,18 @@ task deb(type: Deb ){
 
     preInstall file('src/main/deb/preInstall.sh')
     postInstall file('src/main/deb/postInstall.sh')
+    preUninstall file('src/main/deb/preRm.sh')
 
     into '/usr/local/housedb'
     from( jar.outputs.files ) {
         rename( "z-api-${project.version}.jar",'z-api.jar')
     }
 
-    from( "src/main/systemd")
-
-    link('/etc/systemd/system/housedb-api.service','/usr/local/housedb/housedb-api.service')
+    from( "src/main/systemd") {
+        into( "/lib/systemd/system")
+    }
+    
+    
     doLast {
         println( "::set-output name=DEBFILE::${deb.packageName}_$project.version-${deb.release}_all.deb" )
     }
