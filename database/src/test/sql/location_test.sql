@@ -57,6 +57,26 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION housedb_tests.test_create_with_sub_doesnt_create_duplicate()
+RETURNS SETOF TEXT AS $$
+DECLARE
+    base_name text = 'Test';
+    full_loc text = 'Test-Sub Location';
+    n_rows int;
+BEGIN
+    perform housedb_security.add_permission('guest', 'CREATE', 'locations','.*');
+
+    perform housedb_locations.create_location(base_name);
+    select into n_rows count(*) from housedb.locations;
+    RETURN NEXT ok( n_rows = 1, 'Should only have 1 row');
+
+    perform housedb_locations.create_location(full_loc);
+    select into n_rows count(*) from housedb.locations;
+    RETURN NEXT ok( n_rows = 2, 'Should only have 2 rows, duplicate row created');
+
+END;
+$$ LANGUAGE plpgsql;
+
 
 
 

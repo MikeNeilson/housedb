@@ -50,10 +50,19 @@ BEGIN
     foreach cur_level in ARRAY parts
     loop        
         -- search for existing object at this level
-        --raise info 'Search for (%,%)', cur_level,the_parent_id;
-        select  into the_id,found_parent_id id,parent_id from locations where name=cur_level and (parent_id = the_parent_id); -- or parent_id is null);
+        raise info 'Search for (%,%)', cur_level,the_parent_id;
+        select  
+            into the_id,found_parent_id id,parent_id 
+        from locations 
+        where 
+            name=cur_level
+        and (
+            (parent_id = the_parent_id) 
+          or
+            (parent_id is null and the_parent_id is null)
+        );
         if the_id is NULL THEN
-            --raise notice 'insert new value';    
+            raise notice 'insert new value';    
             --raise notice '%',found_parent_id    ;
             insert into locations(name,parent_id) values (cur_level,the_parent_id) returning id into the_id;
             the_parent_id = the_id;
