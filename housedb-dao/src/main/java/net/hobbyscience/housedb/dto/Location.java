@@ -43,14 +43,7 @@ public class Location{
 
     public String getVertical_datum() {
         return this.vertical_datum;
-    }
-
-    public Location() {
-    }
-
-    public Location(String name) {
-        this.name = name;
-    }
+    }    
 
     public String getName() {
         return this.name;
