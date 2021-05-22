@@ -10,6 +10,9 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 import net.hobbyscience.housedb.api.controllers.*;
 import net.hobbyscience.housedb.dao.*;
 import net.hobbyscience.housedb.jackson.*;
+import net.hobbyscience.housedb.types.DataTriple;
+import net.hobbyscience.housedb.types.serializers.DataTripleDeserializer;
+import net.hobbyscience.housedb.types.serializers.DataTripleSerializer;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import java.util.Base64;

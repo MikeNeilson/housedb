@@ -1,4 +1,4 @@
-package net.hobbyscience.housedb.dao;
+package net.hobbyscience.housedb.types.serializers;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
+import net.hobbyscience.housedb.types.DataTriple;
 
 public class DataTripleSerializer extends StdSerializer<DataTriple>{
 

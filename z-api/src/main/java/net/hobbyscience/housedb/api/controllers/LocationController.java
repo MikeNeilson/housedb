@@ -4,6 +4,7 @@ import io.javalin.apibuilder.*;
 import io.javalin.http.*;
 import io.javalin.plugin.openapi.annotations.*;
 import net.hobbyscience.housedb.dao.*;
+import net.hobbyscience.housedb.dto.Location;
 
 import java.util.logging.Logger;
 

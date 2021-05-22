@@ -1,4 +1,4 @@
-package net.hobbyscience.housedb.dao;
+package net.hobbyscience.housedb.dto;
 
 import java.util.Objects;
 

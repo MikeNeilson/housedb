@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import static net.hobbyscience.housedb.housedb.Routines.*;
+
+import net.hobbyscience.housedb.dto.Location;
+import net.hobbyscience.housedb.dto.TimeSeries;
 import net.hobbyscience.housedb.housedb.tables.*;
 
 import static net.hobbyscience.housedb.housedb.tables.TimeseriesValues.*;
@@ -17,6 +20,7 @@ import static net.hobbyscience.housedb.housedb.tables.Catalog.*;
 import static net.hobbyscience.housedb.housedb.tables.Parameters.*;
 import static net.hobbyscience.housedb.housedb.tables.Intervals.*;
 import net.hobbyscience.housedb.housedb_security.Routines;
+import net.hobbyscience.housedb.types.DataTriple;
 
 import static org.jooq.impl.DSL.*;
 
