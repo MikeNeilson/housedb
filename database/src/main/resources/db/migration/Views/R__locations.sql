@@ -6,7 +6,12 @@ create or replace view housedb.view_locations as
             parent_id,
             housedb_locations.expand_location_name(
                 parent_id
-            ) AS parent
+            ) AS parent,
+            latitude,
+            longitude,
+            horizontal_datum,
+            elevation,
+            vertical_datum
     from housedb.locations
 ;
 
