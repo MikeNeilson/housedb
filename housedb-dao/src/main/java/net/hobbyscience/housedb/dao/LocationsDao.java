@@ -10,6 +10,7 @@ import org.jooq.impl.DSL;
 import net.hobbyscience.housedb.dto.Location;
 
 import static net.hobbyscience.housedb.housedb.tables.ViewLocations.*;
+import static net.hobbyscience.housedb.housedb.tables.Locations.*;
 
 public class LocationsDao extends Dao<Location>{
 
@@ -25,6 +26,7 @@ public class LocationsDao extends Dao<Location>{
             .fetch().stream().map( r -> r.into(VIEW_LOCATIONS) )
             .map( r -> {
                 return new Location (
+                    r.getId(),
                     r.getName(),
                     r.getParent(),
                     r.getLatitude(),
@@ -50,6 +52,7 @@ public class LocationsDao extends Dao<Location>{
         } else {
             return Optional.of(
                 new Location (
+                    r.getId(),
                     r.getName(),
                     r.getParent(),
                     r.getLatitude(),
@@ -65,14 +68,39 @@ public class LocationsDao extends Dao<Location>{
     }
 
     @Override
-    public Location update(Location modified) {
-        // TODO Auto-generated method stub
-        return null;
+    public void update(Location modified) {
+        dsl.update(VIEW_LOCATIONS)
+            .set(VIEW_LOCATIONS.NAME,modified.getName())
+            
+            .set(VIEW_LOCATIONS.LATITUDE,modified.getLatitude())
+            .set(VIEW_LOCATIONS.LONGITUDE,modified.getLongitude())
+            .set(VIEW_LOCATIONS.HORIZONTAL_DATUM,modified.getHorizontal_datum())
+
+            .set(VIEW_LOCATIONS.LATITUDE,modified.getElevation())
+            .set(VIEW_LOCATIONS.VERTICAL_DATUM,modified.getVertical_datum())
+            
+            .where(VIEW_LOCATIONS.ID.eq(modified.getId()))
+            .execute();        
     }
 
     @Override
     public void save(Location newObj) {
-        // TODO Auto-generated method stub
+        dsl.insertInto(VIEW_LOCATIONS)
+           .columns(
+               VIEW_LOCATIONS.NAME,
+               VIEW_LOCATIONS.LATITUDE,
+               VIEW_LOCATIONS.LONGITUDE,
+               VIEW_LOCATIONS.HORIZONTAL_DATUM,
+               VIEW_LOCATIONS.ELEVATION,
+               VIEW_LOCATIONS.HORIZONTAL_DATUM
+           ).values(
+                newObj.getName(),
+                newObj.getLatitude(),
+                newObj.getLongitude(),
+                newObj.getHorizontal_datum(),
+                newObj.getElevation(),
+                newObj.getVertical_datum()
+           ).execute();
         
     }
     

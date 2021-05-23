@@ -3,6 +3,7 @@ package net.hobbyscience.housedb.dto;
 import java.util.Objects;
 
 public class Location{
+    private long id;
     private String name;
     private String parent;
     private Double latitude;
@@ -11,7 +12,8 @@ public class Location{
     private Double elevation;
     private String vertical_datum;
 
-    public Location(String name, String parent, Double latitude, Double longitude, String horizontal_datum, Double elevation, String vertical_datum) {
+    public Location(long id, String name, String parent, Double latitude, Double longitude, String horizontal_datum, Double elevation, String vertical_datum) {
+        this.id = id;
         this.name = name;
         this.parent = parent;
         this.latitude = latitude;
@@ -21,6 +23,10 @@ public class Location{
         this.vertical_datum = vertical_datum;
     }
     
+    public long getId(){
+        return this.id;
+    }
+
     public String getParent() {
         return this.parent;
     }

@@ -17,7 +17,7 @@ public abstract class Dao<T> {
     public abstract List<T> getAll();
     public abstract Optional<T> getByUniqueName(String uniqueName);
 
-    public abstract T update(T modified);
+    public abstract void update(T modified);
     public abstract void save(T newObj);
 
 }
