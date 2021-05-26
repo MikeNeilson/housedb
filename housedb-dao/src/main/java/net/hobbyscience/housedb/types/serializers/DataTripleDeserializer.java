@@ -1,4 +1,4 @@
-package net.hobbyscience.housedb.dao;
+package net.hobbyscience.housedb.types.serializers;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -8,6 +8,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
+import net.hobbyscience.housedb.types.DataTriple;
 
 public class DataTripleDeserializer extends StdDeserializer<DataTriple>{
     public static final Logger logger = Logger.getLogger(DataTripleDeserializer.class.getName());

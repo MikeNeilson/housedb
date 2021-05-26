@@ -3,6 +3,8 @@ import io.javalin.apibuilder.*;
 import io.javalin.http.*;
 import io.javalin.plugin.openapi.annotations.*;
 import net.hobbyscience.housedb.dao.*;
+import net.hobbyscience.housedb.dto.TimeSeries;
+
 import javax.sql.DataSource;
 import org.jooq.exception.*;
 import java.time.*;
@@ -42,6 +44,9 @@ public class TimeSeriesController implements CrudHandler {
         responses = {
             @OpenApiResponse(status="200", content = {@OpenApiContent( from = TimeSeries.class)}),  
             @OpenApiResponse(status="404", content = {@OpenApiContent( from = NotFoundResponse.class)})
+        },
+        security = {
+            @OpenApiSecurity(name = "bearerAuth")
         }
     )
     public void getOne(Context ctx, String locationName){
@@ -95,11 +100,17 @@ public class TimeSeriesController implements CrudHandler {
     }
     
     @OpenApi(
+        security = {
+            @OpenApiSecurity(name = "bearerAuth")
+        },
         tags = {"TimeSeries"}
     )
     public void update(Context ctx, String locationName){ throw new UnsupportedOperationException("not implemented yet"); }
     
     @OpenApi(
+        security = {
+            @OpenApiSecurity(name = "bearerAuth")
+        },
         tags = {"TimeSeries"}
     )
     public void delete(Context ctx , String locationName){ throw new UnsupportedOperationException("not implemented yet"); }

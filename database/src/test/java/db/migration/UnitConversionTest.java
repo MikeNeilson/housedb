@@ -2,7 +2,7 @@ package db.migration;
 
 import org.junit.jupiter.api.Test;
 
-import db.migration.units.R__unit_conversions;
+import db.migration.java.units.R__unit_conversions;
 import net.hobbyscience.SimpleInfixCalculator;
 import net.hobbyscience.database.Conversion;
 import net.hobbyscience.database.Unit;

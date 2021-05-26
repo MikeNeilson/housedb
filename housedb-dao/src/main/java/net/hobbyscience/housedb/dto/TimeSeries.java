@@ -1,4 +1,4 @@
-package net.hobbyscience.housedb.dao;
+package net.hobbyscience.housedb.dto;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.*;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import net.hobbyscience.housedb.types.DataTriple;
 /** 
  * 
  */

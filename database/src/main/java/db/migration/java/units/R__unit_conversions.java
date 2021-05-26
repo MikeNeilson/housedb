@@ -1,4 +1,4 @@
-package db.migration.units;
+package db.migration.java.units;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

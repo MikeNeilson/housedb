@@ -10,6 +10,9 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 import net.hobbyscience.housedb.api.controllers.*;
 import net.hobbyscience.housedb.dao.*;
 import net.hobbyscience.housedb.jackson.*;
+import net.hobbyscience.housedb.types.DataTriple;
+import net.hobbyscience.housedb.types.serializers.DataTripleDeserializer;
+import net.hobbyscience.housedb.types.serializers.DataTripleSerializer;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import java.util.Base64;
@@ -27,15 +30,24 @@ import io.javalin.plugin.openapi.OpenApiOptions;
 import io.javalin.plugin.openapi.OpenApiPlugin;
 import io.javalin.plugin.openapi.ui.ReDocOptions;
 import io.javalin.plugin.openapi.ui.SwaggerOptions;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 
 
 public class Entry {
     private static final Logger logger = Logger.getLogger(Entry.class.getName());
     public static OpenApiPlugin getOpenApiPlugin() {
         Info info = new Info().version("1.0").description("HouseDB API");
-        OpenApiOptions ops = new OpenApiOptions(info)
-                                .path("/swagger-docs")        
+        Components components = new Components().addSecuritySchemes(
+                                    "bearerAuth",
+                                    new SecurityScheme().type(Type.HTTP).scheme("bearer").bearerFormat("JWT")
+                                );
+        
+        OpenApiOptions ops = new OpenApiOptions( () -> new OpenAPI().components(components).info(info) );        
+                                ops.path("/swagger-docs")        
                                 //.toJsonMapper(JacksonToJsonMapper.INSTANCE)
                                 .swagger(new SwaggerOptions("/swagger-ui"))
                                 .reDoc(new ReDocOptions("/redoc"))
@@ -43,6 +55,7 @@ public class Entry {
                                     doc.json("500", ErrorResponse.class);
                                     doc.json("503", ErrorResponse.class);
                                 });
+
         return new OpenApiPlugin(ops);
         
     }
@@ -93,6 +106,11 @@ public class Entry {
                         logger.log(Level.WARNING,"database error",e);
                     }
                 })
+            .exception(NotAuthorized.class, (e, ctx ) -> {
+                logger.warning("Unauthorized access");
+                logger.warning(e.getCause().getMessage());
+                ctx.status(HttpServletResponse.SC_UNAUTHORIZED).json("Unauthorized Access");
+            })
             .exception(UnsupportedOperationException.class, (e,ctx) -> {
                 ctx.status(HttpServletResponse.SC_NOT_IMPLEMENTED);
                 logger.log(Level.WARNING,"error",e);
@@ -108,17 +126,14 @@ public class Entry {
                 var header = ctx.header(Header.AUTHORIZATION);
                 if( header != null ){
                     // verification will be handled at the gateway
-                    //val jwt = Jwts.parserBuilder().build().parseClaimsJws(ctx.header("Authorization"))
-                    logger.info(header);
+                    //val jwt = Jwts.parserBuilder().build().parseClaimsJws(ctx.header("Authorization"))                    
                     var parts = header.split("\\\\s+");
-                    var jwt = parts[parts.length-1].split("\\.");
-                    logger.info(""+jwt.length);
+                    var jwt = parts[parts.length-1].split("\\.");                    
                     var jwtClaims = Base64.getDecoder().decode(jwt[1]);
                     var jsonClaims = om.readTree(jwtClaims);
-                    //val user = jwt.subject()
-                    logger.fine(jsonClaims.toString());
+                    //val user = jwt.subject()                    
                     var user = om.treeToValue(jsonClaims.get("sub"),String.class);
-                    logger.fine(user);                
+                    logger.fine(user);
                     ctx.attribute("username",user);
                 } else {
                     ctx.attribute("username","guest");

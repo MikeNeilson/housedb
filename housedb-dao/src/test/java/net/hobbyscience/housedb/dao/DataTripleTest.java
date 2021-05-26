@@ -2,6 +2,10 @@ package net.hobbyscience.housedb.dao;
 
 import org.junit.jupiter.api.Test;
 
+import net.hobbyscience.housedb.types.DataTriple;
+import net.hobbyscience.housedb.types.serializers.DataTripleDeserializer;
+import net.hobbyscience.housedb.types.serializers.DataTripleSerializer;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
