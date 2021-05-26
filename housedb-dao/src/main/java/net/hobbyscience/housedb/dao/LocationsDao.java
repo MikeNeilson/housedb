@@ -75,10 +75,10 @@ public class LocationsDao extends Dao<Location>{
             
             .set(VIEW_LOCATIONS.LATITUDE,modified.getLatitude())
             .set(VIEW_LOCATIONS.LONGITUDE,modified.getLongitude())
-            .set(VIEW_LOCATIONS.HORIZONTAL_DATUM,modified.getHorizontal_datum())
+            .set(VIEW_LOCATIONS.HORIZONTAL_DATUM,modified.getHorizontalDatum())
 
             .set(VIEW_LOCATIONS.LATITUDE,modified.getElevation())
-            .set(VIEW_LOCATIONS.VERTICAL_DATUM,modified.getVertical_datum())
+            .set(VIEW_LOCATIONS.VERTICAL_DATUM,modified.getVerticalDatum())
             
             .where(VIEW_LOCATIONS.ID.eq(modified.getId()))
             .execute();        
@@ -93,14 +93,14 @@ public class LocationsDao extends Dao<Location>{
                VIEW_LOCATIONS.LONGITUDE,
                VIEW_LOCATIONS.HORIZONTAL_DATUM,
                VIEW_LOCATIONS.ELEVATION,
-               VIEW_LOCATIONS.HORIZONTAL_DATUM
+               VIEW_LOCATIONS.VERTICAL_DATUM
            ).values(
                 newObj.getName(),
                 newObj.getLatitude(),
                 newObj.getLongitude(),
-                newObj.getHorizontal_datum(),
+                newObj.getHorizontalDatum(),
                 newObj.getElevation(),
-                newObj.getVertical_datum()
+                newObj.getVerticalDatum()
            ).execute();
         
     }

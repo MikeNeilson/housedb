@@ -29,7 +29,7 @@ public class LocationController implements CrudHandler {
         var ds = ctx.appAttribute(DataSource.class);
         try( var conn = ds.getConnection(); ){        
             var db = new HouseDb(conn,ctx.attribute("username"));
-            var locations = db.getAllLocations();
+            var locations = db.locationDao().getAll();
             ctx.json(locations);
         } catch( Exception err ){
             throw new RuntimeException("Error retrieving locations",err);
@@ -65,6 +65,9 @@ public class LocationController implements CrudHandler {
         requestBody = @OpenApiRequestBody(content = {@OpenApiContent(from = Location.class)}),
         responses = {
             @OpenApiResponse(status="200", content = {@OpenApiContent( from = Location.class)})
+        },
+        security = {
+            @OpenApiSecurity(name = "bearerAuth")
         }
     )
     public void create(Context ctx) {

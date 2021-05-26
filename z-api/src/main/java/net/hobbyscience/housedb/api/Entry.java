@@ -30,15 +30,24 @@ import io.javalin.plugin.openapi.OpenApiOptions;
 import io.javalin.plugin.openapi.OpenApiPlugin;
 import io.javalin.plugin.openapi.ui.ReDocOptions;
 import io.javalin.plugin.openapi.ui.SwaggerOptions;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 
 
 public class Entry {
     private static final Logger logger = Logger.getLogger(Entry.class.getName());
     public static OpenApiPlugin getOpenApiPlugin() {
         Info info = new Info().version("1.0").description("HouseDB API");
-        OpenApiOptions ops = new OpenApiOptions(info)
-                                .path("/swagger-docs")        
+        Components components = new Components().addSecuritySchemes(
+                                    "bearerAuth",
+                                    new SecurityScheme().type(Type.HTTP).scheme("bearer").bearerFormat("JWT")
+                                );
+        
+        OpenApiOptions ops = new OpenApiOptions( () -> new OpenAPI().components(components).info(info) );        
+                                ops.path("/swagger-docs")        
                                 //.toJsonMapper(JacksonToJsonMapper.INSTANCE)
                                 .swagger(new SwaggerOptions("/swagger-ui"))
                                 .reDoc(new ReDocOptions("/redoc"))
@@ -46,6 +55,7 @@ public class Entry {
                                     doc.json("500", ErrorResponse.class);
                                     doc.json("503", ErrorResponse.class);
                                 });
+
         return new OpenApiPlugin(ops);
         
     }

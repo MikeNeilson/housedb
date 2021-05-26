@@ -13,34 +13,54 @@ public class Location{
     private String parent;
     private Double latitude;
     private Double longitude;
-    private String horizontal_datum;
+    private String horizontalDatum;
     private Double elevation;
-    private String vertical_datum;
+    private String verticalDatum;
+
 
     @JsonCreator
-    public Location(
-            @JsonProperty(value="id", defaultValue="-1",required=false) long id, 
-            @JsonProperty("name") String name, 
-            @JsonProperty(value="parent",defaultValue="",required=false) String parent, 
+    public Location(     
+            @JsonProperty("name") String name,             
             @JsonProperty("latitude") Double latitude, 
             @JsonProperty("longitude") Double longitude, 
-            @JsonProperty("horizontal-datum") String horizontal_datum, 
+            @JsonProperty("horizontalDatum") String horizontalDatum, 
             @JsonProperty("elevation") Double elevation, 
-            @JsonProperty("vertical_datum") String vertical_datum) {
+            @JsonProperty("verticalDatum") String verticalDatum) {
+        this.id = -1;
+        this.name = name;
+        this.parent = null;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.horizontalDatum = horizontalDatum;
+        this.elevation = elevation;
+        this.verticalDatum = verticalDatum;
+    }
+    
+    public Location(
+            long id, 
+            String name, 
+            String parent, 
+            Double latitude, 
+            Double longitude, 
+            String horizontalDatum, 
+            Double elevation, 
+            String verticalDatum) {
         this.id = id;
         this.name = name;
         this.parent = parent;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.horizontal_datum = horizontal_datum;
+        this.horizontalDatum = horizontalDatum;
         this.elevation = elevation;
-        this.vertical_datum = vertical_datum;
+        this.verticalDatum = verticalDatum;
     }
     
+    @JsonIgnore
     public long getId(){
         return this.id;
     }
 
+    @JsonIgnore
     public String getParent() {
         return this.parent;
     }
@@ -53,16 +73,16 @@ public class Location{
         return this.longitude;
     }
 
-    public String getHorizontal_datum() {
-        return this.horizontal_datum;
+    public String getHorizontalDatum() {
+        return this.horizontalDatum;
     }
 
     public Double getElevation() {
         return this.elevation;
     }
 
-    public String getVertical_datum() {
-        return this.vertical_datum;
+    public String getVerticalDatum() {
+        return this.verticalDatum;
     }    
 
     public String getName() {
@@ -78,12 +98,12 @@ public class Location{
             return false;
         }
         Location location = (Location) o;
-        return Objects.equals(name, location.name) && Objects.equals(parent, location.parent) && Objects.equals(latitude, location.latitude) && Objects.equals(longitude, location.longitude) && Objects.equals(horizontal_datum, location.horizontal_datum) && Objects.equals(elevation, location.elevation) && Objects.equals(vertical_datum, location.vertical_datum);
+        return Objects.equals(name, location.name) && Objects.equals(parent, location.parent) && Objects.equals(latitude, location.latitude) && Objects.equals(longitude, location.longitude) && Objects.equals(horizontalDatum, location.horizontalDatum) && Objects.equals(elevation, location.elevation) && Objects.equals(verticalDatum, location.verticalDatum);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, parent, latitude, longitude, horizontal_datum, elevation, vertical_datum);
+        return Objects.hash(name, parent, latitude, longitude, horizontalDatum, elevation, verticalDatum);
     }
     
 
@@ -94,9 +114,9 @@ public class Location{
             ", parent='" + parent + "'" +
             ", latitude='" + latitude + "'" +
             ", longitude='" + longitude + "'" +
-            ", horizontal_datum='" + horizontal_datum + "'" +
+            ", horizontal_datum='" + horizontalDatum + "'" +
             ", elevation='" + elevation + "'" +
-            ", vertical_datum='" + vertical_datum + "'" +
+            ", vertical_datum='" + verticalDatum + "'" +
             "}";
     }
 }
