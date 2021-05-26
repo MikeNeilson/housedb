@@ -22,6 +22,9 @@ public class LocationController implements CrudHandler {
         tags = {"Locations"},
         responses = {
             @OpenApiResponse(status="200", content = {@OpenApiContent( from = Location[].class,isArray=true)})
+        },
+        security = {
+            @OpenApiSecurity(name = "bearerAuth")
         }
     )
     @Override 
@@ -42,6 +45,9 @@ public class LocationController implements CrudHandler {
         },        
         responses = {
             @OpenApiResponse(status="200", content = {@OpenApiContent( from = Location.class)})
+        },
+        security = {
+            @OpenApiSecurity(name = "bearerAuth")
         },
         tags = {"Locations"}
     )
@@ -88,11 +94,17 @@ public class LocationController implements CrudHandler {
 
     
     @OpenApi(
+        security = {
+            @OpenApiSecurity(name = "bearerAuth")
+        },
         tags = {"Locations"}
     )
     public void update(Context ctx, String locationName){ throw new UnsupportedOperationException("not implemented yet"); }
 
     @OpenApi(
+        security = {
+            @OpenApiSecurity(name = "bearerAuth")
+        },
         tags = {"Locations"}
     )
     public void delete(Context ctx, String locationName){ throw new UnsupportedOperationException("not implemented yet"); }
