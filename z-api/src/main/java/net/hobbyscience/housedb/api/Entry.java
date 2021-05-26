@@ -96,6 +96,11 @@ public class Entry {
                         logger.log(Level.WARNING,"database error",e);
                     }
                 })
+            .exception(NotAuthorized.class, (e, ctx ) -> {
+                logger.warning("Unauthorized access");
+                logger.warning(e.getCause().getMessage());
+                ctx.status(HttpServletResponse.SC_UNAUTHORIZED).json("Unauthorized Access");
+            })
             .exception(UnsupportedOperationException.class, (e,ctx) -> {
                 ctx.status(HttpServletResponse.SC_NOT_IMPLEMENTED);
                 logger.log(Level.WARNING,"error",e);

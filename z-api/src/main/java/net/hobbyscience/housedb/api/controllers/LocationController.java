@@ -3,12 +3,17 @@ package net.hobbyscience.housedb.api.controllers;
 import io.javalin.apibuilder.*;
 import io.javalin.http.*;
 import io.javalin.plugin.openapi.annotations.*;
+import net.hobbyscience.housedb.api.NotAuthorized;
 import net.hobbyscience.housedb.dao.*;
 import net.hobbyscience.housedb.dto.Location;
 
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
+import org.jooq.exception.DataAccessException;
 
 public class LocationController implements CrudHandler {
     public static final Logger logger = Logger.getLogger(LocationController.class.getName());
@@ -32,13 +37,27 @@ public class LocationController implements CrudHandler {
     }
 
     @OpenApi(
-        tags = {"Locations"},
+        pathParams = {
+            @OpenApiParam(name="location-name",description = "Name of the location you're trying to look up.")
+        },        
         responses = {
             @OpenApiResponse(status="200", content = {@OpenApiContent( from = Location.class)})
-        }
+        },
+        tags = {"Locations"}
     )
     public void getOne( Context ctx, String locationName ){
-        throw new UnsupportedOperationException("not implemented yet");
+        var ds = ctx.appAttribute(DataSource.class);
+        try( var conn = ds.getConnection(); ){
+            var db = new HouseDb(conn,ctx.attribute("username"));
+            var loc = db.locationDao().getByUniqueName(locationName);
+            if( loc.isPresent() ){
+                ctx.json(loc.get()).contentType("application/json");
+            } else {
+                ctx.result("Location not found").status(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } catch( SQLException err ){
+            throw new RuntimeException("Database error",err);
+        }
     }
 
     @OpenApi(
@@ -53,8 +72,13 @@ public class LocationController implements CrudHandler {
         var ds = ctx.appAttribute(DataSource.class);
         try( var conn = ds.getConnection(); ){        
             var db = new HouseDb(conn,ctx.attribute("username"));
-            db.saveLocation(loc);
-        } catch( Exception err ){
+            db.locationDao().save(loc);            
+        } catch (DataAccessException err ){
+            if( err.getLocalizedMessage().contains("no CREATE")){
+                throw new NotAuthorized("Location", err);
+            }
+        } 
+        catch( Exception err ){
             throw new RuntimeException("Error creating location",err);
         }
     }

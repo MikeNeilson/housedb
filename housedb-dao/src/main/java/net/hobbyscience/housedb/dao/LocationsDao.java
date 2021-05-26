@@ -41,16 +41,17 @@ public class LocationsDao extends Dao<Location>{
 
     @Override
     public Optional<Location> getByUniqueName(String uniqueName) {        
-        var r = dsl
+        var res = dsl
             .select()
             .from(VIEW_LOCATIONS)
             .where(DSL.upper(VIEW_LOCATIONS.NAME).eq(DSL.upper(uniqueName)))
             .orderBy(VIEW_LOCATIONS.NAME)
-            .fetchOne().into(VIEW_LOCATIONS);
-        if( r == null ){
+            .fetchOne();
+        if( res == null ){
             return Optional.ofNullable(null);
         } else {
-            return Optional.of(
+            var r = res.into(VIEW_LOCATIONS); 
+            return Optional.of(                
                 new Location (
                     r.getId(),
                     r.getName(),

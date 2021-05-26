@@ -2,9 +2,14 @@ package net.hobbyscience.housedb.dto;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.*;
+
+
 public class Location{
+    @JsonIgnore
     private long id;
     private String name;
+    @JsonIgnore
     private String parent;
     private Double latitude;
     private Double longitude;
@@ -12,7 +17,16 @@ public class Location{
     private Double elevation;
     private String vertical_datum;
 
-    public Location(long id, String name, String parent, Double latitude, Double longitude, String horizontal_datum, Double elevation, String vertical_datum) {
+    @JsonCreator
+    public Location(
+            @JsonProperty(value="id", defaultValue="-1",required=false) long id, 
+            @JsonProperty("name") String name, 
+            @JsonProperty(value="parent",defaultValue="",required=false) String parent, 
+            @JsonProperty("latitude") Double latitude, 
+            @JsonProperty("longitude") Double longitude, 
+            @JsonProperty("horizontal-datum") String horizontal_datum, 
+            @JsonProperty("elevation") Double elevation, 
+            @JsonProperty("vertical_datum") String vertical_datum) {
         this.id = id;
         this.name = name;
         this.parent = parent;

@@ -57,6 +57,10 @@ public class HouseDb {
         return this;
     }
 
+    public LocationsDao locationDao(){
+        return new LocationsDao(dsl);
+    }
+
     public List<String> getAllLocations() throws Exception{
         ArrayList<String> locations = new ArrayList<>();
 
