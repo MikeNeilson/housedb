@@ -126,17 +126,14 @@ public class Entry {
                 var header = ctx.header(Header.AUTHORIZATION);
                 if( header != null ){
                     // verification will be handled at the gateway
-                    //val jwt = Jwts.parserBuilder().build().parseClaimsJws(ctx.header("Authorization"))
-                    logger.info(header);
+                    //val jwt = Jwts.parserBuilder().build().parseClaimsJws(ctx.header("Authorization"))                    
                     var parts = header.split("\\\\s+");
-                    var jwt = parts[parts.length-1].split("\\.");
-                    logger.info(""+jwt.length);
+                    var jwt = parts[parts.length-1].split("\\.");                    
                     var jwtClaims = Base64.getDecoder().decode(jwt[1]);
                     var jsonClaims = om.readTree(jwtClaims);
-                    //val user = jwt.subject()
-                    logger.fine(jsonClaims.toString());
+                    //val user = jwt.subject()                    
                     var user = om.treeToValue(jsonClaims.get("sub"),String.class);
-                    logger.fine(user);                
+                    logger.fine(user);
                     ctx.attribute("username",user);
                 } else {
                     ctx.attribute("username","guest");
