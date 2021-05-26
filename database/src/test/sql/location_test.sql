@@ -77,6 +77,23 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION housedb_tests.test_insert_new_locations_into_view()
+RETURNS SETOF TEXT AS $$
+DECLARE
+    n_rows int;
+BEGIN
+    perform housedb_security.add_permission('guest', 'CREATE', 'locations','.*');
+
+    insert into 
+        housedb.view_locations(name,latitude,longitude,horizontal_datum)
+        values ('Test',0,3,'RASTER');
+        select into n_rows count(*) from housedb.locations;
+        RETURN NEXT ok( n_rows = 1, 'There should be one row');
+
+END;
+$$ LANGUAGE plpgsql;
+
+
 
 
 

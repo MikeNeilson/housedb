@@ -86,7 +86,7 @@ declare
     l_parent_id bigint;
 	loc_name text;	
 begin 
-	set search_path to housedb_timeseries,housedb_units,housedb,public;
+	set search_path to housedb_locations,housedb_units,housedb,public;
 	if TG_OP = 'DELETE' then		
 		raise notice 'deleting %', OLD;
 		return OLD;
@@ -105,6 +105,13 @@ begin
             select into l_parent_id parent_id from housedb.view_locations where lower(name) = lower(NEW.name);
             NEW.id = l_loc_id;
             NEW.parent_id = l_parent_id;
+            update locations
+                set latitude = NEW.latitude,
+                    longitude = NEW.longitude,
+                    horizontal_datum = NEW.horizontal_datum,
+                    elevation = NEW.elevation,
+                    vertical_datum = NEW.vertical_datum
+                where id = NEW.id;
 		end if ;
 				
 		
