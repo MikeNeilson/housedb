@@ -1,4 +1,5 @@
 #include "locations.h"
+#include "locations_dao.h"
 
 /*
 void LocationHandler::get(const crow::request &req, crow::response &res){
@@ -14,11 +15,17 @@ void LocationHandler::put(const crow::request &req, crow::response &res, const s
     res.write("You are changing: " + name);
     res.end();
 }*/
+LocationHandler::LocationHandler(sqlpp::postgresql::connection &db) : db(db){}
 
 void LocationHandler::routes( crow::SimpleApp &app){
 
-    CROW_ROUTE(app, "/locations/")([](const crow::request &req, crow::response &res){
-        res.write("New test");
+    CROW_ROUTE(app, "/locations/")([&db=this->db](const crow::request &req, crow::response &res){
+        gardendb::sql::LocationDao dao;
+        auto result = dao.get_all(db);
+        for( auto name : result ){
+            res.write(name + "\r\n");
+        }
+        
         res.end();
     });
 
