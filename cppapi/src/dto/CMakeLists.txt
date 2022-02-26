@@ -1,0 +1,1 @@
+add_library(dto location_dto.cpp)

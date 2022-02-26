@@ -21,7 +21,7 @@ namespace gardendb {
 
         struct LocationTab : public sqlpp::table_t<LocationTab,Name> {
             struct _alias_t {
-                static constexpr const char _literal [] = "locations";
+                static constexpr const char _literal [] = "view_locations";
                 using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
                 template<typename T>
                 struct _member_t {

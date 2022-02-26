@@ -5,9 +5,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+set(BUILD_SHARED_LIBS OFF)
+#set(CMAKE_EXE_LINKER_FLAGS "-static")
+
 set(PostgreSQL_TYPE_INCLUDE_DIR "/usr/include/postgresql/")
 find_package(PostgreSQL REQUIRED)
 
-add_subdirectory(src/deps)
-add_subdirectory(src/dao)
-add_subdirectory(src/api)
+add_subdirectory(src)

@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     config->dbname="housedb";
     config->user="housedb_user";
     config->password="testpassword";
-
+    app.loglevel(crow::LogLevel::DEBUG);
     try {
         sqlpp::postgresql::connection db(config);
         //sqlpp::connection db(pgdb);
