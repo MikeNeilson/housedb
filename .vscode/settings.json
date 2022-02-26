@@ -1,4 +1,14 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "python.pythonPath": "C:\\Program Files\\Python38\\python.exe"
+    "python.pythonPath": "C:\\Program Files\\Python38\\python.exe",
+    "files.associations": {
+        "array": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
+    }
 }
