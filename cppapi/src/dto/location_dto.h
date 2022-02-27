@@ -18,7 +18,7 @@ namespace gardendb {
                 LocationDto() {}
                 LocationDto( const crow::json::rvalue &data);
 
-                
+                const std::string& get_name() const;                
         };
     }
 }

@@ -5,18 +5,12 @@
 #include <sqlpp11/select.h>
 #include <sqlpp11/alias_provider.h>
 #include "locations.h"
+#include "common.h"
 
-class Test {
-    public:
-        void operator()(const crow::request& req, crow::response &res) {
-            res.write("test2");
-            res.end();
-        }
-};
-
+using connection = sqlpp::postgresql::connection;
 
 int main(int argc, char *argv[]) {
-    crow::SimpleApp app;
+    crow::App<DatabaseSession> app;
     
     auto config = std::make_shared<sqlpp::postgresql::connection_config>();
     config->host="localhost";
@@ -24,17 +18,22 @@ int main(int argc, char *argv[]) {
     config->dbname="housedb";
     config->user="housedb_user";
     config->password="testpassword";
+    config->debug=1;
     app.loglevel(crow::LogLevel::DEBUG);
     try {
-        sqlpp::postgresql::connection db(config);
-        //sqlpp::connection db(pgdb);
         
+        connection db(config);
+        CROW_LOG_DEBUG << "Database Connection Open";
+        //sqlpp::connection db(pgdb);
+        app.get_middleware<DatabaseSession>().set_db(&db);        
+
+        CROW_LOG_DEBUG << "DB Session Context Set";
 
         CROW_ROUTE(app,"/")([](const crow::request &req){        
             return "Welcome to my data API.";
         });
     
-        LocationHandler loc(db);
+        LocationHandler loc;
 
         loc.routes(app);
 

@@ -1,4 +1,5 @@
 include_directories(headers)
+include_directories(dto)
 add_subdirectory(deps)
 add_subdirectory(dao)
 add_subdirectory(api)
