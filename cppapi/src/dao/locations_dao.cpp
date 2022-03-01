@@ -5,13 +5,21 @@
 
 namespace gardendb {
     namespace sql {
-         std::vector<std::string> LocationDao::get_all(){
+         std::vector<LocationDto> LocationDao::get_all(){
                 
-                std::vector<std::string> list;
+                std::vector<LocationDto> list;
                 auto query = sqlpp::select(sqlpp::all_of(locations)).from(locations).unconditionally();
                 auto result = db->operator()(query);
                 for(const auto &row : result){
-                    list.push_back(row.name);
+                    LocationDto loc(row.name,
+                                    row.parent,
+                                    row.latitude,
+                                    row.longitude,
+                                    row.horizontal_datum,
+                                    row.elevation,
+                                    row.vertical_datum);
+                    
+                    list.push_back(loc);
                 }
                 return list;
             }

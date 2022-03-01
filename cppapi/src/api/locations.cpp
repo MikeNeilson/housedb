@@ -15,10 +15,13 @@ void LocationHandler::routes( crow::App<DatabaseSession> &app){
         auto *db = app.get_middleware<DatabaseSession>().get_db();
         gardendb::sql::LocationDao dao(db);
         auto result = dao.get_all();
-        for( auto name : result ){
-            res.write(name + "\r\n");
+        auto list = std::vector<crow::json::wvalue>();
+        for( auto loc: result ){
+            list.emplace_back(loc);
         }
-        
+        auto json = crow::json::wvalue(list);
+        res.set_header("Content-Type","application/json");
+        res.write(json.dump());               
         res.end();
     });
 

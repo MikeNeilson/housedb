@@ -8,15 +8,18 @@
 #include "location_dto.h"
 
 
+
 namespace gardendb {
     namespace sql {
+        using LocationDto = gardendb::dto::LocationDto;
+
         class LocationDao {
             private:
                 sqlpp::postgresql::connection *db;
             public:
                 LocationDao(sqlpp::postgresql::connection *db) : db(db){}
-                std::vector<std::string> get_all();
-                bool save(const gardendb::dto::LocationDto &location);
+                std::vector<LocationDto> get_all();
+                bool save(const LocationDto &location);
         };
     }
 }
