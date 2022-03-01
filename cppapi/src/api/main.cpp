@@ -5,24 +5,20 @@
 #include <sqlpp11/select.h>
 #include <sqlpp11/alias_provider.h>
 #include "locations.h"
-#include "common.h"
+#include "database.h"
+#include "config.h"
 
 using connection = sqlpp::postgresql::connection;
 
 int main(int argc, char *argv[]) {
     crow::App<DatabaseSession> app;
     
-    auto config = std::make_shared<sqlpp::postgresql::connection_config>();
-    config->host="localhost";
-    config->port=5433;
-    config->dbname="housedb";
-    config->user="housedb_user";
-    config->password="testpassword";
-    config->debug=1;
-    app.loglevel(crow::LogLevel::DEBUG);
+    Config config(argc,argv);
+    
+    app.loglevel(config.get_app_log_level());
     try {
         
-        connection db(config);
+        connection db(config.get_db_config());
         CROW_LOG_DEBUG << "Database Connection Open";
         //sqlpp::connection db(pgdb);
         app.get_middleware<DatabaseSession>().set_db(&db);        
@@ -37,7 +33,7 @@ int main(int argc, char *argv[]) {
 
         loc.routes(app);
 
-        app.server_name("housedb").port(18080).run();
+        app.server_name(config.get_server_name()).port(18080).run();
         return 0;
     } catch( const sqlpp::postgresql::broken_connection& ex ){
         std::cout << "Connection failed: " << ex.what() << "";

@@ -1,4 +1,4 @@
-#include "common.h"
+#include "database.h"
 #include "locations.h"
 #include "locations_dao.h"
 
