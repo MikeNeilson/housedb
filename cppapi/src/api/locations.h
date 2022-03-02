@@ -11,5 +11,5 @@ class LocationHandler {
 
     public:
         LocationHandler();
-        void routes(crow::App<DatabaseSession> &app);
+        void routes(ApiApp &app);
 };

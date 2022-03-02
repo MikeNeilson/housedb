@@ -15,9 +15,9 @@ namespace gardendb {
 
         class LocationDao {
             private:
-                sqlpp::postgresql::connection *db;
+                sqlpp::postgresql::connection &db;
             public:
-                LocationDao(sqlpp::postgresql::connection *db) : db(db){}
+                LocationDao(sqlpp::postgresql::connection &db) : db(db){}
                 std::vector<LocationDto> get_all();
                 bool save(const LocationDto &location);
         };

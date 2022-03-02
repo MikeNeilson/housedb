@@ -7,12 +7,12 @@ LocationHandler::LocationHandler() {
 
 }
 
-void LocationHandler::routes( crow::App<DatabaseSession> &app){
+void LocationHandler::routes( ApiApp &app){
 
 
     CROW_ROUTE(app, "/locations/")([&app](const crow::request &req, crow::response &res){
                 
-        auto *db = app.get_middleware<DatabaseSession>().get_db();
+        auto &db = app.get_middleware<DatabaseSession>().get_db(app.get_context<DatabaseSession>(req));
         gardendb::sql::LocationDao dao(db);
         auto result = dao.get_all();
         auto list = std::vector<crow::json::wvalue>();
@@ -44,7 +44,7 @@ void LocationHandler::routes( crow::App<DatabaseSession> &app){
         ([&app](const crow::request& req, crow::response &res){            
             auto json_data = crow::json::load(req.body);            
             CROW_LOG_DEBUG << json_data["name"].s();
-            auto *db = app.get_middleware<DatabaseSession>().get_db();
+            auto &db = app.get_middleware<DatabaseSession>().get_db(app.get_context<DatabaseSession>(req));
             CROW_LOG_DEBUG << "got db";
             gardendb::sql::LocationDao dao(db);
             CROW_LOG_DEBUG << "saving dao";           

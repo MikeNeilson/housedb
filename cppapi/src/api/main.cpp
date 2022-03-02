@@ -10,18 +10,18 @@
 
 using connection = sqlpp::postgresql::connection;
 
+
 int main(int argc, char *argv[]) {
-    crow::App<DatabaseSession> app;
-    
+    ApiApp app; 
     Config config(argc,argv);
     
     app.loglevel(config.get_app_log_level());
     try {
         
-        connection db(config.get_db_config());
+        //connection db(config.get_db_config());
         CROW_LOG_DEBUG << "Database Connection Open";
         //sqlpp::connection db(pgdb);
-        app.get_middleware<DatabaseSession>().set_db(&db);        
+        app.get_middleware<DatabaseSession>().set_db_config(config.get_db_config());        
 
         CROW_LOG_DEBUG << "DB Session Context Set";
 
@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
         LocationHandler loc;
 
         loc.routes(app);
-
-        app.server_name(config.get_server_name()).port(18080).run();
+        
+        app.server_name(config.get_server_name()).concurrency(16).multithreaded().port(18080).run();
         return 0;
     } catch( const sqlpp::postgresql::broken_connection& ex ){
         std::cout << "Connection failed: " << ex.what() << "";

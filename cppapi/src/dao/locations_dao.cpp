@@ -9,7 +9,7 @@ namespace gardendb {
                 
                 std::vector<LocationDto> list;
                 auto query = sqlpp::select(sqlpp::all_of(locations)).from(locations).unconditionally();
-                auto result = db->operator()(query);
+                auto result = db(query);
                 for(const auto &row : result){
                     LocationDto loc(row.name,
                                     row.parent,
@@ -29,7 +29,7 @@ namespace gardendb {
                                 .set(locations.name = name.get_name())
                                 ;
             CROW_LOG_DEBUG << "inserting";
-            db->update(update);
+            db.update(update);
             CROW_LOG_DEBUG << "inserted";
             return false;
         }
