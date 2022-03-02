@@ -84,7 +84,9 @@ declare
     l_userid bigint;
 begin
     set search_path to housedb,public;
-
+    if p_username is NULL or p_username = '' then
+        p_username = 'guest';
+    end if;
     select id into l_userid from users where username = p_username;
     if l_userid is not null then 
         perform set_config('housedb.user', p_username::text, false);
