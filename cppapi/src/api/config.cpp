@@ -28,6 +28,10 @@ void Config::load_file(const std::string &filename) {
         this->log_level = log_level_str_to_enum(config["log_level"].s());
     }
 
+    if( config.has("threads") ) {
+        this->threads = config["threads"].i();
+    }
+
 
 }
 void Config::load_env(const std::string &prefix) {    
@@ -39,6 +43,7 @@ void Config::load_env(const std::string &prefix) {
     db_config->debug=atoi(getenv(string(prefix+"DB_DEBUG").c_str()));
     std::string tmp_server_name( getenv(string(prefix+"SERVER_NAME").c_str()));
     std::string loglevel( getenv(string(prefix+"_LOG_LEVEL").c_str()));
+    std::string tmp_threads( getenv(string(prefix+"_THREADS").c_str()));
 
     if( tmp_server_name != "" ) {
         this->server_name = tmp_server_name;
@@ -46,6 +51,10 @@ void Config::load_env(const std::string &prefix) {
 
     if( loglevel != "" ) {
         this->log_level = log_level_str_to_enum(loglevel);
+    }
+
+    if( tmp_threads != "" ) {
+        this->threads = atoi(tmp_threads.c_str());
     }
 }
 

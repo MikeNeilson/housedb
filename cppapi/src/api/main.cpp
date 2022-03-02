@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 
         loc.routes(app);
         
-        app.server_name(config.get_server_name()).concurrency(16).multithreaded().port(18080).run();
+        app.server_name(config.get_server_name()).concurrency(config.get_threads()).port(18080).run();
         return 0;
     } catch( const sqlpp::postgresql::broken_connection& ex ){
         std::cout << "Connection failed: " << ex.what() << "";
