@@ -13,5 +13,7 @@ RUN cmake -DCMAKE_CXX_STANDARD_LIBRARIES="-lpgcommon -lpgport -lpgtypes -lopcode
 FROM scratch
 
 COPY --from=builder /src/build/src/api/api /api
+COPY --from=builder /src/passwd /etc/passwd
+USER api
 
-CMD ["/api"]
+ENTRYPOINT [ "/api"]
