@@ -1,0 +1,34 @@
+version: "3.3"
+services:
+  api:
+    build: ./cppapi
+    image: cppapi:latest    
+    command: -f /api.json
+    ports:
+      - 18080:18080
+    #container_name: api
+    volumes:
+      - ${PWD}/test_config/api.json:/api.json
+    depends_on:
+      - db
+    restart: always    
+
+  db:
+    image: postgres:12
+    environment:
+      - POSTGRES_PASSWORD_FILE=/pg_password
+    volumes:      
+      - pg_data:/var/lib/postgresql/data
+      - ${PWD}/.github/workflows/initial_db_setup.sql:/docker-entrypoint-initdb.d/initial_db_setup.sql
+      - ${PWD}/test_config/pg_password:/pg_password
+    restart: always        
+  
+  schema:
+    image: openjdk:11
+    volumes:
+      - ${PWD}:/schema
+    working_dir: /schema
+    command: ./gradlew :database:flywayMigrate -PDBURL="jdbc:postgresql://db:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
+    restart: "no"
+volumes:
+  pg_data:

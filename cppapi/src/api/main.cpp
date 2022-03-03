@@ -7,13 +7,27 @@
 #include "locations.h"
 #include "database.h"
 #include "config.h"
+#include <signal.h>
 
 using connection = sqlpp::postgresql::connection;
 
+ApiApp app;
+
+void health_check_handler(int sig){
+    if( sig = SIGUSR1 ) {
+        CROW_LOG_ERROR << "health check called";
+    }
+}
 
 int main(int argc, char *argv[]) {
-    ApiApp app; 
-    Config config(argc,argv);
+
+    struct sigaction sigusr;
+    sigusr.sa_handler = &health_check_handler;
+    sigemptyset(&sigusr.sa_mask);
+    sigusr.sa_flags = 0;
+    sigaction(SIGUSR1,&sigusr,NULL);
+    
+    Config config(argc,argv);    
     
     app.loglevel(config.get_app_log_level());
     try {

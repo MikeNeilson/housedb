@@ -11,7 +11,7 @@ using namespace std;
 void Config::load_file(const std::string &filename) {
     ifstream file(filename);
     stringstream tmp;
-    tmp << file.rdbuf();    
+    tmp << file.rdbuf();        
     auto config = crow::json::load(tmp.str());
      
     db_config->host=config["host"].s();
@@ -86,16 +86,30 @@ struct Arg : public option::Arg {
   }
 };
 
-enum optionIndex {UNKNOWN, HELP, FILE_CONFIG, ENV};
+enum optionIndex {UNKNOWN, HELP, FILE_CONFIG, ENV, HEALTH};
 const option::Descriptor usage[] = {
-    { UNKNOWN,    0,"", "",        option::Arg::None, "USAGE: example_arg [options]\n\n"
-                                                   "Options:" },
-    { HELP,       0,"h", "help",   option::Arg::None, "  \t-h,--help  \tPrint usage and exit." },
-    { FILE_CONFIG,0,"f","file", Arg::Required,  "  \t-f,--file=<file>  \tconfig file to use"},
-    { ENV,        0,"e","env", option::Arg::Optional,"   \t-e,--env[=prefix]  \tenvironment variable prefix. defaults to GARDENDB_"},
+    { UNKNOWN,    0,"", "",        option::Arg::None,     "USAGE: example_arg [options]\n\n"
+                                                          "Options:" },
+    { HELP,       0,"h", "help",   option::Arg::None,     "  \t-h,--help  \tPrint usage and exit." },
+    { FILE_CONFIG,0,"f","file",    Arg::Required,         "  \t-f,--file=<file>  \tconfig file to use"},
+    { ENV,        0,"e","env",     option::Arg::Optional, "   \t-e,--env[=prefix]  \tenvironment variable prefix. defaults to GARDENDB_"},
+    { HEALTH,     0,"c","check",   option::Arg::None,     "   "},
     { 0, 0, 0, 0, 0, 0 }
 };
 
+void check_health() {
+    ifstream pid_file("/pid.file");
+    if( !pid_file) {
+        exit(1);
+    }
+    pid_t pid;
+    pid_file >> pid;
+    if( kill(pid, SIGUSR1) ) {
+        exit(1);
+    }
+    //TODO, figure out ... something.
+    exit(0);
+}
 
 //    public:
 
@@ -114,6 +128,10 @@ Config::Config(int argc, char **argv){
         cout << "help called" << endl;
     }
 
+    if( options[HEALTH] ) {
+        check_health();        
+    }
+
     db_config = std::make_shared<sqlpp::postgresql::connection_config>();
     if( options[FILE_CONFIG ]) {
         cout << "looking up in file" << endl;
@@ -126,6 +144,9 @@ Config::Config(int argc, char **argv){
         cerr << "must specify either a file or to use the environment" << endl;
         exit(1);
     }
+
+    ofstream pid_file("/pid.file");
+    pid_file << getpid();
 
 }
 const Config::db_config_ptr Config::get_db_config() const {

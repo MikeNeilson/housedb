@@ -15,5 +15,5 @@ FROM scratch
 COPY --from=builder /src/build/src/api/api /api
 COPY --from=builder /src/passwd /etc/passwd
 USER api
-
+#HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "/api", "-c" ]
 ENTRYPOINT [ "/api"]
