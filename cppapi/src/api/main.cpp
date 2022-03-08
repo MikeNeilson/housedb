@@ -5,6 +5,7 @@
 #include <sqlpp11/select.h>
 #include <sqlpp11/alias_provider.h>
 #include "locations.h"
+#include "timeseries.h"
 #include "database.h"
 #include "config.h"
 #include <signal.h>
@@ -44,8 +45,10 @@ int main(int argc, char *argv[]) {
         });
     
         LocationHandler loc;
+        TimeseriesHandler ts;
 
         loc.routes(app);
+        ts.routes(app);
         
         app.server_name(config.get_server_name()).concurrency(config.get_threads()).port(18080).run();
         return 0;

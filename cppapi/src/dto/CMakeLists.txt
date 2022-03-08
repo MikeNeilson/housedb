@@ -1,1 +1,1 @@
-add_library(dto location_dto.cpp)
+add_library(dto location_dto.cpp timeseries_dto.cpp)
