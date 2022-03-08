@@ -8,7 +8,7 @@ namespace gardendb {
          std::vector<LocationDto> LocationDao::get_all(){
                 
                 std::vector<LocationDto> list;
-                auto query = sqlpp::select(sqlpp::all_of(locations)).from(locations).unconditionally();
+                auto query = sqlpp::select(sqlpp::all_of(views::view_locations)).from(views::view_locations).unconditionally();
                 auto result = db(query);
                 for(const auto &row : result){
                     LocationDto loc(row.name,
@@ -25,8 +25,8 @@ namespace gardendb {
             }
 
         bool LocationDao::save( const gardendb::dto::LocationDto &name) {
-            auto update = sqlpp::insert_into(locations)
-                                .set(locations.name = name.get_name())
+            auto update = sqlpp::insert_into(views::view_locations)
+                                .set(views::view_locations.name = name.get_name())
                                 ;
             CROW_LOG_DEBUG << "inserting";
             db.update(update);

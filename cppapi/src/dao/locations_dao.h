@@ -4,7 +4,7 @@
 #include <sqlpp11/postgresql/connection.h>
 #include <vector>
 //#include <crow_all.h>
-#include "sqlpp/locations_tab.h"
+#include "sqlpp/housedb.h"
 #include "location_dto.h"
 
 
