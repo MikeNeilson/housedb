@@ -160,9 +160,9 @@ declare
 begin
 	select regexp_split_to_array(p_timeseries_name,'\.') into ts_parts;	
 	if array_length(ts_parts,1) > 6 then
-		raise exception 'TS Name (%) has more than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		raise exception 'TS Name (%) has more than 7 parts',p_timeseries_name USING ERRCODE = 'ZX081';
 	elsif array_length(ts_parts,1) < 6 then
-		raise exception 'TS Name (%) has less than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		raise exception 'TS Name (%) has less than 7 parts',p_timeseries_name USING ERRCODE = 'ZX081';
 	end if;
 	l_interval = ts_parts[4];
 	select into l_interval_id id from housedb.intervals where lower(l_interval) = lower(name);
@@ -184,9 +184,9 @@ declare
 begin
 	select regexp_split_to_array(p_timeseries_name,'\.') into ts_parts;	
 	if array_length(ts_parts,1) > 6 then
-		raise exception 'TS Name (%) has more than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		raise exception 'TS Name (%) has more than 7 parts',p_timeseries_name USING ERRCODE = 'ZX081';
 	elsif array_length(ts_parts,1) < 6 then
-		raise exception 'TS Name (%) has less than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		raise exception 'TS Name (%) has less than 7 parts',p_timeseries_name USING ERRCODE = 'ZX081';
 	end if;
 	l_parameter = ts_parts[2];
 	select into l_parameter_id id from housedb.parameters where lower(l_parameter) = lower(name);

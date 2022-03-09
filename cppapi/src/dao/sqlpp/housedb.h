@@ -513,7 +513,7 @@ namespace gen_timeseries_values {
                 const T& operator()() const { return date_time;}
             };
         };
-        using _traits = sqlpp::make_traits<sqlpp::time_point>;        
+        using _traits = sqlpp::make_traits<sqlpp::time_point>;
     };
 
     struct value {

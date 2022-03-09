@@ -1,6 +1,7 @@
 #include "timeseries_dao.h"
 #include <sqlpp11/sqlpp11.h>
 #include <crow_all.h>
+#include <chrono>
 #include <sqlpp11/postgresql/connection.h>
 
 namespace gardendb {
@@ -28,8 +29,31 @@ namespace gardendb {
             /*auto update = sqlpp::insert_into(views::view_timeseries)
                                 .set(views::view_timeseries.name = name.get_name())
                                 ;*/
+            auto insert_raw = sqlpp::insert_into(views::timeseries_values)
+                                                    .columns(
+                                                        views::timeseries_values.name /*= parameter(views::timeseries_values.name)*/,
+                                                        views::timeseries_values.units /*= parameter(views::timeseries_values.units)*/,
+                                                        views::timeseries_values.date_time /*= parameter(views::timeseries_values.date_time)*/,
+                                                        views::timeseries_values.value /*= parameter(views::timeseries_values.value)*/,
+                                                        views::timeseries_values.quality /*= parameter(views::timeseries_values.quality)*/
+                                                    );
+            //auto prepared_insert = db.prepare(insert_raw);
+            const auto &tsv = views::timeseries_values;
             CROW_LOG_DEBUG << "inserting";
-            //db.update(update);
+            for( auto tr: ts.get_values()){
+                std::string tr_s = tr;
+                CROW_LOG_DEBUG << "using " << tr_s;
+                //sqlpp::time_point t = std::chrono::time_point_cast<std::chrono::microseconds>(tr.date_time);                
+                
+                insert_raw.values.add(tsv.name = ts.get_name(),
+                                      tsv.units = ts.get_units(),
+                                      tsv.date_time = std::chrono::time_point_cast<std::chrono::microseconds>(tr.date_time),
+                                      tsv.value = tr.value,
+                                      tsv.quality = tr.quality);
+            }
+                        
+            CROW_LOG_DEBUG << "inserting";
+            db(insert_raw);
             CROW_LOG_DEBUG << "inserted";
             return false;
         }

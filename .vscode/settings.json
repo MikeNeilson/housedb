@@ -9,6 +9,14 @@
         "unordered_map": "cpp",
         "vector": "cpp",
         "string_view": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "typeindex": "cpp",
+        "typeinfo": "cpp",
+        "*.h": "cpp",
+        "*.cpp": "cpp",
+        "*.sql": "postgres",
+        "chrono": "cpp",
+        "bitset": "cpp",
+        "algorithm": "cpp"
     }
 }
