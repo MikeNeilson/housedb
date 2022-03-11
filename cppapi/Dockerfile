@@ -7,6 +7,7 @@ RUN mkdir -p /src/build
 WORKDIR /src/build
 # NOTE: perhaps actually figure out *WHY* these aren't getting found
 RUN cmake -DCMAKE_CXX_STANDARD_LIBRARIES="-lpgcommon -lpgport -lpgtypes -lopcodes -lssl -lcrypto" \
+          -DBUILD_STATIC_API=ON \
           -DCMAKE_EXE_LINKER_FLAGS="-static -static-libgcc -static-libstdc++" .. \
     && make && strip src/api/api
 

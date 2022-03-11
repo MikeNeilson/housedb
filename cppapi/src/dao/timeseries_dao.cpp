@@ -53,9 +53,14 @@ namespace gardendb {
             }
                         
             CROW_LOG_DEBUG << "inserting";
-            db(insert_raw);
-            CROW_LOG_DEBUG << "inserted";
-            return false;
+            try{
+                db(insert_raw);
+                CROW_LOG_DEBUG << "inserted";
+                return true;
+            } catch( const sqlpp::postgresql::sql_error& err ){
+                CROW_LOG_WARNING << err.what();
+                return false;
+            }                    
         }
 
 

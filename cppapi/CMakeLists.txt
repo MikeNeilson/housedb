@@ -5,11 +5,16 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-set(BUILD_SHARED_LIBS OFF)
-#set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
+option(BUILD_STATIC_API "Wether not the final build should be Static or Dynamically linked" OFF)
 
-set(PostgreSQL_TYPE_INCLUDE_DIR "/usr/include/postgresql/")
-find_package(PostgreSQL REQUIRED)
+if( BUILD_STATIC_API)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" )
+else (BUILD_STATIC_API)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a" )
+endif()
+set(BUILD_SHARED_LIBS OFF)
+
+#set(PostgreSQL_TYPE_INCLUDE_DIR "/usr/include/postgresql/")
+find_package(OpenSSL REQUIRED)
 
 add_subdirectory(src)
