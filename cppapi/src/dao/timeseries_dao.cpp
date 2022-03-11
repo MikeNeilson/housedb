@@ -3,6 +3,7 @@
 #include <crow_all.h>
 #include <chrono>
 #include <sqlpp11/postgresql/connection.h>
+#include "api_exception.h"
 
 namespace gardendb {
     namespace sql {
@@ -25,7 +26,7 @@ namespace gardendb {
                 return list;
             }
 
-        bool TimeseriesDao::save( const gardendb::dto::TimeseriesDto &ts) {
+        void TimeseriesDao::save( const gardendb::dto::TimeseriesDto &ts) {
             /*auto update = sqlpp::insert_into(views::view_timeseries)
                                 .set(views::view_timeseries.name = name.get_name())
                                 ;*/
@@ -55,11 +56,13 @@ namespace gardendb {
             CROW_LOG_DEBUG << "inserting";
             try{
                 db(insert_raw);
-                CROW_LOG_DEBUG << "inserted";
-                return true;
-            } catch( const sqlpp::postgresql::sql_error& err ){
-                CROW_LOG_WARNING << err.what();
-                return false;
+                CROW_LOG_DEBUG << "inserted";                
+            } catch( const sqlpp::postgresql::sql_user_error& err ){
+                CROW_LOG_WARNING << err.what() << err.code();
+                CROW_LOG_WARNING << "rethrowing as input_error";
+                if (err.code() == "ZX082") {
+                    throw input_error(err.what());
+                }                
             }                    
         }
 

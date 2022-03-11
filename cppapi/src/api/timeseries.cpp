@@ -1,7 +1,7 @@
 #include "database.h"
 #include "timeseries.h"
 #include "timeseries_dao.h"
-
+#include "api_exception.h"
 
 TimeseriesHandler::TimeseriesHandler() {
 
@@ -47,11 +47,19 @@ void TimeseriesHandler::routes( ApiApp &app){
             auto &db = app.get_middleware<DatabaseSession>().get_db(app.get_context<DatabaseSession>(req));
             CROW_LOG_DEBUG << "got db";
             gardendb::sql::TimeseriesDao dao(db);
-            CROW_LOG_DEBUG << "saving dao";           
-            auto result = dao.save(json_data);
-            CROW_LOG_DEBUG << "done";
+            
+            try {
+                CROW_LOG_DEBUG << "saving dao";
+                dao.save(json_data);
+            } catch ( const input_error &err ) {
+                CROW_LOG_DEBUG << "***Input error***";
+                crow::json::wvalue error;
+                error["message"] = "Invalid user input";
+                error["error"] = err.what();
+                res.code = 400;
+                res.write(error.dump());
+            }                        
             res.end();
-            //auto result = dao.save(nullptr);
         });
 
 }
