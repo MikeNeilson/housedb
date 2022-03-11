@@ -25,8 +25,7 @@
 include(FetchContent)
 
 FetchContent_Declare(sqlpp11
-  GIT_REPOSITORY https://github.com/MikeNeilson/sqlpp11
-#  GIT_REPOSITORY /home/mike/projects/sqlpp11
+  GIT_REPOSITORY https://github.com/rbock/sqlpp11  
   GIT_TAG        origin/main
 )
 
