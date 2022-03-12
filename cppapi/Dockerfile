@@ -1,7 +1,7 @@
 FROM alpine:3.15 as builder
 
 RUN apk update && apk upgrade 
-RUN apk add cmake openssl-dev openssl-libs-static libpq-dev postgresql-dev gcc g++ make git boost-dev zlib-static libpq postgresql-common binutils-dev build-base
+RUN apk add cmake openssl-dev openssl-libs-static libpq-dev postgresql-dev gcc g++ make git boost-dev boost-static zlib-static libpq postgresql-common binutils-dev build-base
 ADD . /src/
 RUN mkdir -p /src/build
 WORKDIR /src/build

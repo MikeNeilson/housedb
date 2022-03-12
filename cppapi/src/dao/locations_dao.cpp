@@ -1,6 +1,7 @@
 #include "locations_dao.h"
 #include <sqlpp11/sqlpp11.h>
-#include <crow_all.h>
+#include <crow/json.h>
+#include <crow/logging.h>
 #include <sqlpp11/postgresql/connection.h>
 
 namespace gardendb {

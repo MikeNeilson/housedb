@@ -31,4 +31,9 @@ FetchContent_Declare(sqlpp11
 
 add_subdirectory(sqlpp11)
 
+FetchContent_Declare(Crow
+  GIT_REPOSITORY https://github.com/CrowCpp/Crow
+  GIT_TAG        v0.3+4
+)
 
+add_subdirectory(Crow)

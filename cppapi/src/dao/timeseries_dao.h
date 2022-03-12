@@ -4,7 +4,8 @@
 #include <sqlpp11/postgresql/connection.h>
 #include <vector>
 #include <string>
-//#include <crow_all.h>
+#include <crow/json.h>
+#include <crow/logging.h>
 #include "sqlpp/housedb.h"
 #include "timeseries_dto.h"
 

@@ -1,0 +1,10 @@
+#FetchContent_MakeAvailable(Crow)
+
+FetchContent_GetProperties(Crow)
+if( NOT Crow_POPULATED)
+    FetchContent_Populate(Crow)
+    message(STATUS "adding include_directories ${crow_SOURCE_DIR}")
+    add_library(crow INTERFACE)
+    add_library(crow::crow ALIAS crow)
+    target_include_directories(crow INTERFACE ${crow_SOURCE_DIR}/include)
+endif()

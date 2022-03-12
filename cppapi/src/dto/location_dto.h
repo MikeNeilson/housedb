@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "crow_all.h"
+#include <crow/json.h>
 
 namespace gardendb {
     namespace dto {

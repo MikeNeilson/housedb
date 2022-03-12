@@ -1,5 +1,5 @@
 #define CROW_MAIN
-#include <crow_all.h>
+#include <crow.h>
 #include <sqlpp11/sqlpp11.h>
 #include <sqlpp11/postgresql/connection.h>
 #include <sqlpp11/select.h>
