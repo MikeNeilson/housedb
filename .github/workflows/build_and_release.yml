@@ -60,18 +60,10 @@ jobs:
           POSTGRES_HOST: postgres
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
-      - name: Build API Jar
-        run: ./gradlew :z-api:build -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
-      - name: Build Debian Package 
-        id: deb
-        run: ./gradlew :z-api:deb -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword  
-      - name: Upload Debian
-        uses: actions/upload-artifact@v2
-        with:
-          name: housedb-api.deb
-          path: z-api/build/distributions/${{steps.deb.outputs.DEBFILE}}
-          retention-days: 1
-          if-no-files-found: error
+      - name: Load database
+        run: ./gradlew :database:flywayMigrate -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
+      - name: Test data
+        run: ./gradlew :database:testdb -PDBURL="jdbc:postgresql://localhost:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
 
   deploy:        
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
