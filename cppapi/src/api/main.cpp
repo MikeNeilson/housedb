@@ -9,7 +9,7 @@
 #include <sqlpp11/alias_provider.h>
 #include "locations.h"
 #include "timeseries.h"
-#include "database.h"
+#include "app.h"
 #include "config.h"
 #include <signal.h>
 
