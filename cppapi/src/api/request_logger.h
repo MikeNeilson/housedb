@@ -5,10 +5,9 @@
 
 class RequestLogger {
     public:
-        struct context{
-            //sqlpp::postgressql::connection *db;
+        struct context{            
         };
-
+        
         void before_handle(crow::request &req, crow::response &res, context &ctx) {
             CROW_LOG_INFO << req.remoteIpAddress << " "
                           << crow::method_name(req.method) << " " 

@@ -2,12 +2,12 @@
 // Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
 
 #include "database.h"
+#include "auth.h"
+#include <crow/middleware_context.h>
 #include <thread>
 
 void DatabaseSession::set_db_config(DatabaseSession::db_config_ptr config) { 
-            this->config = config;      
-            
-            //pool[i];
+            this->config = config;            
 };
 
 sqlpp::postgresql::connection& DatabaseSession::get_db(const context &ctx) { 
@@ -26,16 +26,3 @@ sqlpp::postgresql::connection& DatabaseSession::get_db(const context &ctx) {
     return it->second;
 }        
 
-void DatabaseSession::before_handle(crow::request &req, crow::response &res, context &ctx) {
-    CROW_LOG_DEBUG << "Handling DB Session";
-    auto user = req.get_header_value("user");
-    CROW_LOG_DEBUG << "Users presented is: " + user;
-    if( !user.empty()) {
-        try {
-            ctx.user = user;            
-        } catch( const std::exception &err ) {
-            res.code = 401;
-            res.end();
-        }
-    }    
-}

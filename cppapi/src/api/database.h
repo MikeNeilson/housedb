@@ -10,6 +10,7 @@
 #include <thread>
 #include <sqlpp11/postgresql/connection.h>
 #include <sqlpp11/postgresql/connection_config.h>
+#include "auth.h"
 
 class DatabaseSession {
     using db_config_ptr = std::shared_ptr<sqlpp::postgresql::connection_config>;
@@ -19,17 +20,21 @@ class DatabaseSession {
     std::map<std::thread::id,sqlpp::postgresql::connection> pool;
     
     public:
-        struct context{
-            //sqlpp::postgressql::connection *db;
+        struct context{            
             std::string user;
         };
 
         void set_db_config(db_config_ptr config);
         sqlpp::postgresql::connection& get_db(const context &ctx);
 
-        void before_handle(crow::request &req, crow::response &res, context &ctx);
+        template<typename AllContext>
+        void before_handle(crow::request &req, crow::response &res, context &ctx, AllContext& all_ctx) {
+            auto other_ctx = all_ctx.template get<Auth>();
+            ctx.user = other_ctx.user;     
+        }
 
-        void after_handle(crow::request &req, crow::response &res, context &ctx) {
+        template<typename AllContext>
+        void after_handle(crow::request &req, crow::response &res, context &ctx, AllContext &/*unused*/) {
 
         }
 };
