@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 DROP VIEW housedb.catalog;
 DROP VIEW housedb.catalog_view;
 

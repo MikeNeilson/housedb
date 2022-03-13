@@ -1,3 +1,6 @@
+// Copyright 2022 Michael Neilson
+// Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 #include "database.h"
 #include "locations.h"
 #include "locations_dao.h"

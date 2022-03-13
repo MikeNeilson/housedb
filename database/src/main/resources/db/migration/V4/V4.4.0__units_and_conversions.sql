@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 do $$
 begin 
     if not exists (select 1 from information_schema.schemata where schema_name = 'housedb_units') then   

@@ -1,3 +1,6 @@
+// Copyright 2022 Michael Neilson
+// Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 #define CROW_MAIN
 #include <crow.h>
 #include <sqlpp11/sqlpp11.h>

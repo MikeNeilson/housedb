@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 CREATE OR REPLACE VIEW housedb.catalog_view AS
     SELECT ts.id AS id, 			
 			housedb_locations.expand_location_name(

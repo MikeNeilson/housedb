@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 -- ${flyway:timestamp}
 
 create or replace function housedb_timeseries.error_no_conversion() returns text as $$ begin return 'ZX091'; end; $$ language plpgsql;

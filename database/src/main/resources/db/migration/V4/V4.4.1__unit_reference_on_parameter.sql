@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 -- bootstrap a small amount of data here due to history of project
 insert into housedb.units(unit,unitClass,system,description) values
     ('%','Percentage','EN_SI','percentage of 100'),

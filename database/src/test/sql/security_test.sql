@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 CREATE OR REPLACE FUNCTION housedb_tests.test_can_perform()
 RETURNS SETOF TEXT AS $$
 DECLARE

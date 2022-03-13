@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 create or replace function housedb_timeseries.error_bad_tsname() returns text as $$ begin return 'ZX081'; end; $$ language plpgsql;
 create or replace function housedb_timeseries.error_bad_data() returns text as $$ begin return 'ZX082'; end; $$ language plpgsql;
 create or replace function housedb_timeseries.duplicate_timeseries() returns text as $$ begin return 'ZX083'; end; $$ language plpgsql;

@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 GRANT USAGE ON SCHEMA housedb to housedb_user;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA housedb to housedb_user; 
 GRANT SELECT,INSERT,UPDATE,DELETE,REFERENCES,TRIGGER ON ALL TABLES IN SCHEMA housedb TO housedb_user;

@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 create or replace function housedb_security.can_perform__( p_username varchar(255), p_permission varchar(255), p_data_table varchar(255), p_object text ) 
 returns boolean
 AS $$
