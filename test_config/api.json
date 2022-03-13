@@ -1,0 +1,10 @@
+{
+    "host": "db",
+    "port": 5432,
+    "dbname": "housedb",
+    "user": "housedb_user",
+    "password": "testpassword",
+    "db_debug": 0,
+    "log_level": "INFO",
+    "threads": 3
+}

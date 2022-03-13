@@ -4,7 +4,7 @@
 # Description
 -----------
 
-This is a database create to store time series database for monitoring my home and garden.
+This is a database and api create to store time series database for monitoring my home and garden.
 
 
 # How to Use
@@ -50,3 +50,7 @@ The three primary function are
 
 Wanted simple database for home/garden automation. I'm familiar with SQL and wanted to work with it more. 
 And I wanted a place to expirement with how timeseries data interacts with an RDBMS.
+
+# Why C++ for the Api
+
+I wanted to get back into c++ and found that the tools to do so clean appear to exist now.

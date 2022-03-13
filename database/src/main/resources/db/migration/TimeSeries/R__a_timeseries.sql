@@ -13,8 +13,8 @@ as $$
 declare
 	l_interval interval;
 	l_dt_epoch bigint;
-	l_interval_epoch int;
-	l_offset_epoch int;
+	l_interval_epoch bigint;
+	l_offset_epoch bigint;
 	l_mod int;
 begin
 	SET search_path TO housedb_timeseries,housedb,public;    	
@@ -22,10 +22,14 @@ begin
 	select into l_interval time_interval from intervals where id=p_interval;	
 	if l_interval != '00:00:00' then
 		-- regular data, data should match offset
-		select extract(epoch from p_date_time) into l_dt_epoch;
-		select extract(epoch from l_interval) into l_interval_epoch;
-		select extract(epoch from p_offset) into l_offset_epoch;
+		select extract(epoch from p_date_time)*1000+extract(milliseconds from p_date_time) into l_dt_epoch;
+		raise notice 'dt epoch %', l_dt_epoch;
+		select extract(epoch from l_interval)*1000 into l_interval_epoch;
+		raise notice 'interval epoch %', l_interval_epoch;
+		select extract(epoch from p_offset)*1000 into l_offset_epoch;
+		raise notice 'offset epoch %', l_offset_epoch;
 		l_mod := l_dt_epoch % l_interval_epoch;
+		raise notice 'The difference: %', l_mod;
 		if l_mod != l_offset_epoch then
 			raise exception 'Offset (% seconds) of date_time (%) doesn''t match expected offset (%)(%s seconds)', l_mod,p_date_time,p_offset,l_offset_epoch USING ERRCODE='ZX082';
 		end if;
@@ -160,9 +164,9 @@ declare
 begin
 	select regexp_split_to_array(p_timeseries_name,'\.') into ts_parts;	
 	if array_length(ts_parts,1) > 6 then
-		raise exception 'TS Name (%) has more than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		raise exception 'TS Name (%) has more than 7 parts',p_timeseries_name USING ERRCODE = 'ZX081';
 	elsif array_length(ts_parts,1) < 6 then
-		raise exception 'TS Name (%) has less than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		raise exception 'TS Name (%) has less than 7 parts',p_timeseries_name USING ERRCODE = 'ZX081';
 	end if;
 	l_interval = ts_parts[4];
 	select into l_interval_id id from housedb.intervals where lower(l_interval) = lower(name);
@@ -184,9 +188,9 @@ declare
 begin
 	select regexp_split_to_array(p_timeseries_name,'\.') into ts_parts;	
 	if array_length(ts_parts,1) > 6 then
-		raise exception 'TS Name (%) has more than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		raise exception 'TS Name (%) has more than 7 parts',p_timeseries_name USING ERRCODE = 'ZX081';
 	elsif array_length(ts_parts,1) < 6 then
-		raise exception 'TS Name (%) has less than 7 parts',ts_name USING ERRCODE = 'ZX081';
+		raise exception 'TS Name (%) has less than 7 parts',p_timeseries_name USING ERRCODE = 'ZX081';
 	end if;
 	l_parameter = ts_parts[2];
 	select into l_parameter_id id from housedb.parameters where lower(l_parameter) = lower(name);
