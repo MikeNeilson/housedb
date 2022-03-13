@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 create or replace function housedb_tests.test_unit_basics()
 returns setof text as $$
 declare    

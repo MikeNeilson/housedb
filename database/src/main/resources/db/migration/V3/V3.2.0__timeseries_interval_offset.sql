@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 alter table housedb.timeseries add column interval_offset interval;
 update housedb.timeseries set interval_offset = '00:00:00' where interval_offset is null;
 alter table housedb.timeseries alter column interval_offset set not null;

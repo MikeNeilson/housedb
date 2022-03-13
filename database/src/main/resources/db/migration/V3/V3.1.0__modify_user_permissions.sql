@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 alter table housedb.user_permissions drop constraint user_permissions_pkey;
 
 alter table housedb.user_permissions add constraint user_permissions_pkey primary key (user_id,permission_id,data_table_id,regex);

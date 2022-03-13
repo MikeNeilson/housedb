@@ -1,3 +1,6 @@
+-- Copyright 2022 Michael Neilson
+-- Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
+
 create or replace view housedb.timeseries_values as 
       select 
         itv.timeseries_id as ts_id,        
