@@ -37,3 +37,10 @@ FetchContent_Declare(Crow
 )
 
 add_subdirectory(Crow)
+
+FetchContent_Declare(jwt
+  GIT_REPOSITORY https://github.com/Thalhammer/jwt-cpp
+  GIT_TAG        v0.6.0
+)
+
+add_subdirectory(jwt-cpp)

@@ -1,5 +1,6 @@
 #pragma once
 #include <crow.h>
+#include <jwt-cpp/jwt.h>
 
 class Auth {
     
@@ -11,15 +12,18 @@ class Auth {
 
         template<typename AllContext>     
         void before_handle(crow::request &req, crow::response &res, context &ctx, AllContext &all_ctx) {
-            auto user = req.get_header_value("user");                
-            CROW_LOG_DEBUG << "User presented is: " + user;
-            if( !user.empty()) {
-                try {
-                    ctx.user = user;            
-                } catch( const std::exception &err ) {
-                    res.code = 401;
-                    res.end();
-                }
+            std::string auth_header = req.get_header_value("authorization");
+            
+            if(auth_header != ""){
+                auto token = jwt::decode(auth_header.substr(7));               
+                auto user = token.get_subject();
+                CROW_LOG_DEBUG << "User presented is: " + user;
+                if(!user.empty()){
+                    ctx.user = user;
+                } 
+            }
+            if(ctx.user == ""){
+                ctx.user = "guest";
             }
         }
 
