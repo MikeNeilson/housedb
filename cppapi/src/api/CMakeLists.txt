@@ -1,7 +1,7 @@
 include_directories(../dao)
-add_executable(api 
-               database.cpp               
-               locations.cpp               
+add_executable(api                             
+               locations.cpp    
+               database.cpp           
                config.cpp
                timeseries.cpp
                main.cpp)
@@ -11,7 +11,7 @@ target_link_libraries(api
                       PUBLIC crow::crow
                       PUBLIC Boost::system
                       PUBLIC jwt-cpp::jwt-cpp
-                      pthread                       
+                      pthread                      
                       dao
                       dto
                      )
