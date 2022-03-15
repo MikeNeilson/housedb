@@ -1,4 +1,7 @@
-include_directories(../dao)
+include_directories(dao)
+include_directories(dto)
+add_subdirectory(dao)
+add_subdirectory(dto)
 add_executable(api                             
                locations.cpp    
                database.cpp           
