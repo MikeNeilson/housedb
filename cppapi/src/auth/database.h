@@ -29,8 +29,8 @@ class DatabaseSession {
 
         template<typename AllContext>
         void before_handle(crow::request &req, crow::response &res, context &ctx, AllContext& all_ctx) {
-            auto other_ctx = all_ctx.template get<Auth>();
-            ctx.user = other_ctx.user;     
+            /*auto other_ctx = all_ctx.template get<Auth>();
+            ctx.user = other_ctx.user;     */
         }
 
         template<typename AllContext>

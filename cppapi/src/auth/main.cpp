@@ -10,6 +10,9 @@
 #include "app.h"
 #include "config.h"
 #include <signal.h>
+#include <sstream>
+#include <fstream>
+#include <jwt-cpp/jwt.h>
 
 using connection = sqlpp::postgresql::connection;
 
@@ -20,7 +23,7 @@ void health_check_handler(int sig){
         CROW_LOG_ERROR << "health check called";
     }
 }
-
+using namespace std;
 int main(int argc, char *argv[]) {
 
     struct sigaction sigusr;
@@ -33,7 +36,30 @@ int main(int argc, char *argv[]) {
     
     app.loglevel(config.get_app_log_level());
     try {
-        
+        stringstream ss;
+        string pubkey;
+        string privkey;
+        string ca;
+        {
+            // scoping for fstreams
+            fstream ca_file ("../../test_config/certs/ca.cert.pem");
+            fstream pubkey_file ("../../test_config/certs/jwt.pem");
+            fstream privkey_file("../../test_config/certs/jwt.key");
+            ss << pubkey_file.rdbuf();
+            pubkey = ss.str();
+            ss.str(""); ss.clear();
+            
+            ss << privkey_file.rdbuf();
+            privkey = ss.str();
+
+            ss.str(""); ss.clear();
+
+            ss << ca_file.rdbuf();
+            ca = ss.str();
+            cout << pubkey << endl;
+            cout << privkey << endl;
+            cout << ca << endl;
+        }
         //connection db(config.get_db_config());
         CROW_LOG_DEBUG << "Database Connection Open";
         //sqlpp::connection db(pgdb);
@@ -41,9 +67,26 @@ int main(int argc, char *argv[]) {
 
         CROW_LOG_DEBUG << "DB Session Context Set";
 
-        CROW_ROUTE(app,"/")([](const crow::request &req){        
-            return "Welcome to my data API.";
+        vector<string> x5c_keys;
+        auto test = jwt::helper::load_public_key_from_string(pubkey);
+        
+        x5c_keys.push_back(pubkey);
+
+        CROW_ROUTE(app,"/")([&pubkey,&privkey,&x5c_keys](const crow::request &req){        
+            return "test return";
+            /*
+            auto token = jwt::create()
+                            .set_header_claim("x5c", jwt::claim{x5c_keys.begin(),x5c_keys.end()})
+                            .set_issuer("test")
+                            .set_subject("testuser")
+                            .sign(jwt::algorithm::rs256{"",privkey,"",""})
+            
+                        ;
+
+            return token;*/
         });
+
+        
     
         
         
