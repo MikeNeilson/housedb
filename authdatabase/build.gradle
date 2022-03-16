@@ -1,0 +1,32 @@
+buildscript{
+    dependencies {
+       classpath 'org.postgresql:postgresql:42.2.18.jre7'
+    }
+}
+
+plugins {    
+    id 'java'
+    id "org.flywaydb.flyway" version "7.7.0"
+
+}
+
+configurations {
+    flywayMigration 
+}
+
+dependencies {
+    compile "net.objecthunter:exp4j:0.4.8"
+    compile "org.flywaydb:flyway-core:7.7.0"    
+    flywayMigration "org.postgresql:postgresql:$PG_VERSION"
+    flywayMigration sourceSets.main.runtimeClasspath
+}
+
+flyway {
+    locations = ["db/migration"]
+    configurations = ['flywayMigration','compile']    
+    mixed = true
+    schemas = ['authdb',]
+}
+
+flywayMigrate.dependsOn classes
+
