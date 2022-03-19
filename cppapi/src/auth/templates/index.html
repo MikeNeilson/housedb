@@ -1,0 +1,70 @@
+!include base.html!
+
+<div>
+    <a href="#" onclick="openTab('home'); return false;">Home</a>
+    <a href="#login" onclick="openTab('login'); return false;">Login</a>
+    <hr/>
+    <div id="tabs">
+        <div id="home" class="tab">
+            Hello, {{#auth.user}}{{.}}{{/auth.user}}{{^auth.user}}please login{{/auth.user}}
+        </div>
+        <div id="login" class="tab" style="display: none">
+            <form id="login_form" onsubmit="doLogin(); return false;">
+                <label for="username">Username:</label><input type="text" name="username"/><br/>
+                <label for="password">Password:</label><input type="password" name="password"/><br/>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+    function openTab(tab){
+        let tabs = document.getElementsByClassName("tab");
+        for(let i=0; i<tabs.length; i++){
+            if( tabs[i].id===tab){
+                tabs[i].style.display = 'block';
+            } else {
+                tabs[i].style.display = 'none';
+            }            
+        }
+    }
+
+    function doLogin() {
+        console.log("sending");
+        console.log(document.forms["login_form"].username.value);
+        const userInfo = document.forms["login_form"];
+        var data = {
+            "username": userInfo.username.value,
+            "password": userInfo.password.value
+        };
+        ajax("POST","/login",data,function(response){
+            alert("Login Success");             
+        },function(event){
+            alert("Login failed");
+        })
+    }
+
+    const queryString = window.location;
+    console.log(queryString);
+
+    function ajax(method, url, data, onSuccess, onError) {        
+        var request = new XMLHttpRequest();
+        request.open(method,url);
+        request.setRequestHeader("Content-Type","application/json");        
+        request.onreadystatechange = function(){
+            if (this.readyState === XMLHttpRequest.DONE && this.status >= 200 && this.status < 300){
+                onSuccess(this);
+            } else if ( this.readyState === XMLHttpRequest.DONE ){
+                onError(this);
+            }
+        }
+
+        request.send(JSON.stringify(data));
+    }
+
+    
+
+</script>
+!include end.html!

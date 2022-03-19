@@ -32,7 +32,8 @@ class Session{
 class Auth {
     
     std::map<std::string,std::shared_ptr<Session>> sessions;
-    
+        
+
     public:
         struct context{    
             std::shared_ptr<Session> session;
@@ -73,7 +74,9 @@ class Auth {
         void after_handle(crow::request &req, crow::response &res, context &ctx, AllContext& /*unused*/) {
 
         }
+        
 
+    private:
         std::string generate_session_id() {
             std::array<unsigned char,256> buffer = {0};
             std::array<unsigned char,512> base64 = {0};
