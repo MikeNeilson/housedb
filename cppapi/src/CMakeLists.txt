@@ -1,4 +1,5 @@
 include_directories(headers)
+include_directories(ssl)
 add_subdirectory(deps)
 #add_subdirectory(dto)
 #add_subdirectory(dao)

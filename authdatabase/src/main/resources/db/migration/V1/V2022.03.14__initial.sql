@@ -5,15 +5,15 @@ check(
         VALUE ~ '.*@.*'        
 ) ;
 
-create table users (
+create table garden_users (
     id serial not null primary key,
-    username varchar(255) unique,
-    email email_address unique    
+    username varchar(255) unique not null,
+    email email_address unique not null
 );
 
 
 create table user_crendentials (
-    id int not null primary key references users(id),
+    id int not null primary key references garden_users(id),
     otp_key text,
     password_hash text
 );

@@ -10,7 +10,7 @@ void DatabaseSession::set_db_config(DatabaseSession::db_config_ptr config) {
             this->config = config;            
 };
 
-sqlpp::postgresql::connection& DatabaseSession::get_db(const context &ctx) { 
+sqlpp::postgresql::connection& DatabaseSession::get_db(/*const context &ctx*/) {
     std::map<std::thread::id,sqlpp::postgresql::connection>::iterator it;
 
     const std::thread::id thread_id = std::this_thread::get_id();

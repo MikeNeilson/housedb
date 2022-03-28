@@ -48,13 +48,11 @@ int main(int argc, char *argv[]) {
 
         CROW_LOG_DEBUG << "DB Session Context Set";
 
-        auto tmpl = crow::mustache::load("index.html");
+        auto tmpl = crow::mustache::load("index.html");        
 
         CROW_ROUTE(app,"/")([&app,&tmpl](const crow::request &req, crow::response &res){
             auto &auth_ctx = app.get_context<Auth>(req);
-            auto data = crow::mustache::context{};
-            data["page.title"] = "Test";
-            data["auth.user"] = auth_ctx.session->get_user();
+            auto data = crow::mustache::context{};            
             res.write(tmpl.render(data));
             res.end();            
         });
@@ -62,14 +60,27 @@ int main(int argc, char *argv[]) {
         CROW_ROUTE(app,"/login").methods(crow::HTTPMethod::POST)([&app](const crow::request &req, crow::response &res){
             auto& auth_mw = app.get_middleware<Auth>();
             auto& auth_ctx = app.get_context<Auth>(req);
-            auto form = crow::json::load(req.body);
-            if(form["username"].s() == "mike" && form["password"] == "test"){
+            auto& db = app.get_middleware<DatabaseSession>().get_db();
+            auto form = crow::json::load(req.body);            
+            if(auth_mw.do_login(form, auth_ctx.session, db)){
                 res.code = 204;
-                //auth_mw.reset_session(auth_ctx.session)
             } else {
                 res.code = 401;
             }
             res.write("");
+            res.end();
+        });
+
+        CROW_ROUTE(app,"/register").methods(crow::HTTPMethod::POST)([&app](const crow::request &req, crow::response &res){
+            auto& auth_mw = app.get_middleware<Auth>();
+            auto& auth_ctx = app.get_context<Auth>(req);
+            auto& db = app.get_middleware<DatabaseSession>().get_db();
+            auto form = crow::json::load(req.body);
+            if(auth_mw.do_register(form,auth_ctx.session, db)){
+                res.code=201;
+            } else {
+                res.code = 404;
+            }
             res.end();
         });
 

@@ -25,7 +25,7 @@ class DatabaseSession {
         };
 
         void set_db_config(db_config_ptr config);
-        sqlpp::postgresql::connection& get_db(const context &ctx);
+        sqlpp::postgresql::connection& get_db(/*const context &ctx*/);
 
         template<typename AllContext>
         void before_handle(crow::request &req, crow::response &res, context &ctx, AllContext& all_ctx) {

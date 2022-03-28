@@ -30,5 +30,12 @@ services:
     working_dir: /schema
     command: ./gradlew :database:flywayMigrate -PDBURL="jdbc:postgresql://db:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
     restart: "no"
+  auth_schema:
+    image: openjdk:11
+    volumes:
+      - ${PWD}:/schema
+    working_dir: /schema
+    command: ./gradlew :authdatabase:flywayMigrate -PDBURL="jdbc:postgresql://db:5432/authdb" -PDBUSER=authdb_owner -PDBPASSWORD=authpassword
+    restart: "no"
 volumes:
   pg_data:
