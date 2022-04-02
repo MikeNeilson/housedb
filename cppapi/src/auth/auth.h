@@ -116,7 +116,22 @@ class Auth {
         }
 
         bool do_register(const crow::json::rvalue &form, std::shared_ptr<Session> current_session, sqlpp::postgresql::connection &db){
-            
+            auto &users_tbl = authdb::tables::garden_users;
+            auto &cred_tbl = authdb::tables::user_crendentials;
+            auto query = sqlpp::insert_into(users_tbl).set(
+                users_tbl.username = form["username"].s(),
+                users_tbl.email = form["email"].s()
+            );
+            //db(query);
+
+            std::array<unsigned char,32> salt;
+            if( !RAND_bytes(salt.data(),32)){
+                throw std::runtime_error("Error Generating Random Number " + ERR_get_error());
+            }
+
+            std::string pw_hash = openssl::pkcs5_pbkdf2_hmac(salt,1000,form["password"].s());
+            CROW_LOG_INFO << openssl::b64encode(salt) << "$" << 1000 << "$" << pw_hash;
+
             return false;
         }
 
@@ -141,4 +156,6 @@ class Auth {
                 throw std::runtime_error("Open SSL RAND_Bytes failed with code " + ERR_get_error());
             }
         }
+
+        
 };
