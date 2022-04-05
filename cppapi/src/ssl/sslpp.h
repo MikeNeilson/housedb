@@ -4,6 +4,8 @@
 #include <sstream>
 #include <vector>
 #include <functional>
+#include <string_encoding.h>
+#include <cmath>
 
 namespace openssl {    
         
@@ -11,8 +13,11 @@ namespace openssl {
 
     std::vector<unsigned char> b64decode(const std::string& encoded);
     
-    template<typename T>
-    std::string b64encode(const T& bytes){
-        return "";
+    
+    template<typename T, int N>
+    inline std::string b64encode(const std::array<T,N>& bytes){
+        std::array<T,static_cast<int>(4*std::ceil((N/3.0)))> buffer;
+        EVP_EncodeBlock(buffer.data(), bytes.data(), N);
+        return std::string(reinterpret_cast<const char*>(buffer.data()));
     }
 }

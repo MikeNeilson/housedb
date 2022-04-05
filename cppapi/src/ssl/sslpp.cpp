@@ -12,9 +12,10 @@ namespace openssl {
                                        md,
                                        EVP_MD_meth_get_result_size(md), 
                                        buffer.data());
-        std::stringstream ss;
         
-        return std::string(reinterpret_cast<char*>(buffer.data()));
+        return b64encode<unsigned char,512>(buffer);
+        //return to_hex<unsigned char,512>(buffer);
+        
         
     }
 

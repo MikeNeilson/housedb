@@ -39,7 +39,7 @@ SQLPP_ALIAS_PROVIDER(pw_parts);
 class Auth {
     
     std::map<std::string,std::shared_ptr<Session>> sessions;
-        
+    const int iterations = 1000;
 
     public:
         struct context{    
@@ -118,21 +118,38 @@ class Auth {
         bool do_register(const crow::json::rvalue &form, std::shared_ptr<Session> current_session, sqlpp::postgresql::connection &db){
             auto &users_tbl = authdb::tables::garden_users;
             auto &cred_tbl = authdb::tables::user_crendentials;
-            auto query = sqlpp::insert_into(users_tbl).set(
+            auto add_user = sqlpp::insert_into(users_tbl).set(
                 users_tbl.username = form["username"].s(),
                 users_tbl.email = form["email"].s()
-            );
-            //db(query);
-
+            );            
+            
             std::array<unsigned char,32> salt;
             if( !RAND_bytes(salt.data(),32)){
                 throw std::runtime_error("Error Generating Random Number " + ERR_get_error());
             }
+            
+            std::string pw_hash = openssl::pkcs5_pbkdf2_hmac(salt,iterations,form["password"].s());
+            std::stringstream pw_info;
+            pw_info << openssl::b64encode<unsigned char,32>(salt);
+            pw_info <<"$" << iterations << "$" << pw_hash;
 
-            std::string pw_hash = openssl::pkcs5_pbkdf2_hmac(salt,1000,form["password"].s());
-            CROW_LOG_INFO << openssl::b64encode(salt) << "$" << 1000 << "$" << pw_hash;
+            auto tx = sqlpp::start_transaction(db);
+            db(add_user);
+            auto get_user_id = sqlpp::select(users_tbl.id)
+                                     .from(users_tbl)
+                                     .where(users_tbl.username == form["username"].s());
+            auto res = db(get_user_id);
+            if( const auto& row = *res.begin() ) {
+                auto add_creds = sqlpp::insert_into(cred_tbl).set(
+                    cred_tbl.password_hash = pw_info.str(),
+                    cred_tbl.id = row.id
+                );
+                db(add_creds);
+            }
+            
+            tx.commit();
 
-            return false;
+            return true;
         }
 
         template<typename AllContext>
