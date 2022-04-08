@@ -3,7 +3,7 @@
 namespace openssl {    
         
     std::string pkcs5_pbkdf2_hmac(const std::array<unsigned char,32> &salt, int iter, const std::string &password, const EVP_MD* md){
-        std::array<unsigned char,512> buffer;
+        std::array<unsigned char,512> buffer = {0};
         int result = PKCS5_PBKDF2_HMAC(password.c_str(),
                                        password.size(),
                                        salt.data(),

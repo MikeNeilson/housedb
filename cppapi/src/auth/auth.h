@@ -39,7 +39,8 @@ SQLPP_ALIAS_PROVIDER(pw_parts);
 class Auth {
     
     std::map<std::string,std::shared_ptr<Session>> sessions;
-    const int iterations = 1000;
+    static const int iterations = 1000;
+    static const int salt_size = 32;
 
     public:
         struct context{    
@@ -89,29 +90,35 @@ class Auth {
             if( result.size() == 1){
                 auto inner = sqlpp::cte(sqlpp::alias::a).as(
                                     sqlpp::select(
-                                            sqlpp::verbatim("regexp_split_to_array(password_hash,E'\\$')").as(pw_parts)
+                                            sqlpp::verbatim("regexp_split_to_array(password_hash,'\\$')").as(pw_parts)
                                     )
                                     .from(cred_tbl)
                                     .where(cred_tbl.id == result.begin()->id));
-                auto cred_query = sqlpp::select(sqlpp::verbatim("pw_parts[0]").as(pw_salt), sqlpp::verbatim("pw_parts[1]").as(pw_iterations))
+                auto cred_query = sqlpp::select(sqlpp::verbatim<sqlpp::text>("pw_parts[1]").as(pw_salt), sqlpp::verbatim<sqlpp::integer>("pw_parts[2]").as(pw_iterations))
                                     .from(sqlpp::from_table(inner)).unconditionally();
                 auto parts = db(sqlpp::with(inner)(cred_query));
-               /* const auto& row = parts.begin();
-                if( row) {
-                    std::string salt = row.pw_salt;
-                    int iterations = row.pw_iterations;
-                    return true;
-                }
-                return false;*/
-                return true;
-                // check password
-                // reset session
-                // set user variable
                 
+                if( parts.size() == 1) {
+                    const auto& row = *parts.begin();
+                    auto salt = openssl::b64decode<unsigned char,salt_size>(row.pw_salt);                    
+                    int iterations = row.pw_iterations;
+                    std::string pw = openssl::pkcs5_pbkdf2_hmac(salt,iterations,form["password"].s());
+                    std::stringstream ss;
+                    ss << row.pw_salt << "$" << iterations << "$" << pw;
+                    auto pw_check = sqlpp::select(cred_tbl.password_hash)
+                                          .from(cred_tbl)
+                                          .where(
+                                              cred_tbl.id == result.begin()->id
+                                              and 
+                                              cred_tbl.password_hash == ss.str());
+                    if( db(pw_check).size() == 1) {
+                        return true;
+                    }                    
+                }
             } else if( result.size() > 1){
                 CROW_LOG_CRITICAL << "User database is corrupted";
                 return false;
-            } // no user
+            } // no user or password mismatch
             return false;
         }
 
@@ -123,14 +130,14 @@ class Auth {
                 users_tbl.email = form["email"].s()
             );            
             
-            std::array<unsigned char,32> salt;
-            if( !RAND_bytes(salt.data(),32)){
+            std::array<unsigned char,salt_size> salt;
+            if( !RAND_bytes(salt.data(),salt_size)){
                 throw std::runtime_error("Error Generating Random Number " + ERR_get_error());
             }
             
             std::string pw_hash = openssl::pkcs5_pbkdf2_hmac(salt,iterations,form["password"].s());
             std::stringstream pw_info;
-            pw_info << openssl::b64encode<unsigned char,32>(salt);
+            pw_info << openssl::b64encode<unsigned char,salt_size>(salt);
             pw_info <<"$" << iterations << "$" << pw_hash;
 
             auto tx = sqlpp::start_transaction(db);
