@@ -48,4 +48,16 @@ public class Conversion {
         return Objects.hash(from, to, method);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(").append(from.getName())
+          .append("->")
+          .append(to.getName())
+          .append(": ")
+          .append(method.render());
+
+          ;
+        return sb.toString();
+    }
 }

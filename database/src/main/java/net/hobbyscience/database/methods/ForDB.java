@@ -36,5 +36,5 @@ public class ForDB implements ConversionMethod{
 		if( !( other instanceof ForDB )) return false;
 		return this.postfix.equals( ((ForDB)other).postfix );
 	}
-
+    
 }
