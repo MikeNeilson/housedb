@@ -1,5 +1,7 @@
 package net.hobbyscience.math;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -24,18 +26,9 @@ public class Equations {
      */
     public static String infixToPostfix( String infix){        
         //System.out.println(infix);        
-        StringBuilder builder = new StringBuilder();
+        //StringBuilder builder = new StringBuilder();
         Token tokens[] = ShuntingYard.convertToRPN(infix, null, null, vars, false);
-        for( Token tok: tokens ){
-            switch(tok.getType()){
-                case Token.TOKEN_FUNCTION: { builder.append(((FunctionToken)tok).getFunction().getName()).append(" "); break;}
-                case Token.TOKEN_NUMBER: { builder.append(((NumberToken)tok).getValue()).append(" "); break;}
-                case Token.TOKEN_VARIABLE: { builder.append( ((VariableToken)tok).getName() ).append(" "); break;  }
-                case Token.TOKEN_OPERATOR: { builder.append( ((OperatorToken)tok).getOperator().getSymbol() ).append(" "); break; }
-                default: { break;}
-            }
-        }        
-        return builder.toString().trim();
+        return tokensToString(tokens);
     }
 
 
@@ -144,13 +137,45 @@ public class Equations {
         return builder.toString().trim();
     }
 
+    private static Deque<Token> stringToTokens(String postfix) {
+        Deque<Token> tokens = new ArrayDeque<>(10);
+        var tokenizer = new Tokenizer(postfix,null,null,vars,false);
+        while(tokenizer.hasNext()){
+            tokens.add(tokenizer.nextToken());
+        }
+        return tokens;
+    }
+
+    private static String tokensToString(Token[] tokens) {
+        StringBuilder builder = new StringBuilder();
+        for( Token tok: tokens ){
+            switch(tok.getType()){
+                case Token.TOKEN_FUNCTION: { builder.append(((FunctionToken)tok).getFunction().getName()).append(" "); break;}
+                case Token.TOKEN_NUMBER: { builder.append(((NumberToken)tok).getValue()).append(" "); break;}
+                case Token.TOKEN_VARIABLE: { builder.append( ((VariableToken)tok).getName() ).append(" "); break;  }
+                case Token.TOKEN_OPERATOR: { builder.append( ((OperatorToken)tok).getOperator().getSymbol() ).append(" "); break; }
+                default: { break;}
+            }
+        }        
+        return builder.toString().trim();
+    }
+
+
+
     /**
      * 
      * @param postfix
      * @return a version of the 
      */
     public static String reduce( String postfix ){
-        return postfix;
+        Deque<Token> rhs = stringToTokens(postfix);
+        Deque<Token> lhs = new ArrayDeque<>(10);
+        Deque<Token> holdStack = new ArrayDeque<>(10);
+        Deque<Token> varStack = new ArrayDeque<>(5);
+        Deque<Token> regStack = new ArrayDeque<>(2);
+        OperatorToken holdOp = null;
+
+        return tokensToString(lhs.toArray(new Token[0]));
     }
 
     /**
