@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.stream.Stream;
 
 import db.migration.NoConversionFound;
 import net.hobbyscience.database.exceptions.NoInverse;
@@ -166,6 +167,102 @@ public class Equations {
     }
 
 
+    private static void evaluate(Deque<Token> lhs, final OperatorToken holdOp) {
+        Deque<Token> holdStack = new ArrayDeque<>(10);
+        Deque<Token> varStack = new ArrayDeque<>(5);
+        Deque<Token> regStack = new ArrayDeque<>(2);
+                
+        Deque<Token>  opStack = new ArrayDeque<>(10);
+        
+        Token tmp = null;
+        // move the lhs stack to the hold stack        
+        while ((tmp = lhs.pollLast()) != null ) {
+            holdStack.add(tmp);
+        }
+
+        // evaluate each element of the hold tack
+        while( (tmp = holdStack.pollFirst()) != null ) {
+            switch(tmp.getType()) {
+                case Token.TOKEN_NUMBER:
+                case Token.TOKEN_VARIABLE: {
+                    varStack.add(tmp);
+                    break;
+                }
+                case Token.TOKEN_OPERATOR: {
+                    
+                    if( distribute(holdOp,(OperatorToken)tmp)) {
+                        opStack.add(tmp);
+                        varStack.add(varStack.peekLast());
+                    } else {
+                        opStack.add(varStack.peekLast());
+                    }
+                    break;
+                }
+            }
+
+            var theOp = holdOp.getOperator();
+            int numOperands = theOp.getNumOperands();
+            if( varStack.size() >= numOperands ) {
+                var allNumber = true;
+                for (int i = 0; i < numOperands; i++) {
+                    var tmpVar = varStack.pollLast();
+                    if( tmpVar.getType() == Token.TOKEN_VARIABLE) {
+                        allNumber = false;
+                    }
+                    regStack.add(tmpVar);
+                }
+
+                if( allNumber ) {                    
+                    double values[] = regStack.stream()
+                                              .map((t)->(NumberToken)t)
+                                              .mapToDouble( NumberToken::getValue)
+                                              .toArray();
+                    regStack.clear();
+                    double result = theOp.apply(values);
+                    varStack.add(new NumberToken(result));
+                } else {
+                    opStack.add(holdOp);
+                    Token tmpVar = null;
+                    while( (tmpVar = regStack.pollLast()) != null) {
+                        opStack.add(tmpVar);
+                    }
+                }               
+           }            
+        }
+
+        /* unwind the stacks that are left */
+        Token regTmp = null;
+        while ((regTmp = regStack.pollLast()) != null) {
+            opStack.add(regTmp);
+        }
+
+        Token varTmp = null;
+        while ((varTmp = varStack.pollLast()) != null) {
+            opStack.add(varTmp);
+        }
+
+        Token opStackTmp = null;
+        while( (opStackTmp = opStack.pollLast()) != null ) {
+            lhs.add(opStackTmp);
+        }
+
+        switch (lhs.peekLast().getType()) {
+            case Token.TOKEN_NUMBER:
+            case Token.TOKEN_VARIABLE: {
+                lhs.add(holdOp);
+                break;
+            }
+            case Token.TOKEN_OPERATOR: {
+                // do nothing
+                break;
+            }
+            default: {
+                throw new RuntimeException(String.format("Token type %s not implemented",opStackTmp.toString()));
+            }
+        }
+
+    }
+
 
     /**
      * 
@@ -175,12 +272,54 @@ public class Equations {
     public static String reduce( String postfix ){
         Deque<Token> rhs = stringToTokens(postfix);
         Deque<Token> lhs = new ArrayDeque<>(10);
-        Deque<Token> holdStack = new ArrayDeque<>(10);
-        Deque<Token> varStack = new ArrayDeque<>(5);
-        Deque<Token> regStack = new ArrayDeque<>(2);
-        OperatorToken holdOp = null;
+        
+
+        while( !rhs.isEmpty() ) {
+            var token = rhs.pollFirst();
+            switch( token.getType() ) {
+                case Token.TOKEN_VARIABLE:
+                case Token.TOKEN_NUMBER: {
+                    lhs.add(token);
+                    break;
+                }
+                case Token.TOKEN_OPERATOR: {
+                    // do the stuff
+                    var holdOp = (OperatorToken)token;
+                    evaluate(lhs,holdOp);                    
+                    break;
+                }
+                default: {
+                    throw new RuntimeException("Function Tokens not implemented yet");                    
+                }
+            }
+        }
 
         return tokensToString(lhs.toArray(new Token[0]));
+    }
+
+    private static boolean distribute(OperatorToken holdOp, OperatorToken currentOp) {
+        String set = String.format("%s,%s",
+                                   holdOp.getOperator().getSymbol(),
+                                   currentOp.getOperator().getSymbol());
+        switch(set) {
+            case "*,+": return true;
+            case "*,-": return true;
+            case "*,*": return false;
+            case "*,/": return false;
+            case "/,*": return false;
+            case "/,/": return false;
+            case "/,+": return true;
+            case "/,-": return false;
+            case "+,*": return false;
+            case "+,/": return false;
+            case "+,+": return false;            
+            case "+,-": return false;
+            case "-,-": return false;            
+            case "-,+": return false;
+            case "-,*": return false;
+            case "-,/": return false;
+            default: return false;
+        }        
     }
 
     /**
