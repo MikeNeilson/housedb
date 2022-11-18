@@ -1,8 +1,12 @@
-version: "3.3"
+version: "3.4"
 services:
   api:
-    build: ./cppapi
-    image: cppapi:latest    
+    build:
+      target: api
+      context: ./cppapi
+      dockerfile: Dockerfile
+    image: cppapi:latest
+        
     command: -f /api.json
     ports:
       - 18080:18080

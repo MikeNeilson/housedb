@@ -11,7 +11,7 @@ RUN cmake -DCMAKE_CXX_STANDARD_LIBRARIES="-lpgcommon -lpgport -lpgtypes -lopcode
           -DCMAKE_EXE_LINKER_FLAGS="-static -static-libgcc -static-libstdc++" .. \
     && make && strip src/api/api
 
-FROM scratch
+FROM scratch as api
 
 COPY --from=builder /src/build/src/api/api /api
 COPY --from=builder /src/passwd /etc/passwd
