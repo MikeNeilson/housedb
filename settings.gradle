@@ -17,4 +17,3 @@ include 'services:webservice'
 
 rootProject.name = 'housedb'
 include 'database'
-include 'authdatabase'
