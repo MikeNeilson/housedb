@@ -49,7 +49,6 @@ int main(int argc, char *argv[]) {
     
         LocationHandler loc;
         TimeseriesHandler ts;
-
         loc.routes(app);
         ts.routes(app);
         
