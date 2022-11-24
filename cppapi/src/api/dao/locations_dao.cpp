@@ -29,12 +29,22 @@ namespace gardendb {
             }
 
         bool LocationDao::save( const gardendb::dto::LocationDto &name) {
-            auto update = sqlpp::insert_into(views::view_locations)
+            CROW_LOG_DEBUG << "saving location";
+            try {
+                auto update = sqlpp::insert_into(views::view_locations)
                                 .set(views::view_locations.name = name.get_name())
                                 ;
-            CROW_LOG_DEBUG << "inserting";
-            db.update(update);
-            CROW_LOG_DEBUG << "inserted";
+                CROW_LOG_DEBUG << "inserting";
+                db.update(update);
+                CROW_LOG_DEBUG << "inserted";
+                return true;
+            } catch( const sqlpp::exception &ex) {
+                CROW_LOG_ERROR << "Unable to save location" << ex.what();
+            } catch( const std::exception &ex) {
+                CROW_LOG_ERROR << "Unable to save location" << ex.what();
+            }
+
+            
             return false;
         }
     }

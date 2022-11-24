@@ -1,0 +1,10 @@
+{
+    "host": "localhost",
+    "port": 5432,
+    "dbname": "gardendb",
+    "user": "housedb_user",
+    "password": "testpassword",
+    "db_debug": 0,
+    "log_level": "DEBUG",
+    "threads": 3
+}

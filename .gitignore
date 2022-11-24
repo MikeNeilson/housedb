@@ -6,3 +6,4 @@ build/**
 .classpath
 .vscode
 .settings
+gradle.properties

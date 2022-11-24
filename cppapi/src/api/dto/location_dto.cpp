@@ -25,7 +25,11 @@ namespace gardendb {
 
         LocationDto::LocationDto(const crow::json::rvalue &data ){
             this->name = data["name"].s();
-            this->parent = data["parent"].s();
+            
+            if( data.has("parent") && data["parent"].t() == crow::json::type::String) {
+                this->parent = data["parent"].s();
+            }
+
             this->latitude = data["latitude"].d();
             this->longitude = data["longitude"].d();
             this->horizontal_datum = data["horizontal_datum"].s();

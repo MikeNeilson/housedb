@@ -43,5 +43,6 @@ services:
     working_dir: /schema
     command: ./gradlew --no-daemon :database:flywayMigrate -PDBURL="jdbc:postgresql://db:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
     restart: "no"
+    user: "${UID}:${GID}"
 volumes:
   pg_data:
