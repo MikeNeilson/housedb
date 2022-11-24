@@ -4,4 +4,4 @@
 #include "database.h"
 
 
-using ApiApp = crow::App<Auth,DatabaseSession,RequestLogger>;
+using ApiApp = crow::App<RequestLogger,DatabaseSession,Auth>;
