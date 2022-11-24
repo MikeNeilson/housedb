@@ -1,0 +1,18 @@
+---
+users:
+    user1:
+        password: $argon2id$v=19$m=65536,t=3,p=4$BCOtqW0Rq0qwO3oJyp9I2g$oXMKIZzTxflpqSZOeiXLVH5QPELlbNxAZDpEJfmxewM
+        displayname: User One
+        email: User1@localdomain
+        groups:
+            - users
+        disabled: false
+    adminuser:
+        password: $argon2id$v=19$m=65536,t=3,p=4$BCOtqW0Rq0qwO3oJyp9I2g$oXMKIZzTxflpqSZOeiXLVH5QPELlbNxAZDpEJfmxewM
+        displayname: Admin User
+        email: admin@localdomain
+        disabled: false
+        groups:
+            - users
+            - admin
+...

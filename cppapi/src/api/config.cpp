@@ -118,7 +118,7 @@ void check_health() {
 
 Config::Config(int argc, char **argv){    
     argc -= (argc>0);
-    argv += (argv>0);
+    argv += (argv != nullptr ? 1 : 0);
     option::Stats stats(usage, argc,argv);
     option::Option options[stats.options_max], buffer[stats.buffer_max];
     option::Parser parser(usage,argc,argv,options,buffer);

@@ -135,4 +135,25 @@ begin
         return l_userid;
     end if;
 end;
-$$ language plpgsql
+$$ language plpgsql;
+
+create or replace function housedb_security.apikey_readonly()
+returns trigger
+as $$
+begin 
+	set search_path to housedb_security,housedb,public;
+    if    NEW.created <> OLD.created 
+       OR NEW.key_name <> OLD.key_name
+       OR NEW.user_id <> OLD.user_id
+       OR NEW.apikey <> OLD.apikey
+    then
+        raise exception 'Changing API key information other than expires is is not allowed, (''%'',''%'')',old.user_id,old.key_name USING ERRCODE = 'check_violation';
+    end if;
+end;
+$$ language plpgsql;
+
+drop trigger if exists trigger_key_readonly on housedb_security.user_authorization;
+create trigger trigger_apikey_readonly 
+    before update 
+    on user_authorization
+    for each row  execute procedure housedb_security.apikey_readonly();

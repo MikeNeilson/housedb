@@ -1,7 +1,7 @@
 // Copyright 2022 Michael Neilson
 // Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
 
-#include "database.h"
+#include "app.h"
 #include "timeseries.h"
 #include "timeseries_dao.h"
 #include "api_exception.h"
@@ -15,7 +15,7 @@ void TimeseriesHandler::routes( ApiApp &app){
 
     CROW_ROUTE(app, "/timeseries/")([&app](const crow::request &req, crow::response &res){
                 
-        auto &db = app.get_middleware<DatabaseSession>().get_db(app.get_context<DatabaseSession>(req));
+        auto &db = app.get_middleware<DatabaseSession>().get_db(*(app.get_context<Auth>(req).user));
         gardendb::sql::TimeseriesDao dao(db);
         auto result = dao.get_all();
         auto list = std::vector<crow::json::wvalue>();
@@ -47,7 +47,7 @@ void TimeseriesHandler::routes( ApiApp &app){
         ([&app](const crow::request& req, crow::response &res){            
             auto json_data = crow::json::load(req.body);            
             CROW_LOG_DEBUG << json_data["name"].s();
-            auto &db = app.get_middleware<DatabaseSession>().get_db(app.get_context<DatabaseSession>(req));
+            auto &db = app.get_middleware<DatabaseSession>().get_db(*(app.get_context<Auth>(req).user));
             CROW_LOG_DEBUG << "got db";
             gardendb::sql::TimeseriesDao dao(db);
             

@@ -1,8 +1,21 @@
-version: "3.3"
+version: "3.4"
 services:
+  auth:
+    image: authelia/authelia:4.37.2
+    ports:
+      - 9091:9091
+    volumes:
+      - ./test_config/authelia:/config
+    user: "${UID}:${GID}"
+
   api:
-    build: ./cppapi
-    image: cppapi:latest    
+    build:
+      target: api
+      context: ./cppapi
+      dockerfile: Dockerfile
+      
+    image: cppapi:latest
+        
     command: -f /api.json
     ports:
       - 18080:18080
@@ -28,7 +41,7 @@ services:
     volumes:
       - ${PWD}:/schema
     working_dir: /schema
-    command: ./gradlew :database:flywayMigrate -PDBURL="jdbc:postgresql://db:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
+    command: ./gradlew --no-daemon :database:flywayMigrate -PDBURL="jdbc:postgresql://db:5432/housedb" -PDBUSER=housedb_owner -PDBPASSWORD=housepassword   
     restart: "no"
 volumes:
   pg_data:

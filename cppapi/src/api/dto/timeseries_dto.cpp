@@ -40,7 +40,7 @@ namespace gardendb {
         TimeseriesDto::TimeseriesDto(const rvalue &data){
             this->name = data["name"].s();
             
-            this->interval_offset = data["interval_offset"].s();
+            this->interval_offset = data["interval-offset"].s();
             if( data.has("units") ){
                 this->units = data["units"].s();
             }

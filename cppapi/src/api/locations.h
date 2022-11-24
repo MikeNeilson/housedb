@@ -8,7 +8,7 @@
 #include <sqlpp11/sqlpp11.h>
 #include <sqlpp11/postgresql/connection.h>
 #include <crow.h>
-#include "database.h"
+#include "app.h"
 
 class LocationHandler {
     private:
