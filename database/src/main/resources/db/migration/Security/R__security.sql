@@ -152,10 +152,10 @@ begin
 end;
 $$ language plpgsql;
 
-drop trigger if exists trigger_key_readonly on housedb_security.user_authorization;
+drop trigger if exists trigger_apikey_readonly on housedb.user_authorization;
 create trigger trigger_apikey_readonly 
     before update 
-    on user_authorization
+    on housedb.user_authorization
     for each row  execute procedure housedb_security.apikey_readonly();
 
 
