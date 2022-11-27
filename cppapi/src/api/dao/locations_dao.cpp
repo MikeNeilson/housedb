@@ -39,9 +39,9 @@ namespace gardendb {
                 CROW_LOG_DEBUG << "inserted";
                 return true;
             } catch( const sqlpp::exception &ex) {
-                CROW_LOG_ERROR << "Unable to save location" << ex.what();
+                CROW_LOG_ERROR << "Database was Unable to save location: " << ex.what();
             } catch( const std::exception &ex) {
-                CROW_LOG_ERROR << "Unable to save location" << ex.what();
+                CROW_LOG_ERROR << "System was Unable to save location: " << ex.what();
             }
 
             

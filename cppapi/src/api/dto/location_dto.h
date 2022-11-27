@@ -6,18 +6,20 @@
 #pragma once
 #include <string>
 #include <crow/json.h>
+#include <boost/optional.hpp>
+#include "api_exception.h"
 
 namespace gardendb {
     namespace dto {
         class LocationDto {
             private:
                 std::string name;
-                std::string parent;
-                double latitude;
-                double longitude;
-                std::string horizontal_datum;
-                double elevation;
-                std::string vertical_datum;
+                boost::optional<std::string> parent;
+                boost::optional<double> latitude;
+                boost::optional<double> longitude;
+                boost::optional<std::string> horizontal_datum;
+                boost::optional<double> elevation;
+                boost::optional<std::string> vertical_datum;
             public:
 
                 LocationDto() {}
@@ -31,12 +33,12 @@ namespace gardendb {
                 LocationDto( const crow::json::rvalue &data);
 
                 const std::string& get_name() const;
-                const std::string& get_parent() const;
-                double get_latitude() const;
-                double get_longitude() const;
-                const std::string& get_horizontal_datum() const;      
-                double get_elevation() const;
-                const std::string& get_vertical_datum() const;
+                const boost::optional<std::string>& get_parent() const;
+                const boost::optional<double>& get_latitude() const;
+                const boost::optional<double>& get_longitude() const;
+                const boost::optional<std::string>& get_horizontal_datum() const;      
+                const boost::optional<double>& get_elevation() const;
+                const boost::optional<std::string>& get_vertical_datum() const;
 
                 operator crow::json::wvalue();
         };

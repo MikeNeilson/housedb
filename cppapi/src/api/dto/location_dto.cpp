@@ -2,9 +2,14 @@
 // Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
 
 #include "location_dto.h"
+#include "api_exception.h"
+#include <boost/optional.hpp>
+
+
 
 namespace gardendb {
     namespace dto {
+        using namespace gardendb::exceptions;
 
         LocationDto::LocationDto(const std::string& name, 
                                  const std::string& parent,
@@ -23,58 +28,88 @@ namespace gardendb {
 
             }
 
-        LocationDto::LocationDto(const crow::json::rvalue &data ){
+        LocationDto::LocationDto(const crow::json::rvalue &data ) {
             this->name = data["name"].s();
-            
-            if( data.has("parent") && data["parent"].t() == crow::json::type::String) {
-                this->parent = data["parent"].s();
+            try {
+                if (data.has("parent") ) {
+                    this->parent = data["parent"].s();
+                }
+                if (data.has("latitude")) {
+                    this->latitude = data["latitude"].d();
+                }
+                if (data.has("longitude")) {
+                    this->longitude = data["longitude"].d();
+                }
+                if (data.has("horizontal_datum")) {
+                    this->horizontal_datum = data["horizontal_datum"].s();
+                }
+                if (data.has("elevation")) {
+                    this->elevation = data["elevation"].d();
+                }
+                if (data.has("vertical_datum")) {
+                    this->elevation = data["elevation"].d();
+                }
             }
-
-            this->latitude = data["latitude"].d();
-            this->longitude = data["longitude"].d();
-            this->horizontal_datum = data["horizontal_datum"].s();
-            this->elevation = data["elevation"].d();
-            this->vertical_datum = data["vertical_datum"].s();
+            catch(const std::runtime_error& e)
+            {
+                std::stringstream ss;
+                ss << __FILE__ << ":" << __LINE__ << " " << e.what();
+                throw input_error(ss.str());
+            }
+            
+            
         }
 
         const std::string& LocationDto::get_name() const {
             return this->name;
         }
 
-        const std::string & LocationDto::get_parent() const {
+        const boost::optional<std::string>& LocationDto::get_parent() const {
             return this->parent;
         }
 
-        double LocationDto::get_latitude() const {
+        const boost::optional<double>& LocationDto::get_latitude() const {
             return this->latitude;
         }
 
-        double LocationDto::get_longitude() const {
+        const boost::optional<double>& LocationDto::get_longitude() const {
             return this->longitude;
         }
 
-        const std::string& LocationDto::get_horizontal_datum() const {
+        const boost::optional<std::string>& LocationDto::get_horizontal_datum() const {
             return this->horizontal_datum;
         }
 
-        double LocationDto::get_elevation() const {
+        const boost::optional<double>& LocationDto::get_elevation() const {
             return this->elevation;
         }
 
-        const std::string& LocationDto::get_vertical_datum() const {
+        const boost::optional<std::string>& LocationDto::get_vertical_datum() const {
             return this->vertical_datum;
         }
 
         LocationDto::operator crow::json::wvalue() {
-                    auto val = crow::json::wvalue();
-                    val["name"] = this->name;
-                    val["parent"] = this->parent;
-                    val["latitude"] = this->latitude;
-                    val["longitude"] = this->longitude;
-                    val["horizontal_datum"] = this->horizontal_datum;
-                    val["elevation"] = this->elevation;
-                    val["vertical_datum"] = this->vertical_datum;
-                    return val;
+            auto val = crow::json::wvalue();
+            val["name"] = this->name;
+            if (this->parent.has_value()) {
+                val["parent"] = this->parent.get();
+            }
+            if (this->latitude.has_value()) {
+                val["latitude"] = this->latitude.get();
+            }
+            if (this->longitude.has_value()) {
+                val["longitude"] = this->longitude.get();
+            }
+            if (this->horizontal_datum.has_value()) {
+                val["horizontal_datum"] = this->horizontal_datum.get();    
+            }
+            if (this->elevation.has_value()) {
+                val["elevation"] = this->elevation.get();
+            }
+            if( this->vertical_datum.has_value()) {
+                val["vertical_datum"] = this->vertical_datum.get();
+            }
+            return val;
         }
     }
 }

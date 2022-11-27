@@ -6,6 +6,8 @@
 #include "timeseries_dao.h"
 #include "api_exception.h"
 
+using namespace gardendb::exceptions;
+
 TimeseriesHandler::TimeseriesHandler() {
 
 }

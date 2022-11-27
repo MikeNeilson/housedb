@@ -11,6 +11,7 @@
 
 namespace gardendb {
     namespace sql {
+        using namespace gardendb::exceptions;
          std::vector<TimeseriesDto> TimeseriesDao::get_all(){
                 
                 std::vector<TimeseriesDto> list;
