@@ -157,3 +157,12 @@ create trigger trigger_apikey_readonly
     before update 
     on user_authorization
     for each row  execute procedure housedb_security.apikey_readonly();
+
+
+create or replace view housedb_security.active_user_auth_keys as
+select 
+    username,key_name, apikey, created, expires
+from
+    housedb.user_authorization ua
+join housedb.users u on u.id = ua.user_id
+where u.active = true;

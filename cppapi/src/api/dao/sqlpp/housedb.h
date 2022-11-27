@@ -1,13 +1,97 @@
-/*
- * Copyright 2022 Michael Neilson
- * Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
- */
-
 #pragma once
 #include <sqlpp11/sqlpp11.h>
 
 namespace gardendb { namespace sql { 
 	 namespace views {
+
+namespace gen_active_user_auth_keys {
+
+    struct username {
+        struct _alias_t {
+            static constexpr const char _literal [] = "username";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T username;
+                T& operator()(){ return username; }
+                const T& operator()() const { return username;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct key_name {
+        struct _alias_t {
+            static constexpr const char _literal [] = "key_name";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T key_name;
+                T& operator()(){ return key_name; }
+                const T& operator()() const { return key_name;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct apikey {
+        struct _alias_t {
+            static constexpr const char _literal [] = "apikey";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T apikey;
+                T& operator()(){ return apikey; }
+                const T& operator()() const { return apikey;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct created {
+        struct _alias_t {
+            static constexpr const char _literal [] = "created";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T created;
+                T& operator()(){ return created; }
+                const T& operator()() const { return created;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::time_point>;        
+    };
+
+    struct expires {
+        struct _alias_t {
+            static constexpr const char _literal [] = "expires";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T expires;
+                T& operator()(){ return expires; }
+                const T& operator()() const { return expires;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::time_point>;        
+    };
+
+
+    struct active_user_auth_keys : public sqlpp::table_t<active_user_auth_keys,username,key_name,apikey,created,expires> {
+        struct _alias_t {
+            static constexpr const char _literal [] = "housedb_security.active_user_auth_keys";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T active_user_auth_keys;
+                T& operator()(){ return active_user_auth_keys; }
+                const T& operator()() const { return active_user_auth_keys; }
+            };
+        };
+    };
+
+}
+constexpr gen_active_user_auth_keys::active_user_auth_keys active_user_auth_keys;
 
 namespace gen_units_for_parameters {
 
@@ -97,151 +181,6 @@ namespace gen_units_for_parameters {
 
 }
 constexpr gen_units_for_parameters::units_for_parameters units_for_parameters;
-
-namespace gen_view_locations {
-
-    struct id {
-        struct _alias_t {
-            static constexpr const char _literal [] = "id";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T id;
-                T& operator()(){ return id; }
-                const T& operator()() const { return id;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::integral>;        
-    };
-
-    struct name {
-        struct _alias_t {
-            static constexpr const char _literal [] = "name";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T name;
-                T& operator()(){ return name; }
-                const T& operator()() const { return name;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct parent_id {
-        struct _alias_t {
-            static constexpr const char _literal [] = "parent_id";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T parent_id;
-                T& operator()(){ return parent_id; }
-                const T& operator()() const { return parent_id;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::integral>;        
-    };
-
-    struct parent {
-        struct _alias_t {
-            static constexpr const char _literal [] = "parent";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T parent;
-                T& operator()(){ return parent; }
-                const T& operator()() const { return parent;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct latitude {
-        struct _alias_t {
-            static constexpr const char _literal [] = "latitude";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T latitude;
-                T& operator()(){ return latitude; }
-                const T& operator()() const { return latitude;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
-    };
-
-    struct longitude {
-        struct _alias_t {
-            static constexpr const char _literal [] = "longitude";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T longitude;
-                T& operator()(){ return longitude; }
-                const T& operator()() const { return longitude;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
-    };
-
-    struct horizontal_datum {
-        struct _alias_t {
-            static constexpr const char _literal [] = "horizontal_datum";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T horizontal_datum;
-                T& operator()(){ return horizontal_datum; }
-                const T& operator()() const { return horizontal_datum;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct elevation {
-        struct _alias_t {
-            static constexpr const char _literal [] = "elevation";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T elevation;
-                T& operator()(){ return elevation; }
-                const T& operator()() const { return elevation;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
-    };
-
-    struct vertical_datum {
-        struct _alias_t {
-            static constexpr const char _literal [] = "vertical_datum";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T vertical_datum;
-                T& operator()(){ return vertical_datum; }
-                const T& operator()() const { return vertical_datum;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-
-    struct view_locations : public sqlpp::table_t<view_locations,id,name,parent_id,parent,latitude,longitude,horizontal_datum,elevation,vertical_datum> {
-        struct _alias_t {
-            static constexpr const char _literal [] = "housedb.view_locations";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T view_locations;
-                T& operator()(){ return view_locations; }
-                const T& operator()() const { return view_locations; }
-            };
-        };
-    };
-
-}
-constexpr gen_view_locations::view_locations view_locations;
 
 namespace gen_catalog_view {
 
@@ -477,6 +416,151 @@ namespace gen_catalog {
 }
 constexpr gen_catalog::catalog catalog;
 
+namespace gen_view_locations {
+
+    struct id {
+        struct _alias_t {
+            static constexpr const char _literal [] = "id";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T id;
+                T& operator()(){ return id; }
+                const T& operator()() const { return id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+    struct name {
+        struct _alias_t {
+            static constexpr const char _literal [] = "name";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T name;
+                T& operator()(){ return name; }
+                const T& operator()() const { return name;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct parent_id {
+        struct _alias_t {
+            static constexpr const char _literal [] = "parent_id";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T parent_id;
+                T& operator()(){ return parent_id; }
+                const T& operator()() const { return parent_id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+    struct parent {
+        struct _alias_t {
+            static constexpr const char _literal [] = "parent";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T parent;
+                T& operator()(){ return parent; }
+                const T& operator()() const { return parent;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct latitude {
+        struct _alias_t {
+            static constexpr const char _literal [] = "latitude";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T latitude;
+                T& operator()(){ return latitude; }
+                const T& operator()() const { return latitude;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
+    };
+
+    struct longitude {
+        struct _alias_t {
+            static constexpr const char _literal [] = "longitude";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T longitude;
+                T& operator()(){ return longitude; }
+                const T& operator()() const { return longitude;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
+    };
+
+    struct horizontal_datum {
+        struct _alias_t {
+            static constexpr const char _literal [] = "horizontal_datum";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T horizontal_datum;
+                T& operator()(){ return horizontal_datum; }
+                const T& operator()() const { return horizontal_datum;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct elevation {
+        struct _alias_t {
+            static constexpr const char _literal [] = "elevation";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T elevation;
+                T& operator()(){ return elevation; }
+                const T& operator()() const { return elevation;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
+    };
+
+    struct vertical_datum {
+        struct _alias_t {
+            static constexpr const char _literal [] = "vertical_datum";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T vertical_datum;
+                T& operator()(){ return vertical_datum; }
+                const T& operator()() const { return vertical_datum;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+
+    struct view_locations : public sqlpp::table_t<view_locations,id,name,parent_id,parent,latitude,longitude,horizontal_datum,elevation,vertical_datum> {
+        struct _alias_t {
+            static constexpr const char _literal [] = "housedb.view_locations";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T view_locations;
+                T& operator()(){ return view_locations; }
+                const T& operator()() const { return view_locations; }
+            };
+        };
+    };
+
+}
+constexpr gen_view_locations::view_locations view_locations;
+
 namespace gen_timeseries_values {
 
     struct ts_id {
@@ -518,7 +602,7 @@ namespace gen_timeseries_values {
                 const T& operator()() const { return date_time;}
             };
         };
-        using _traits = sqlpp::make_traits<sqlpp::time_point>;
+        using _traits = sqlpp::make_traits<sqlpp::time_point>;        
     };
 
     struct value {
@@ -581,6 +665,67 @@ namespace gen_timeseries_values {
 constexpr gen_timeseries_values::timeseries_values timeseries_values;
 	 }
 	 namespace tables {
+
+namespace gen_conversions {
+
+    struct unit_from {
+        struct _alias_t {
+            static constexpr const char _literal [] = "unit_from";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T unit_from;
+                T& operator()(){ return unit_from; }
+                const T& operator()() const { return unit_from;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct unit_to {
+        struct _alias_t {
+            static constexpr const char _literal [] = "unit_to";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T unit_to;
+                T& operator()(){ return unit_to; }
+                const T& operator()() const { return unit_to;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct postfix_func {
+        struct _alias_t {
+            static constexpr const char _literal [] = "postfix_func";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T postfix_func;
+                T& operator()(){ return postfix_func; }
+                const T& operator()() const { return postfix_func;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+
+    struct conversions : public sqlpp::table_t<conversions,unit_from,unit_to,postfix_func> {
+        struct _alias_t {
+            static constexpr const char _literal [] = "housedb_units.conversions";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T conversions;
+                T& operator()(){ return conversions; }
+                const T& operator()() const { return conversions; }
+            };
+        };
+    };
+
+}
+constexpr gen_conversions::conversions conversions;
 
 namespace gen_flyway_schema_history {
 
@@ -863,6 +1008,245 @@ namespace gen_users {
 }
 constexpr gen_users::users users;
 
+namespace gen_units_parameters {
+
+    struct unit {
+        struct _alias_t {
+            static constexpr const char _literal [] = "unit";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T unit;
+                T& operator()(){ return unit; }
+                const T& operator()() const { return unit;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct parameter_id {
+        struct _alias_t {
+            static constexpr const char _literal [] = "parameter_id";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T parameter_id;
+                T& operator()(){ return parameter_id; }
+                const T& operator()() const { return parameter_id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+    struct is_default {
+        struct _alias_t {
+            static constexpr const char _literal [] = "is_default";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T is_default;
+                T& operator()(){ return is_default; }
+                const T& operator()() const { return is_default;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::boolean>;        
+    };
+
+
+    struct units_parameters : public sqlpp::table_t<units_parameters,unit,parameter_id,is_default> {
+        struct _alias_t {
+            static constexpr const char _literal [] = "housedb.units_parameters";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T units_parameters;
+                T& operator()(){ return units_parameters; }
+                const T& operator()() const { return units_parameters; }
+            };
+        };
+    };
+
+}
+constexpr gen_units_parameters::units_parameters units_parameters;
+
+namespace gen_user_authorization {
+
+    struct user_id {
+        struct _alias_t {
+            static constexpr const char _literal [] = "user_id";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T user_id;
+                T& operator()(){ return user_id; }
+                const T& operator()() const { return user_id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+    struct key_name {
+        struct _alias_t {
+            static constexpr const char _literal [] = "key_name";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T key_name;
+                T& operator()(){ return key_name; }
+                const T& operator()() const { return key_name;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct apikey {
+        struct _alias_t {
+            static constexpr const char _literal [] = "apikey";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T apikey;
+                T& operator()(){ return apikey; }
+                const T& operator()() const { return apikey;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct created {
+        struct _alias_t {
+            static constexpr const char _literal [] = "created";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T created;
+                T& operator()(){ return created; }
+                const T& operator()() const { return created;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::time_point>;        
+    };
+
+    struct expires {
+        struct _alias_t {
+            static constexpr const char _literal [] = "expires";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T expires;
+                T& operator()(){ return expires; }
+                const T& operator()() const { return expires;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::time_point>;        
+    };
+
+
+    struct user_authorization : public sqlpp::table_t<user_authorization,user_id,key_name,apikey,created,expires> {
+        struct _alias_t {
+            static constexpr const char _literal [] = "housedb.user_authorization";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T user_authorization;
+                T& operator()(){ return user_authorization; }
+                const T& operator()() const { return user_authorization; }
+            };
+        };
+    };
+
+}
+constexpr gen_user_authorization::user_authorization user_authorization;
+
+namespace gen_user_permissions {
+
+    struct user_id {
+        struct _alias_t {
+            static constexpr const char _literal [] = "user_id";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T user_id;
+                T& operator()(){ return user_id; }
+                const T& operator()() const { return user_id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+    struct permission_id {
+        struct _alias_t {
+            static constexpr const char _literal [] = "permission_id";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T permission_id;
+                T& operator()(){ return permission_id; }
+                const T& operator()() const { return permission_id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+    struct data_table_id {
+        struct _alias_t {
+            static constexpr const char _literal [] = "data_table_id";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T data_table_id;
+                T& operator()(){ return data_table_id; }
+                const T& operator()() const { return data_table_id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+    struct regex {
+        struct _alias_t {
+            static constexpr const char _literal [] = "regex";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T regex;
+                T& operator()(){ return regex; }
+                const T& operator()() const { return regex;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct granter_id {
+        struct _alias_t {
+            static constexpr const char _literal [] = "granter_id";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T granter_id;
+                T& operator()(){ return granter_id; }
+                const T& operator()() const { return granter_id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+
+    struct user_permissions : public sqlpp::table_t<user_permissions,user_id,permission_id,data_table_id,regex,granter_id> {
+        struct _alias_t {
+            static constexpr const char _literal [] = "housedb.user_permissions";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T user_permissions;
+                T& operator()(){ return user_permissions; }
+                const T& operator()() const { return user_permissions; }
+            };
+        };
+    };
+
+}
+constexpr gen_user_permissions::user_permissions user_permissions;
+
 namespace gen_permissions {
 
     struct id {
@@ -956,170 +1340,6 @@ namespace gen_data_tables {
 
 }
 constexpr gen_data_tables::data_tables data_tables;
-
-namespace gen_user_permissions {
-
-    struct user_id {
-        struct _alias_t {
-            static constexpr const char _literal [] = "user_id";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T user_id;
-                T& operator()(){ return user_id; }
-                const T& operator()() const { return user_id;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::integral>;        
-    };
-
-    struct permission_id {
-        struct _alias_t {
-            static constexpr const char _literal [] = "permission_id";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T permission_id;
-                T& operator()(){ return permission_id; }
-                const T& operator()() const { return permission_id;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::integral>;        
-    };
-
-    struct data_table_id {
-        struct _alias_t {
-            static constexpr const char _literal [] = "data_table_id";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T data_table_id;
-                T& operator()(){ return data_table_id; }
-                const T& operator()() const { return data_table_id;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::integral>;        
-    };
-
-    struct regex {
-        struct _alias_t {
-            static constexpr const char _literal [] = "regex";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T regex;
-                T& operator()(){ return regex; }
-                const T& operator()() const { return regex;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct granter_id {
-        struct _alias_t {
-            static constexpr const char _literal [] = "granter_id";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T granter_id;
-                T& operator()(){ return granter_id; }
-                const T& operator()() const { return granter_id;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::integral>;        
-    };
-
-
-    struct user_permissions : public sqlpp::table_t<user_permissions,user_id,permission_id,data_table_id,regex,granter_id> {
-        struct _alias_t {
-            static constexpr const char _literal [] = "housedb.user_permissions";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T user_permissions;
-                T& operator()(){ return user_permissions; }
-                const T& operator()() const { return user_permissions; }
-            };
-        };
-    };
-
-}
-constexpr gen_user_permissions::user_permissions user_permissions;
-
-namespace gen_units {
-
-    struct unit {
-        struct _alias_t {
-            static constexpr const char _literal [] = "unit";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T unit;
-                T& operator()(){ return unit; }
-                const T& operator()() const { return unit;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct unitclass {
-        struct _alias_t {
-            static constexpr const char _literal [] = "unitclass";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T unitclass;
-                T& operator()(){ return unitclass; }
-                const T& operator()() const { return unitclass;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct system {
-        struct _alias_t {
-            static constexpr const char _literal [] = "system";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T system;
-                T& operator()(){ return system; }
-                const T& operator()() const { return system;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct description {
-        struct _alias_t {
-            static constexpr const char _literal [] = "description";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T description;
-                T& operator()(){ return description; }
-                const T& operator()() const { return description;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-
-    struct units : public sqlpp::table_t<units,unit,unitclass,system,description> {
-        struct _alias_t {
-            static constexpr const char _literal [] = "housedb.units";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T units;
-                T& operator()(){ return units; }
-                const T& operator()() const { return units; }
-            };
-        };
-    };
-
-}
-constexpr gen_units::units units;
 
 namespace gen_intervals {
 
@@ -1228,198 +1448,6 @@ namespace gen_types {
 
 }
 constexpr gen_types::types types;
-
-namespace gen_units_parameters {
-
-    struct unit {
-        struct _alias_t {
-            static constexpr const char _literal [] = "unit";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T unit;
-                T& operator()(){ return unit; }
-                const T& operator()() const { return unit;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct parameter_id {
-        struct _alias_t {
-            static constexpr const char _literal [] = "parameter_id";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T parameter_id;
-                T& operator()(){ return parameter_id; }
-                const T& operator()() const { return parameter_id;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::integral>;        
-    };
-
-    struct is_default {
-        struct _alias_t {
-            static constexpr const char _literal [] = "is_default";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T is_default;
-                T& operator()(){ return is_default; }
-                const T& operator()() const { return is_default;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::boolean>;        
-    };
-
-
-    struct units_parameters : public sqlpp::table_t<units_parameters,unit,parameter_id,is_default> {
-        struct _alias_t {
-            static constexpr const char _literal [] = "housedb.units_parameters";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T units_parameters;
-                T& operator()(){ return units_parameters; }
-                const T& operator()() const { return units_parameters; }
-            };
-        };
-    };
-
-}
-constexpr gen_units_parameters::units_parameters units_parameters;
-
-namespace gen_locations {
-
-    struct id {
-        struct _alias_t {
-            static constexpr const char _literal [] = "id";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T id;
-                T& operator()(){ return id; }
-                const T& operator()() const { return id;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::integral>;        
-    };
-
-    struct name {
-        struct _alias_t {
-            static constexpr const char _literal [] = "name";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T name;
-                T& operator()(){ return name; }
-                const T& operator()() const { return name;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct parent_id {
-        struct _alias_t {
-            static constexpr const char _literal [] = "parent_id";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T parent_id;
-                T& operator()(){ return parent_id; }
-                const T& operator()() const { return parent_id;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::integral>;        
-    };
-
-    struct latitude {
-        struct _alias_t {
-            static constexpr const char _literal [] = "latitude";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T latitude;
-                T& operator()(){ return latitude; }
-                const T& operator()() const { return latitude;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
-    };
-
-    struct longitude {
-        struct _alias_t {
-            static constexpr const char _literal [] = "longitude";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T longitude;
-                T& operator()(){ return longitude; }
-                const T& operator()() const { return longitude;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
-    };
-
-    struct horizontal_datum {
-        struct _alias_t {
-            static constexpr const char _literal [] = "horizontal_datum";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T horizontal_datum;
-                T& operator()(){ return horizontal_datum; }
-                const T& operator()() const { return horizontal_datum;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-    struct elevation {
-        struct _alias_t {
-            static constexpr const char _literal [] = "elevation";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T elevation;
-                T& operator()(){ return elevation; }
-                const T& operator()() const { return elevation;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
-    };
-
-    struct vertical_datum {
-        struct _alias_t {
-            static constexpr const char _literal [] = "vertical_datum";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T vertical_datum;
-                T& operator()(){ return vertical_datum; }
-                const T& operator()() const { return vertical_datum;}
-            };
-        };
-        using _traits = sqlpp::make_traits<sqlpp::text>;        
-    };
-
-
-    struct locations : public sqlpp::table_t<locations,id,name,parent_id,latitude,longitude,horizontal_datum,elevation,vertical_datum> {
-        struct _alias_t {
-            static constexpr const char _literal [] = "housedb.locations";
-            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
-            template<typename T>
-            struct _member_t {
-                T locations;
-                T& operator()(){ return locations; }
-                const T& operator()() const { return locations; }
-            };
-        };
-    };
-
-}
-constexpr gen_locations::locations locations;
 
 namespace gen_internal_timeseries_values {
 
@@ -1627,66 +1655,211 @@ namespace gen_timeseries {
 }
 constexpr gen_timeseries::timeseries timeseries;
 
-namespace gen_conversions {
+namespace gen_locations {
 
-    struct unit_from {
+    struct id {
         struct _alias_t {
-            static constexpr const char _literal [] = "unit_from";
+            static constexpr const char _literal [] = "id";
             using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
             template<typename T>
             struct _member_t {
-                T unit_from;
-                T& operator()(){ return unit_from; }
-                const T& operator()() const { return unit_from;}
+                T id;
+                T& operator()(){ return id; }
+                const T& operator()() const { return id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+    struct name {
+        struct _alias_t {
+            static constexpr const char _literal [] = "name";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T name;
+                T& operator()(){ return name; }
+                const T& operator()() const { return name;}
             };
         };
         using _traits = sqlpp::make_traits<sqlpp::text>;        
     };
 
-    struct unit_to {
+    struct parent_id {
         struct _alias_t {
-            static constexpr const char _literal [] = "unit_to";
+            static constexpr const char _literal [] = "parent_id";
             using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
             template<typename T>
             struct _member_t {
-                T unit_to;
-                T& operator()(){ return unit_to; }
-                const T& operator()() const { return unit_to;}
+                T parent_id;
+                T& operator()(){ return parent_id; }
+                const T& operator()() const { return parent_id;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::integral>;        
+    };
+
+    struct latitude {
+        struct _alias_t {
+            static constexpr const char _literal [] = "latitude";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T latitude;
+                T& operator()(){ return latitude; }
+                const T& operator()() const { return latitude;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
+    };
+
+    struct longitude {
+        struct _alias_t {
+            static constexpr const char _literal [] = "longitude";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T longitude;
+                T& operator()(){ return longitude; }
+                const T& operator()() const { return longitude;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
+    };
+
+    struct horizontal_datum {
+        struct _alias_t {
+            static constexpr const char _literal [] = "horizontal_datum";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T horizontal_datum;
+                T& operator()(){ return horizontal_datum; }
+                const T& operator()() const { return horizontal_datum;}
             };
         };
         using _traits = sqlpp::make_traits<sqlpp::text>;        
     };
 
-    struct postfix_func {
+    struct elevation {
         struct _alias_t {
-            static constexpr const char _literal [] = "postfix_func";
+            static constexpr const char _literal [] = "elevation";
             using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
             template<typename T>
             struct _member_t {
-                T postfix_func;
-                T& operator()(){ return postfix_func; }
-                const T& operator()() const { return postfix_func;}
+                T elevation;
+                T& operator()(){ return elevation; }
+                const T& operator()() const { return elevation;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::floating_point>;        
+    };
+
+    struct vertical_datum {
+        struct _alias_t {
+            static constexpr const char _literal [] = "vertical_datum";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T vertical_datum;
+                T& operator()(){ return vertical_datum; }
+                const T& operator()() const { return vertical_datum;}
             };
         };
         using _traits = sqlpp::make_traits<sqlpp::text>;        
     };
 
 
-    struct conversions : public sqlpp::table_t<conversions,unit_from,unit_to,postfix_func> {
+    struct locations : public sqlpp::table_t<locations,id,name,parent_id,latitude,longitude,horizontal_datum,elevation,vertical_datum> {
         struct _alias_t {
-            static constexpr const char _literal [] = "housedb_units.conversions";
+            static constexpr const char _literal [] = "housedb.locations";
             using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
             template<typename T>
             struct _member_t {
-                T conversions;
-                T& operator()(){ return conversions; }
-                const T& operator()() const { return conversions; }
+                T locations;
+                T& operator()(){ return locations; }
+                const T& operator()() const { return locations; }
             };
         };
     };
 
 }
-constexpr gen_conversions::conversions conversions;
+constexpr gen_locations::locations locations;
+
+namespace gen_units {
+
+    struct unit {
+        struct _alias_t {
+            static constexpr const char _literal [] = "unit";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T unit;
+                T& operator()(){ return unit; }
+                const T& operator()() const { return unit;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct unitclass {
+        struct _alias_t {
+            static constexpr const char _literal [] = "unitclass";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T unitclass;
+                T& operator()(){ return unitclass; }
+                const T& operator()() const { return unitclass;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct system {
+        struct _alias_t {
+            static constexpr const char _literal [] = "system";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T system;
+                T& operator()(){ return system; }
+                const T& operator()() const { return system;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+    struct description {
+        struct _alias_t {
+            static constexpr const char _literal [] = "description";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T description;
+                T& operator()(){ return description; }
+                const T& operator()() const { return description;}
+            };
+        };
+        using _traits = sqlpp::make_traits<sqlpp::text>;        
+    };
+
+
+    struct units : public sqlpp::table_t<units,unit,unitclass,system,description> {
+        struct _alias_t {
+            static constexpr const char _literal [] = "housedb.units";
+            using _name_t = sqlpp::make_char_sequence<sizeof(_literal),_literal>;
+            template<typename T>
+            struct _member_t {
+                T units;
+                T& operator()(){ return units; }
+                const T& operator()() const { return units; }
+            };
+        };
+    };
+
+}
+constexpr gen_units::units units;
 	 }
 /* routines */
 } } 
