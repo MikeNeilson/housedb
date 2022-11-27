@@ -3,7 +3,9 @@
 
 namespace gardendb {
     namespace sql {
-        using UserDto = gardendb::dto::UserDto;                
+        using UserDto = gardendb::dto::UserDto;
+        using namespace gardendb::sql::views;
+
         std::vector<UserDto> get_all() {
             std::vector<UserDto> users;
             return users;
@@ -12,6 +14,10 @@ namespace gardendb {
             return false;
         }
         std::unique_ptr<UserDto> UserDao::fromApiKey(const std::string& apikey){
+            auto query = sqlpp::select(active_user_auth_keys.username,active_user_auth_keys.key_name,active_user_auth_keys.apikey)
+                                .from(active_user_auth_keys)
+                                .where(active_user_auth_keys.apikey == apikey);
+
             return std::make_unique<UserDto>(0,"guest1","guest1","");
         }
         std::unique_ptr<UserDto> UserDao::fromName(const std::string& name) {

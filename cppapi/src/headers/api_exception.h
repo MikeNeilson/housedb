@@ -5,14 +5,23 @@
 
 #pragma once
 #include <exception>
+#include <boost/stacktrace.hpp>
+#include <boost/exception/all.hpp>
 
 namespace gardendb {
     namespace exceptions {
+        typedef boost::error_info<struct tag_stacktrace, boost::stacktrace::stacktrace> traced;
+
+        template<class E>
+        void throw_with_trace(const E& e) {
+            throw boost::enable_error_info(e) << traced(boost::stacktrace::stacktrace());
+        }
+
 
         class input_error : public std::runtime_error {
-            public:
-                input_error(std::string what) noexcept : runtime_error(what)  {
 
+            public:
+                input_error(std::string msg) noexcept : runtime_error(msg) {
                 }
         };
     }

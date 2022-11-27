@@ -54,7 +54,7 @@ namespace gardendb {
             {
                 std::stringstream ss;
                 ss << __FILE__ << ":" << __LINE__ << " " << e.what();
-                throw input_error(ss.str());
+                throw_with_trace(input_error(ss.str()));
             }
             
             
