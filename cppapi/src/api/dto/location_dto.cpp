@@ -30,8 +30,9 @@ namespace gardendb {
 
         LocationDto::LocationDto(const crow::json::rvalue &data ) {
             this->name = data["name"].s();
+            std::string column;
             try {
-                if (data.has("parent") ) {
+                if (data.has("parent") && data["parent"]) {
                     this->parent = data["parent"].s();
                 }
                 if (data.has("latitude")) {

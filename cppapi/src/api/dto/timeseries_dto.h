@@ -26,13 +26,12 @@ namespace gardendb {
                         value = data[1].d();
                         quality = data[2].d();
                     }
-                    using wvalue = crow::json::wvalue;
-                    operator wvalue(){
-                        std::vector<wvalue> v;
-                        v.push_back(wvalue() = date_time.time_since_epoch().count());
-                        v.push_back(wvalue() = value);
-                        v.push_back(wvalue() = quality);
-                        
+                    
+                    operator crow::json::wvalue() const {
+                        crow::json::wvalue v;
+                        v[0] = date_time.time_since_epoch().count();
+                        v[1] = value;
+                        v[2] = quality;
                         return v;
                     }
                     operator std::string() const {
@@ -61,7 +60,7 @@ namespace gardendb {
                 const std::string get_interval_offset() const;
                 const std::vector<triple>& get_values() const;
 
-                operator crow::json::wvalue();
+                operator crow::json::wvalue() const;
                 operator std::string() const;
         };
     }

@@ -9,7 +9,7 @@ class RequestLogger {
         };
         
         void before_handle(crow::request &req, crow::response &res, context &ctx) {
-            CROW_LOG_INFO << req.remoteIpAddress << " "
+            CROW_LOG_INFO << req.remote_ip_address << " "
                           << crow::method_name(req.method) << " " 
                           << req.raw_url << " " 
                           << res.code << " " << res.body.size();

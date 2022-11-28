@@ -66,14 +66,14 @@ namespace gardendb {
             return this->values;
         }
 
-        TimeseriesDto::operator crow::json::wvalue(){
+        TimeseriesDto::operator crow::json::wvalue() const {
             auto val = crow::json::wvalue();
             val["name"] = this->name;
             val["units"] = this->units;
             val["interval_offset"] = this->interval_offset;
             crow::json::wvalue the_values; 
             for( size_t i = 0; i < this->values.size(); i++){
-                the_values[i] = (crow::json::wvalue)this->values[i];
+                the_values[i] = this->values[i].operator crow::json::wvalue();
             }
             val["values"] = ::move(the_values);
             return val;

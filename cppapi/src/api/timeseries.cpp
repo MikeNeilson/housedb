@@ -22,7 +22,7 @@ void TimeseriesHandler::routes( ApiApp &app){
         auto result = dao.get_all();
         auto list = std::vector<crow::json::wvalue>();
         for( auto loc: result ){
-            list.emplace_back(loc);
+            list.emplace_back(loc.operator crow::json::wvalue());
         }
         auto json = crow::json::wvalue(list);
         res.set_header("Content-Type","application/json");
