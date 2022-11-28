@@ -48,7 +48,7 @@ void LocationHandler::routes( ApiApp &app){
     CROW_ROUTE(app,"/locations/")
         .methods(crow::HTTPMethod::POST)
         ([&app](const crow::request& req, crow::response &res){
-            try {
+            error_wrapper( [&app,&req,&res]() {
                 auto json_data = crow::json::load(req.body);            
                 CROW_LOG_DEBUG << json_data["name"].s();
                 auto &db = app.get_middleware<DatabaseSession>().get_db(*(app.get_context<Auth>(req).user));
@@ -64,19 +64,7 @@ void LocationHandler::routes( ApiApp &app){
                     res.write("Unable to save data");
                 }
                 res.end();
-            } catch( const input_error& ex) {
-                res.code = 400;
-                CROW_LOG_ERROR << ex.what();
-                res.write("Unable to process input.");
-                res.end();
-            } catch( const std::exception& ex) {
-                CROW_LOG_ERROR << "Unable to process input: " << ex.what();
-                res.write("Server Error.");
-                res.code = 500;
-                res.end();
-            }
-            
-            //auto result = dao.save(nullptr);
+            },res);
         });
 
 }

@@ -16,7 +16,7 @@ void TimeseriesHandler::routes( ApiApp &app){
 
 
     CROW_ROUTE(app, "/timeseries/")([&app](const crow::request &req, crow::response &res){
-                
+        
         auto &db = app.get_middleware<DatabaseSession>().get_db(*(app.get_context<Auth>(req).user));
         gardendb::sql::TimeseriesDao dao(db);
         auto result = dao.get_all();

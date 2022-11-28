@@ -32,29 +32,36 @@ namespace gardendb {
             this->name = data["name"].s();
             std::string column;
             try {
-                if (data.has("parent") && data["parent"]) {
-                    this->parent = data["parent"].s();
+                column = "parent";
+                if (data.has(column) && data[column].t() != crow::json::type::Null) {
+                    this->parent = data[column].s();
                 }
-                if (data.has("latitude")) {
-                    this->latitude = data["latitude"].d();
+                column = "latitude";
+                if (data.has(column)) {
+                    this->latitude = data[column].d();
                 }
-                if (data.has("longitude")) {
-                    this->longitude = data["longitude"].d();
+                column = "longitude";
+                if (data.has(column)) {
+                    this->longitude = data[column].d();
                 }
-                if (data.has("horizontal_datum")) {
-                    this->horizontal_datum = data["horizontal_datum"].s();
+                column = "horizontal_datum";
+                if (data.has(column)) {
+                    this->horizontal_datum = data[column].s();
                 }
-                if (data.has("elevation")) {
-                    this->elevation = data["elevation"].d();
+                column = "elevation";
+                if (data.has(column)) {
+                    this->elevation = data[column].d();
                 }
-                if (data.has("vertical_datum")) {
-                    this->elevation = data["elevation"].d();
+                column = "vertical_datum";
+                if (data.has(column)) {
+                    this->vertical_datum = data[column].s();
                 }
             }
             catch(const std::runtime_error& e)
             {
                 std::stringstream ss;
-                ss << __FILE__ << ":" << __LINE__ << " " << e.what();
+                ss << "On Column '" << column << "':" << e.what();
+                //ss << __FILE__ << ":" << __LINE__ << " " << e.what();
                 throw_with_trace(input_error(ss.str()));
             }
             

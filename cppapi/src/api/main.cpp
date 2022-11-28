@@ -11,9 +11,11 @@
 #include "timeseries.h"
 #include "app.h"
 #include "config.h"
+#include "api_exception.h"
 #include <signal.h>
 
 using connection = sqlpp::postgresql::connection;
+using namespace gardendb::exceptions;
 
 ApiApp app;
 
@@ -60,4 +62,24 @@ int main(int argc, char *argv[]) {
     }
 
 
+}
+
+void error_wrapper( std::function<void(void)> func, crow::response &res) {
+    try {
+        func();
+    } catch( const gardendb::exceptions::input_error& ex) {
+        res.code = 400;
+        CROW_LOG_ERROR << ex.what();
+        const boost::stacktrace::stacktrace* st = boost::get_error_info<traced>(ex);
+        if (st) {
+        CROW_LOG_ERROR << *st << '\n';
+        }
+        res.write("Unable to process input.");
+        res.end();
+    } catch( const std::exception& ex) {
+        CROW_LOG_ERROR << "Unable to process input: " << ex.what();
+        res.write("Server Error.");
+        res.code = 500;
+        res.end();
+    }
 }
