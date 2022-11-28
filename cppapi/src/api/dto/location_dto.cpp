@@ -61,7 +61,6 @@ namespace gardendb {
             {
                 std::stringstream ss;
                 ss << "On Column '" << column << "':" << e.what();
-                //ss << __FILE__ << ":" << __LINE__ << " " << e.what();
                 throw_with_trace(input_error(ss.str()));
             }
             

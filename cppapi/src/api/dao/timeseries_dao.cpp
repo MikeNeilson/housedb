@@ -66,7 +66,7 @@ namespace gardendb {
                 CROW_LOG_WARNING << err.what() << err.code();
                 CROW_LOG_WARNING << "rethrowing as input_error";
                 if (err.code() == "ZX082") {
-                    throw input_error(err.what());
+                    throw_with_trace(input_error(err.what()));
                 }                
             }                    
         }

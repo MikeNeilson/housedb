@@ -2,6 +2,7 @@
 // Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
 
 #include "locations_dao.h"
+#include "api_exception.h"
 #include <sqlpp11/sqlpp11.h>
 #include <crow/json.h>
 #include <crow/logging.h>
@@ -9,24 +10,25 @@
 
 namespace gardendb {
     namespace sql {
-         std::vector<LocationDto> LocationDao::get_all(){
+        using namespace gardendb::exceptions;
+        std::vector<LocationDto> LocationDao::get_all() {
+            
+            std::vector<LocationDto> list;
+            auto query = sqlpp::select(sqlpp::all_of(views::view_locations)).from(views::view_locations).unconditionally();
+            auto result = db(query);
+            for(const auto &row : result){
+                LocationDto loc(row.name,
+                                row.parent,
+                                row.latitude,
+                                row.longitude,
+                                row.horizontal_datum,
+                                row.elevation,
+                                row.vertical_datum);
                 
-                std::vector<LocationDto> list;
-                auto query = sqlpp::select(sqlpp::all_of(views::view_locations)).from(views::view_locations).unconditionally();
-                auto result = db(query);
-                for(const auto &row : result){
-                    LocationDto loc(row.name,
-                                    row.parent,
-                                    row.latitude,
-                                    row.longitude,
-                                    row.horizontal_datum,
-                                    row.elevation,
-                                    row.vertical_datum);
-                    
-                    list.push_back(loc);
-                }
-                return list;
+                list.push_back(loc);
             }
+            return list;
+        }
 
         bool LocationDao::save( const gardendb::dto::LocationDto &name) {
             CROW_LOG_DEBUG << "saving location";
@@ -38,10 +40,8 @@ namespace gardendb {
                 db.update(update);
                 CROW_LOG_DEBUG << "inserted";
                 return true;
-            } catch( const sqlpp::exception &ex) {
-                CROW_LOG_ERROR << "Database was Unable to save location: " << ex.what();
             } catch( const std::exception &ex) {
-                CROW_LOG_ERROR << "System was Unable to save location: " << ex.what();
+                throw_with_trace(ex);
             }
 
             

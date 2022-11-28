@@ -32,28 +32,28 @@ int main(int argc, char *argv[]) {
     sigemptyset(&sigusr.sa_mask);
     sigusr.sa_flags = 0;
     sigaction(SIGUSR1,&sigusr,NULL);
-    
-    Config config(argc,argv);    
-    
+
+    Config config(argc,argv);
+
     app.loglevel(config.get_app_log_level());
     try {
-        
+
         //connection db(config.get_db_config());
         CROW_LOG_DEBUG << "Database Connection Open";
         //sqlpp::connection db(pgdb);
-        app.get_middleware<DatabaseSession>().set_db_config(config.get_db_config());        
+        app.get_middleware<DatabaseSession>().set_db_config(config.get_db_config());
 
         CROW_LOG_DEBUG << "DB Session Context Set";
 
-        CROW_ROUTE(app,"/")([](const crow::request &req){        
+        CROW_ROUTE(app,"/")([](const crow::request &req){
             return "Welcome to my data API.";
         });
-    
+
         LocationHandler loc;
         TimeseriesHandler ts;
         loc.routes(app);
         ts.routes(app);
-        
+
         app.server_name(config.get_server_name()).concurrency(config.get_threads()).port(18080).run();
         return 0;
     } catch( const sqlpp::postgresql::broken_connection& ex ){
@@ -69,16 +69,28 @@ void error_wrapper( std::function<void(void)> func, crow::response &res) {
         func();
     } catch( const gardendb::exceptions::input_error& ex) {
         res.code = 400;
+        res.set_header("content-type","application/json");
         CROW_LOG_ERROR << ex.what();
         const boost::stacktrace::stacktrace* st = boost::get_error_info<traced>(ex);
         if (st) {
-        CROW_LOG_ERROR << *st << '\n';
+            CROW_LOG_ERROR << *st << '\n';
         }
-        res.write("Unable to process input.");
+        auto v = crow::json::wvalue();
+        v["code"] = 400;
+        v["message"] = ex.what();
+        res.write(v.dump());
         res.end();
     } catch( const std::exception& ex) {
+        res.set_header("content-type","application/json");
         CROW_LOG_ERROR << "Unable to process input: " << ex.what();
-        res.write("Server Error.");
+        const boost::stacktrace::stacktrace* st = boost::get_error_info<traced>(ex);
+        if (st) {
+            CROW_LOG_ERROR << *st << '\n';
+        }
+        auto v = crow::json::wvalue();
+        v["code"] = 500;
+        v["message"] = "Unable to process request.";
+        res.write(v.dump());
         res.code = 500;
         res.end();
     }
