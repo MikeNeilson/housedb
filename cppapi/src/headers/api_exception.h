@@ -6,6 +6,8 @@
 #pragma once
 #include <exception>
 #include <string>
+#define BOOST_STACKTRACE_LINK
+#define BOOST_STACKTRACE_USE_BACKTRACE
 #include <boost/stacktrace.hpp>
 #include <boost/exception/all.hpp>
 
@@ -18,10 +20,10 @@ void throw_with_trace(const E& e) {
     throw boost::enable_error_info(e) << traced(boost::stacktrace::stacktrace());
 }
 
-
 class input_error : public std::runtime_error {
  public:
-    explicit input_error(std::string msg) noexcept : runtime_error(msg) {}
+    input_error(std::string msg) noexcept : runtime_error(msg) {}
 };
+
 }  // namespace exceptions
 }  // namespace gardendb
