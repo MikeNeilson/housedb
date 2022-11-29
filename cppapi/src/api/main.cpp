@@ -7,45 +7,44 @@
 #include <sqlpp11/postgresql/connection.h>
 #include <sqlpp11/select.h>
 #include <sqlpp11/alias_provider.h>
+#include <signal.h>
 #include "locations.h"
 #include "timeseries.h"
 #include "app.h"
 #include "config.h"
 #include "api_exception.h"
-#include <signal.h>
+
 
 using connection = sqlpp::postgresql::connection;
-using namespace gardendb::exceptions;
+using gardendb::exceptions::api_exception;
 
 ApiApp app;
 
-void health_check_handler(int sig){
-    if( sig = SIGUSR1 ) {
+void health_check_handler(int sig) {
+    if (sig = SIGUSR1) {
         CROW_LOG_ERROR << "health check called";
     }
 }
 
 int main(int argc, char *argv[]) {
-
     struct sigaction sigusr;
     sigusr.sa_handler = &health_check_handler;
     sigemptyset(&sigusr.sa_mask);
     sigusr.sa_flags = 0;
-    sigaction(SIGUSR1,&sigusr,NULL);
+    sigaction(SIGUSR1, &sigusr, NULL);
 
-    Config config(argc,argv);
+    Config config(argc, argv);
 
     app.loglevel(config.get_app_log_level());
     try {
-
-        //connection db(config.get_db_config());
+        // connection db(config.get_db_config());
         CROW_LOG_DEBUG << "Database Connection Open";
-        //sqlpp::connection db(pgdb);
+        // sqlpp::connection db(pgdb);
         app.get_middleware<DatabaseSession>().set_db_config(config.get_db_config());
 
         CROW_LOG_DEBUG << "DB Session Context Set";
 
-        CROW_ROUTE(app,"/")([](const crow::request &req){
+        CROW_ROUTE(app, "/")([](const crow::request &req){
             return "Welcome to my data API.";
         });
 
@@ -56,20 +55,18 @@ int main(int argc, char *argv[]) {
 
         app.server_name(config.get_server_name()).concurrency(config.get_threads()).port(18080).run();
         return 0;
-    } catch( const sqlpp::postgresql::broken_connection& ex ){
+    } catch( const sqlpp::postgresql::broken_connection& ex ) {
         std::cout << "Connection failed: " << ex.what() << "";
         return 1;
     }
-
-
 }
 
-void error_wrapper( std::function<void(void)> func, crow::response &res) {
+void error_wrapper(std::function<void(void)> func, crow::response &res) {
     try {
         func();
     } catch( const gardendb::exceptions::input_error& ex) {
         res.code = 400;
-        res.set_header("content-type","application/json");
+        res.set_header("content-type", "application/json");
         CROW_LOG_ERROR << ex.what();
         const boost::stacktrace::stacktrace* st = boost::get_error_info<traced>(ex);
         if (st) {
@@ -81,7 +78,7 @@ void error_wrapper( std::function<void(void)> func, crow::response &res) {
         res.write(v.dump());
         res.end();
     } catch( const std::exception& ex) {
-        res.set_header("content-type","application/json");
+        res.set_header("content-type", "application/json");
         CROW_LOG_ERROR << "Unable to process input: " << ex.what();
         const boost::stacktrace::stacktrace* st = boost::get_error_info<traced>(ex);
         if (st) {

@@ -1,62 +1,56 @@
 // Copyright 2022 Michael Neilson
 // Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
-
+#include <string>
+#include <vector>
 #include "app.h"
 #include "locations.h"
 #include "locations_dao.h"
 #include "api_exception.h"
 
-using namespace gardendb::exceptions;
+using gardendb::exceptions::throw_with_trace;
 
 
-LocationHandler::LocationHandler() {
+LocationHandler::LocationHandler() {}
 
-}
-
-void LocationHandler::routes( ApiApp &app){
-
-
+void LocationHandler::routes(ApiApp &app) {
     CROW_ROUTE(app, "/locations/")([&app](const crow::request &req, crow::response &res){
-        error_wrapper( [&app,&req,&res]() {
+        error_wrapper([&app, &req, &res]() {
             auto &db = app.get_middleware<DatabaseSession>().get_db((*app.get_context<Auth>(req).user));
             gardendb::sql::LocationDao dao(db);
             auto result = dao.get_all();
             auto list = std::vector<crow::json::wvalue>();
-            for( auto loc: result ){
+            for (auto loc : result) {
                 list.emplace_back(loc);
             }
             auto json = crow::json::wvalue(list);
-            res.set_header("Content-Type","application/json");
-            res.write(json.dump());               
+            res.set_header("Content-Type", "application/json");
+            res.write(json.dump());
             res.end();
         }, res);
-        
     });
 
-    CROW_ROUTE(app,"/locations/<string>")
+    CROW_ROUTE(app, "/locations/<string>")
         .methods(crow::HTTPMethod::GET)
         ([&app](const crow::request& req, crow::response &res, const std::string &name) {
-            error_wrapper( [&app,&req,&res,&name]() {
+            error_wrapper([&app, &req, &res, &name]() {
                 res.write("You wanted: " + name);
                 res.end();
             }, res);
-           
     });
 
-    CROW_ROUTE(app,"/locations/<string>")
+    CROW_ROUTE(app, "/locations/<string>")
         .methods(crow::HTTPMethod::PUT)
         ([&app](const crow::request& req, crow::response &res, const std::string &name) {
-            error_wrapper( [&app,&req,&res,&name]() {
+            error_wrapper([&app, &req, &res, &name]() {
                 res.write("You are changing: " + name);
                 res.end();
-            },res);
-            
+            }, res);
         });
 
-    CROW_ROUTE(app,"/locations/")
+    CROW_ROUTE(app, "/locations/")
         .methods(crow::HTTPMethod::POST)
         ([&app](const crow::request& req, crow::response &res) {
-            error_wrapper( [&app,&req,&res]() {
+            error_wrapper([&app, &req, &res]() {
                 auto json_data = crow::json::load(req.body);
                 CROW_LOG_DEBUG << json_data["name"].s();
                 auto &db = app.get_middleware<DatabaseSession>().get_db(*(app.get_context<Auth>(req).user));
@@ -72,7 +66,6 @@ void LocationHandler::routes( ApiApp &app){
                     res.write("Unable to save data");
                 }
                 res.end();
-            },res);
+            }, res);
         });
-
 }

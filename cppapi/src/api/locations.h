@@ -11,10 +11,7 @@
 #include "app.h"
 
 class LocationHandler {
-    private:
-        //sqlpp::postgresql::connection &db;
-
-    public:
-        LocationHandler();
-        void routes(ApiApp &app);
+ public:
+    LocationHandler();
+    void routes(ApiApp &app);
 };

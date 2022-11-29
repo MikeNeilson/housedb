@@ -11,10 +11,7 @@
 #include "app.h"
 
 class TimeseriesHandler {
-    private:
-        //sqlpp::postgresql::connection &db;
-
-    public:
-        TimeseriesHandler();
-        void routes(ApiApp &app);
+ public:
+    TimeseriesHandler();
+    void routes(ApiApp &app);
 };

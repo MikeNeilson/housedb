@@ -4,12 +4,13 @@
  */
 
 #pragma once
-#include <map>
 #include <crow.h>
-#include <sqlpp11/sqlpp11.h>
-#include <thread>
 #include <sqlpp11/postgresql/connection.h>
 #include <sqlpp11/postgresql/connection_config.h>
+#include <sqlpp11/sqlpp11.h>
+#include <map>
+#include <memory>
+#include <thread>
 #include "user_dto.h"
 
 class DatabaseSession {
@@ -17,25 +18,22 @@ class DatabaseSession {
     db_config_ptr config;
     sqlpp::postgresql::prepared_statement_t set_user;
 
-    std::map<std::thread::id,sqlpp::postgresql::connection> pool;
-    
-    public:
-        struct context{
-            DatabaseSession *pool;
-        };
+    std::map<std::thread::id, sqlpp::postgresql::connection> pool;
 
-        void set_db_config(db_config_ptr config);
-        sqlpp::postgresql::connection& get_db();
-        sqlpp::postgresql::connection& get_db(const gardendb::dto::UserDto& user);
+ public:
+    struct context{
+        DatabaseSession *pool;
+    };
 
-        template<typename AllContext>
-        void before_handle(crow::request &req, crow::response &res, context &ctx, AllContext& all_ctx) {
-            ctx.pool = this;            
-        }
+    void set_db_config(db_config_ptr config);
+    sqlpp::postgresql::connection& get_db();
+    sqlpp::postgresql::connection& get_db(const gardendb::dto::UserDto& user);
 
-        template<typename AllContext>
-        void after_handle(crow::request &req, crow::response &res, context &ctx, AllContext &/*unused*/) {
+    template<typename AllContext>
+    void before_handle(crow::request &req, crow::response &res, context &ctx, AllContext& all_ctx) {
+        ctx.pool = this;
+    }
 
-        }
+    template<typename AllContext>
+    void after_handle(crow::request &req, crow::response &res, context &ctx, AllContext &/*unused*/) {}
 };
-

@@ -1585,7 +1585,7 @@ inline bool Parser::workhorse(bool gnu, const Descriptor usage[], int numargs, c
     else
     {
       handle_short_options = true;
-      longopt_name = param + 1; //for testing a potential -long-option
+      longopt_name = param + 1; // for testing a potential -long-option
     }
 
     bool try_single_minus_longopt = single_minus_longopt;
