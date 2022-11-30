@@ -14,6 +14,7 @@ namespace gardendb {
 namespace sql {
 
 using gardendb::exceptions::throw_with_trace;
+using gardendb::exceptions::input_error;
 
 std::vector<TimeseriesDto> TimeseriesDao::get_all() {
     std::vector<TimeseriesDto> list;
@@ -71,7 +72,9 @@ void TimeseriesDao::save(const gardendb::dto::TimeseriesDto &ts) {
 
 TimeseriesDto TimeseriesDao::get(const std::string &name, const std::string start_time,
                                  const std::string &end_time, const std::string &units) {
-    return TimeseriesDto(name, "");
+    TimeseriesDto dto(name, "");
+    return dto;
 }
+
 }  // namespace sql
 }  // namespace gardendb

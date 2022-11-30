@@ -9,6 +9,7 @@
 namespace gardendb {
 namespace dto {
 using gardendb::exceptions::throw_with_trace;
+using gardendb::exceptions::input_error;
 
 LocationDto::LocationDto(const std::string& name,
                             const std::string& parent,

@@ -7,8 +7,14 @@
 
 using crow::json::wvalue;
 using crow::json::rvalue;
+using std::move;
+using std::vector;
+using std::string;
+using std::stringstream;
+
 namespace gardendb {
 namespace dto {
+
 TimeseriesDto::TimeseriesDto(const TimeseriesDto &other) {
     this->name = other.name;
     this->units = other.units;

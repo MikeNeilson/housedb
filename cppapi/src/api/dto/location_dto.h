@@ -30,7 +30,7 @@ class LocationDto {
                 const std::string& horizontal_datum,
                 double elevation,
                 const std::string& vertical_datum);
-    explicit LocationDto(const crow::json::rvalue &data);
+    LocationDto(const crow::json::rvalue &data);
 
     const std::string& get_name() const;
     const boost::optional<std::string>& get_parent() const;

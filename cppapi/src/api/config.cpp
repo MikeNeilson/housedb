@@ -11,7 +11,13 @@
 #include <string>
 
 using std::ifstream;
+using std::ofstream;
 using std::stringstream;
+using std::string;
+using std::runtime_error;
+using std::cerr;
+using std::cout;
+using std::endl;
 
 void Config::load_file(const std::string &filename) {
     ifstream file(filename);

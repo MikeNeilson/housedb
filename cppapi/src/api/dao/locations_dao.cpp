@@ -40,7 +40,7 @@ bool LocationDao::save(const gardendb::dto::LocationDto &name) {
         db.update(update);
         CROW_LOG_DEBUG << "inserted";
         return true;
-    } catch( const std::exception &ex) {
+    } catch( const sqlpp::exception &ex) {
         throw_with_trace(ex);
     }
     return false;

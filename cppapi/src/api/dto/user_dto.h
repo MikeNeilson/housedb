@@ -22,6 +22,11 @@ class UserDto {
  public:
     UserDto(uint64_t, std::string username, std::string display_name, std::string email)
         : id(id), username(username), display_name(display_name), email(email) {}
+    UserDto(UserDto &&other);
+    UserDto(const UserDto &other);
+
+    UserDto& operator=(const UserDto &other);
+    UserDto& operator=(UserDto &&other);
 
     uint64_t get_id() const;
     const std::string& get_username() const;

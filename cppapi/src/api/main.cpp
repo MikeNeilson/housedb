@@ -16,7 +16,8 @@
 
 
 using connection = sqlpp::postgresql::connection;
-using gardendb::exceptions::api_exception;
+using gardendb::exceptions::input_error;
+using gardendb::exceptions::traced;
 
 ApiApp app;
 

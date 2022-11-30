@@ -5,6 +5,7 @@
 #pragma once
 #include <crow.h>
 #include <jwt-cpp/jwt.h>
+#include <boost/optional.hpp>
 #include <memory>
 #include <string>
 #include "user_dao.h"
@@ -14,7 +15,7 @@
 class Auth {
  public:
     struct context{
-        std::unique_ptr<gardendb::dto::UserDto> user;
+        boost::optional<gardendb::dto::UserDto> user;
     };
 
     template<typename AllContext>
@@ -34,10 +35,14 @@ class Auth {
             res.code = 500;
             res.write("{\"error\":\"Not Implemented\"}");
             res.end();
-        } else {
-            ctx.user = std::make_unique<gardendb::dto::UserDto>(0, "guest", "guest", "");
+        } else if (!auth_header.empty()) {
+            res.code = 500;
+            res.write("{\"error\":\"Invalid authentication presented\"");
+            res.end();
         }
-        CROW_LOG_INFO << "Got user '" << ctx.user->get_username() << "'";
+        if (ctx.user) {
+            CROW_LOG_INFO << "Got user '" << ctx.user->get_username() << "'";
+        }
     }
 
     template<typename AllContext>
