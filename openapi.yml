@@ -1,0 +1,70 @@
+---
+openapi: 3.0.3
+info:
+  title: Garden Database Api
+  description: API for data access for my garden database.
+  version: "0.0.1"
+components:
+  schemas:
+    input_error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int16
+        message:
+          type: string
+    location:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string         
+  responses:
+    input_error:
+      description: Error processing user input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/input_error'
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
+paths:
+  /locations:
+    get:
+      description: Returns all locations
+      tags:
+        - locations
+      responses:
+        '200':
+          description: list of locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/location'
+    post:
+      summary: Create new location
+      operationId: createLocation
+      tags:
+        - locations
+      requestBody:
+        content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/location'
+      responses:
+        "201":
+          description: created
+        "422":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/input_error'
+            

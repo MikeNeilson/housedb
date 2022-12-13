@@ -46,6 +46,13 @@ void TimeseriesHandler::routes(ApiApp &app) {
             }, res);
         });
 
+/**
+ * @brief Write timeseries data
+ * 
+ * @response{201} Timeseries was created and data saved
+ * @response{203} Data was saved, not response content
+ * 
+ */
     CROW_ROUTE(app, "/timeseries/")
         .methods(crow::HTTPMethod::POST)
         ([&app](const crow::request& req, crow::response &res) {

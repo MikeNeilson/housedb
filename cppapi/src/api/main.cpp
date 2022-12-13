@@ -1,6 +1,6 @@
 // Copyright 2022 Michael Neilson
 // Licensed Under MIT License. https://github.com/MikeNeilson/housedb/LICENSE.md
-
+/** @file main.cpp */
 #define CROW_MAIN
 #include <crow.h>
 #include <sqlpp11/sqlpp11.h>
@@ -26,7 +26,13 @@ void health_check_handler(int sig) {
         CROW_LOG_ERROR << "health check called";
     }
 }
-
+/**
+ * @brief Entry Point
+ * 
+ * @param argc argument count
+ * @param argv  argument array
+ * @return int program exit code
+ */
 int main(int argc, char *argv[]) {
     struct sigaction sigusr;
     sigusr.sa_handler = &health_check_handler;
@@ -45,6 +51,12 @@ int main(int argc, char *argv[]) {
 
         CROW_LOG_DEBUG << "DB Session Context Set";
 
+        /**         
+         * @brief Main page.
+         * 
+         * @response{200} This endpoint never fails.
+         * 
+         */
         CROW_ROUTE(app, "/")([](const crow::request &req){
             return "Welcome to my data API.";
         });

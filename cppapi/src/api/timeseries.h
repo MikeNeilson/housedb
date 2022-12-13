@@ -9,7 +9,10 @@
 #include <sqlpp11/postgresql/connection.h>
 #include <crow.h>
 #include "app.h"
-
+/**
+ * @brief Timeseries Operations handlers
+ * 
+ */
 class TimeseriesHandler {
  public:
     TimeseriesHandler();
