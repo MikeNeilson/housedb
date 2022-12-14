@@ -12,6 +12,11 @@
 
 namespace gardendb {
 namespace dto {
+/**
+ * @brief Basic User Info
+ * @schema(User)
+ * 
+ */
 class UserDto {
  private:
     uint64_t id;
