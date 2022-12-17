@@ -19,6 +19,10 @@ namespace dto {
  */
 class UserDto {
  private:
+    /**
+     * @brief 
+     * @schema_ignore
+     */
     uint64_t id;
     std::string username;
     std::string display_name;

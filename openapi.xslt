@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.1" 
+<xsl:stylesheet version="3.0" 
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="text" media-type="text/yml" />
 <xsl:strip-space elements="*"/>
@@ -14,7 +14,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    </xsl:call-template>
   </xsl:if>
 </xsl:template>
-
 
 <xsl:template match="/">
 ---
@@ -44,7 +43,8 @@ schemas:
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent"/>
     </xsl:call-template>
-    <xsl:value-of select="concat(compoundname,':',$nl)"/>
+    <xsl:variable name="className" select="concat(replace(compoundname,'::','.'),':',$nl)"/>
+    <xsl:value-of select="$className"/>
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent+1"/>
     </xsl:call-template>
@@ -58,19 +58,39 @@ schemas:
 </xsl:template>
 
 <xsl:template match="memberdef[@kind='variable']">
-    <xsl:variable name="indent" select="count(ancestor::*)" />
+    <xsl:if test="not(contains(briefdescription/para,'schema_ignore'))">
+        <xsl:variable name="indent" select="count(ancestor::*)" />
         <xsl:call-template name="indent">
-        <xsl:with-param name="depth" select="$indent"/>
-    </xsl:call-template>
-    <xsl:value-of select="./name"/>:
-        type: <xsl:value-of select="./type"/>
-    <xsl:if test="./type != 'std::string'">
-        format: <xsl:value-of select="./type"/>
+            <xsl:with-param name="depth" select="$indent"/>
+        </xsl:call-template>
+        <xsl:apply-templates select="./type/text"/>
+        <xsl:value-of select="concat(./name,':',$nl)"/>
+        <xsl:apply-templates select="./type"/>
+        <xsl:if test="position() &lt; last()"><xsl:value-of select="$nl"/></xsl:if>    
     </xsl:if>
-    <xsl:if test="position() &lt; last()"><xsl:value-of select="$nl"/></xsl:if>    
 </xsl:template>
 
+<xsl:template match="memberdef/type[text()='uint64_t']" >
+    <xsl:variable name="indent" select="count(ancestor::*)" />
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent"/>
+    </xsl:call-template>
+    <xsl:value-of select="concat('type: integer',$nl)"/>
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent"/>
+    </xsl:call-template>    
+    <xsl:value-of select="'format: uint64'"/>
+</xsl:template>
+
+<xsl:template match="memberdef/type[(text()='std::string')]">
+    <xsl:variable name="indent" select="count(ancestor::*)" />
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent"/>
+    </xsl:call-template>
+    <xsl:value-of select="'type: string'"/>
+</xsl:template>
 </xsl:stylesheet>
+
 
 
 

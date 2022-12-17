@@ -272,7 +272,8 @@ TAB_SIZE               = 4
 ALIASES += "response{1}=\return \1"
 ALIASES += "required=openapi:required"
 ALIASES += "openapi_schema=openapi:schema"
-ALIASES += "schema{1}=<api:schema>\1</api:schema>"
+ALIASES += "schema{1}=@schema(\1)"
+ALIASES += "schema_ignore=@schema_ignore"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
 # only. Doxygen will then generate output that is more tailored for C. For
