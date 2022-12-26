@@ -25,7 +25,7 @@ class TimeseriesDao {
  public:
     explicit TimeseriesDao(sqlpp::postgresql::connection &db) : db(db) {}
     std::vector<TimeseriesDto> get_all();
-    TimeseriesDto get(const std::string &name, const std::string start_time,
+    TimeseriesDto get(const std::string &name, const std::string &start_time,
                       const std::string &end_time, const std::string &units);
     void save(const TimeseriesDto &timeseries);
 };

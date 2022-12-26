@@ -70,7 +70,7 @@ void TimeseriesDao::save(const gardendb::dto::TimeseriesDto &ts) {
 }
 
 
-TimeseriesDto TimeseriesDao::get(const std::string &name, const std::string start_time,
+TimeseriesDto TimeseriesDao::get(const std::string &name, const std::string &start_time,
                                  const std::string &end_time, const std::string &units) {
     TimeseriesDto dto(name, "");
     return dto;

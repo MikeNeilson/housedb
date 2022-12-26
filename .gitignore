@@ -7,3 +7,4 @@ build/**
 .vscode
 .settings
 gradle.properties
+cppapi/cppcheck-cppcheck-build-dir
