@@ -13,7 +13,7 @@ namespace gardendb {
 namespace dto {
 /**
  * @brief Location in the garden
- * @openapi_schema 
+ * @api_schema 
  */
 class LocationDto {
  private:

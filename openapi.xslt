@@ -33,7 +33,7 @@ components:
    <xsl:with-param name="depth" select="$indent"/>
   </xsl:call-template>  
 schemas:
-<xsl:apply-templates select="//para[contains(.,'@schema')]/ancestor::compounddef[@kind='class']"/>
+<xsl:apply-templates select="//para[contains(.,'@api_schema')]/ancestor::compounddef[@kind='class']"/>
 </xsl:template>
     
 
@@ -55,10 +55,11 @@ schemas:
     </xsl:call-template>
     <xsl:value-of select="concat('properties:', $nl)"/>
     <xsl:apply-templates select=".//memberdef[@kind='variable']"/>
+    <xsl:if test="position() &lt; last()"><xsl:value-of select="$nl"/></xsl:if>
 </xsl:template>
 
 <xsl:template match="memberdef[@kind='variable']">
-    <xsl:if test="not(contains(briefdescription/para,'schema_ignore'))">
+    <xsl:if test="not(contains(briefdescription/para,'api_schema_ignore'))">
         <xsl:variable name="indent" select="count(ancestor::*)" />
         <xsl:call-template name="indent">
             <xsl:with-param name="depth" select="$indent"/>
@@ -80,6 +81,29 @@ schemas:
         <xsl:with-param name="depth" select="$indent"/>
     </xsl:call-template>    
     <xsl:value-of select="'format: uint64'"/>
+</xsl:template>
+
+<xsl:template match="memberdef/type[contains(text(),'boost::optional')]" >
+    <xsl:variable name="indent" select="count(ancestor::*)" />
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent"/>
+    </xsl:call-template>
+    <xsl:analyze-string select="." 
+        regex="boost::optional&lt;\s?(.*)\s?>">
+        <xsl:matching-substring>
+            <xsl:variable name="actualType" select="replace(regex-group(1),'std::','')"/>
+            <xsl:text>type: </xsl:text>
+            <xsl:value-of select=" $actualType"/>
+        </xsl:matching-substring>
+    </xsl:analyze-string>
+</xsl:template>
+
+<xsl:template name="std__string" match="std__string" mode="direct_call">
+    <xsl:variable name="indent" select="count(ancestor::*)" />
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent"/>
+    </xsl:call-template>
+    <xsl:value-of select="'type: string'"/>
 </xsl:template>
 
 <xsl:template match="memberdef/type[(text()='std::string')]">

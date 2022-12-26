@@ -14,14 +14,15 @@ namespace gardendb {
 namespace dto {
 /**
  * @brief Basic User Info
- * @schema(User)
+ * 
+ * @api_schema
  * 
  */
 class UserDto {
  private:
     /**
      * @brief 
-     * @schema_ignore
+     * @api_schema_ignore
      */
     uint64_t id;
     std::string username;
