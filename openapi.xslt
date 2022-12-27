@@ -14,32 +14,50 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
    </xsl:call-template>
   </xsl:if>
 </xsl:template>
-
 <xsl:template match="/">
 ---
 openapi: 3.0.3
-components:
-<xsl:call-template name="schemas"/>
-  
+<xsl:apply-templates select="api_info"/>
+<xsl:call-template name="components"/>
   responses:
   securitySchemes:
   paths:
-...    
+...
+</xsl:template>
+<xsl:template match="api_info">
+
+    <xsl:variable name="indent" select="count(ancestor-or-self::*)"/>
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent"/>
+    </xsl:call-template>
+    <xsl:text>info:</xsl:text>
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent+1"/>
+    </xsl:call-template>
+    <xsl:text>title: </xsl:text><xsl:value-of select="title"/>
+</xsl:template>
+
+<xsl:template name="components">
+<xsl:variable name="indent" select="count(ancestor-or-self::*)" />
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent"/>
+    </xsl:call-template>
+    <xsl:text>components:</xsl:text><xsl:value-of select="$nl"/>
+    <xsl:call-template name="schemas"/>
 </xsl:template>
 
 <xsl:template name="schemas">
-<xsl:variable name="indent" select="count(ancestor::*)" />
-  <xsl:call-template name="indent">
-   <xsl:with-param name="depth" select="$indent"/>
-  </xsl:call-template>  
-schemas:
-<xsl:apply-templates select="//para[contains(.,'@api_schema')]/ancestor::compounddef[@kind='class']"/>
+    <xsl:variable name="indent" select="count(ancestor-or-self::*)" />
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent+1"/>
+    </xsl:call-template>
+    <xsl:text>schemas:</xsl:text><xsl:value-of select="$nl"/>
+    <xsl:apply-templates select="//para[contains(.,'@api_schema')]/ancestor::compounddef[@kind='class']"/>
 </xsl:template>
-    
 
 
-<xsl:template match="compounddef[@kind='class']">  
-    <xsl:variable name="indent" select="count(ancestor::*)" />
+<xsl:template match="compounddef[@kind='class']">
+    <xsl:variable name="indent" select="count(ancestor-or-self::*)" />
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent"/>
     </xsl:call-template>
@@ -49,7 +67,7 @@ schemas:
         <xsl:with-param name="depth" select="$indent+1"/>
     </xsl:call-template>
     <xsl:value-of select="concat('type: object', $nl)"/>
-    
+
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent+1"/>
     </xsl:call-template>
@@ -60,35 +78,35 @@ schemas:
 
 <xsl:template match="memberdef[@kind='variable']">
     <xsl:if test="not(contains(briefdescription/para,'api_schema_ignore'))">
-        <xsl:variable name="indent" select="count(ancestor::*)" />
+        <xsl:variable name="indent" select="count(ancestor-or-self::*)" />
         <xsl:call-template name="indent">
             <xsl:with-param name="depth" select="$indent"/>
         </xsl:call-template>
         <xsl:apply-templates select="./type/text"/>
         <xsl:value-of select="concat(./name,':',$nl)"/>
         <xsl:apply-templates select="./type"/>
-        <xsl:if test="position() &lt; last()"><xsl:value-of select="$nl"/></xsl:if>    
+        <xsl:if test="position() &lt; last()"><xsl:value-of select="$nl"/></xsl:if>
     </xsl:if>
 </xsl:template>
 
 <xsl:template match="memberdef/type[text()='uint64_t']" >
-    <xsl:variable name="indent" select="count(ancestor::*)" />
+    <xsl:variable name="indent" select="count(ancestor-or-self::*)" />
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent"/>
     </xsl:call-template>
     <xsl:value-of select="concat('type: integer',$nl)"/>
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent"/>
-    </xsl:call-template>    
+    </xsl:call-template>
     <xsl:value-of select="'format: uint64'"/>
 </xsl:template>
 
 <xsl:template match="memberdef/type[contains(text(),'boost::optional')]" >
-    <xsl:variable name="indent" select="count(ancestor::*)" />
+    <xsl:variable name="indent" select="count(ancestor-or-self::*)" />
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent"/>
     </xsl:call-template>
-    <xsl:analyze-string select="." 
+    <xsl:analyze-string select="."
         regex="boost::optional&lt;\s?(.*)\s?>">
         <xsl:matching-substring>
             <xsl:variable name="actualType" select="replace(regex-group(1),'std::','')"/>
@@ -99,7 +117,7 @@ schemas:
 </xsl:template>
 
 <xsl:template name="std__string" match="std__string" mode="direct_call">
-    <xsl:variable name="indent" select="count(ancestor::*)" />
+    <xsl:variable name="indent" select="count(ancestor-or-self::*)" />
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent"/>
     </xsl:call-template>
@@ -107,7 +125,7 @@ schemas:
 </xsl:template>
 
 <xsl:template match="memberdef/type[(text()='std::string')]">
-    <xsl:variable name="indent" select="count(ancestor::*)" />
+    <xsl:variable name="indent" select="count(ancestor-or-self::*)" />
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent"/>
     </xsl:call-template>
