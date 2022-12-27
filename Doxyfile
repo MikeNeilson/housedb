@@ -269,10 +269,14 @@ TAB_SIZE               = 4
 # commands \{ and \} for these it is advised to use the version @{ and @} or use
 # a double escape (\\{ and \\})
 
-ALIASES += "api_schema=@api_schema"
-ALIASES += "api_schema_required=@api_schema_required"
-ALIASES += "api_schema_ignore=@schema_ignore"
-ALIASES += "api_info{1}=<api:info>\1</api:info>"
+ALIASES += api_schema="@api_schema"
+ALIASES += api_schema_required="@api_schema_required"
+ALIASES += api_schema_ignore="@schema_ignore"
+ALASIAS += api_info_title{1}="<title>\1</title> "
+ALASIAS += api_info_description{1}="<description>\1</description>"
+ALASIAS += api_info_version{1}="<version>\1</version>"
+ALIASES += api_info_start="\xmlonly <api_info>"
+ALIASES += api_info_end="</api_info> \endxmlonly"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
 # only. Doxygen will then generate output that is more tailored for C. For

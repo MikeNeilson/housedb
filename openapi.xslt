@@ -17,7 +17,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:template match="/">
 ---
 openapi: 3.0.3
-<xsl:apply-templates select="api_info"/>
+<xsl:apply-templates select="//api_info"/>
 <xsl:call-template name="components"/>
   responses:
   securitySchemes:
@@ -25,16 +25,23 @@ openapi: 3.0.3
 ...
 </xsl:template>
 <xsl:template match="api_info">
-
-    <xsl:variable name="indent" select="count(ancestor-or-self::*)"/>
+    <xsl:variable name="indent" select="0"/>
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent"/>
     </xsl:call-template>
-    <xsl:text>info:</xsl:text>
+    <xsl:text>info:</xsl:text><xsl:value-of select="$nl"/>
     <xsl:call-template name="indent">
         <xsl:with-param name="depth" select="$indent+1"/>
     </xsl:call-template>
-    <xsl:text>title: </xsl:text><xsl:value-of select="title"/>
+    <xsl:text>title: </xsl:text><xsl:value-of select="concat(title,$nl)"/>
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent+1"/>
+    </xsl:call-template>
+    <xsl:text>description: </xsl:text><xsl:value-of select="concat(description,$nl)"/>
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent+1"/>
+    </xsl:call-template>
+    <xsl:text>version: </xsl:text><xsl:value-of select="concat(version,$nl)"/>
 </xsl:template>
 
 <xsl:template name="components">

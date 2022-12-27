@@ -28,11 +28,13 @@ void health_check_handler(int sig) {
 }
 /**
  * @brief Entry Point
- * @api_info(
- *  <title>Garden Database API</title>
- *  <description>A Database for storing garden data</description>
- *  <version>0.0.1</version>
- * )
+ * 
+ * 
+ * @api_info_start
+ *   <title>Garden Database API</title>
+ *   <description>A Database for storing garden data}</description>
+ *   <version>0.0.1</version>
+ * @api_info_end
  * 
  * @param argc argument count
  * @param argv  argument array
