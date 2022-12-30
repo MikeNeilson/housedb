@@ -13,6 +13,16 @@ using gardendb::exceptions::throw_with_trace;
 LocationHandler::LocationHandler() {}
 
 void LocationHandler::routes(ApiApp &app) {
+    /**
+     * @brief 
+     * 
+     * @api_path{/locations}
+     *  <get>
+     *      <description>Get all locations in the database</description>
+     *  </get>
+     * @end_api_path
+     * 
+     */
     CROW_ROUTE(app, "/locations/")([&app](const crow::request &req, crow::response &res){
         error_wrapper([&app, &req, &res]() {
             auto &db = app.get_middleware<DatabaseSession>().get_db((*app.get_context<Auth>(req).user));

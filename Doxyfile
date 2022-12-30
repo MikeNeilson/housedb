@@ -272,11 +272,16 @@ TAB_SIZE               = 4
 ALIASES += api_schema="@api_schema"
 ALIASES += api_schema_required="@api_schema_required"
 ALIASES += api_schema_ignore="@schema_ignore"
-ALASIAS += api_info_title{1}="<title>\1</title> "
-ALASIAS += api_info_description{1}="<description>\1</description>"
-ALASIAS += api_info_version{1}="<version>\1</version>"
+#ALASIAS += api_info_title{1}="\xmlonly <title>\1</title> \endxmlonly"
+#ALASIAS += api_info_description{1}="\xmlonly <description>\1</description> \endxmlonly"
+#ALASIAS += api_info_version{1}="\xmlonly <version>\1</version> \endxmlonly"
 ALIASES += api_info_start="\xmlonly <api_info>"
 ALIASES += api_info_end="</api_info> \endxmlonly"
+ALIASES += api_path{1}="\xmlonly <api_path path=\"\1\">"
+ALIASES += end_api_path="</api_path> \endxmlonly"
+#ALIASES += api_path_method{1}="\xmlonly <\1> \endxmlonly"
+#ALIASES += api_path_description{1}="\xmlonly <description>\1</description> \endxmlonly"
+#ALIASES += end_api_path_method{1}="\xmlonly> </\1> \endxmlonly"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
 # only. Doxygen will then generate output that is more tailored for C. For

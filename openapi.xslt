@@ -22,6 +22,7 @@ openapi: 3.0.3
   responses:
   securitySchemes:
   paths:
+<xsl:apply-templates select="//api_path"/>
 ...
 </xsl:template>
 <xsl:template match="api_info">
@@ -51,6 +52,18 @@ openapi: 3.0.3
     </xsl:call-template>
     <xsl:text>components:</xsl:text><xsl:value-of select="$nl"/>
     <xsl:call-template name="schemas"/>
+</xsl:template>
+
+<xsl:template match="api_path">
+    <xsl:variable name="indent" select="count(ancestor-or-self::*)" />
+    <xsl:call-template name="indent">
+        <xsl:with-param name="depth" select="$indent"/>
+    </xsl:call-template>
+    <xsl:value-of select="concat(./[@path],':',$nl)"/>
+    <xsl:apply-templates match="method"/>
+</xsl:template>
+
+<xsl:template match="api_path/method">
 </xsl:template>
 
 <xsl:template name="schemas">
